@@ -1,17 +1,50 @@
 import { Link } from 'react-router-dom'
 import '../../Styles/Default/LoginPage.css'
+import axios from 'axios'
+import { useState } from 'react'
+
+const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 interface LoginPageProps {
   onSwitchToRegister: () => void
 }
 
+interface LoginFormData {
+  email: string
+  password: string
+}
+
 const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: '',
+    password: ''
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      console.log(formData)
+      const response = await axios.post(`${ServerURL}/api/auth/login`, formData);
+      alert(response.data.message);
+      // Handle successful login here (e.g., redirect, store token)
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Please check your credentials and try again.');
+    }
+  };
+
   return (
     <div className="login-page">
       <h2 className="auth-title">Login to your account</h2>
 
-      <form className="auth-form">
-        {/* Email Field */}
+      <form className="auth-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="email" className="form-label">Email</label>
           <div className="input-wrapper">
@@ -24,6 +57,8 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
               id="email"
               className="form-input"
               placeholder="john.doe@gotogether.com"
+              value={formData.email}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -41,6 +76,8 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
               id="password"
               className="form-input"
               placeholder="••••••••••••••••"
+              value={formData.password}
+              onChange={handleChange}
             />
           </div>
         </div>

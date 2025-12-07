@@ -1,6 +1,6 @@
 import express from 'express';
 import Registration from '../../DB/Schema/registrationSchema.js';
-
+import bcrypt from 'bcryptjs';
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
@@ -20,6 +20,23 @@ router.post('/register', async (req, res) => {
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' ,error: error.message });
+    }
+});
+
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await Registration.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+        const isMatch = await user.matchPassword(password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+        res.status(200).json({ message: 'Login successful', user });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
 
