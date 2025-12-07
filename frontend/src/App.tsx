@@ -2,6 +2,7 @@ import LandingPage from "./components/Default/LandingPage"
 import { useEffect } from "react"
 import {Routes , Route} from 'react-router-dom'
 import Switcher from "./components/Default/Switcher";
+
 const App = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -11,6 +12,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Switcher />} />
+        <Route path="/register" element={<Switcher />} />
       </Routes>
     </div>
   )

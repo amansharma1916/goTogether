@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import '../../Styles/Default/RegisterPage.css'
 
 interface RegisterPageProps {
@@ -95,7 +96,7 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
 
         {/* Switch to Login */}
         <div className="switch-auth">
-          Already have an account? <button type="button" onClick={onSwitchToLogin} className="link-btn">Login</button>
+          Already have an account? <Link to="/login" className="link-btn" onClick={onSwitchToLogin}>Login</Link>
         </div>
       </form>
     </div>

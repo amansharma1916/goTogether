@@ -181,6 +181,11 @@
         padding: 60px 40px 40px;
         gap: 30px;
     }
+
+    .hero-image {
+        position: static;
+        margin-top: 40px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -214,5 +219,9 @@
     .footer {
         flex-direction: column;
         gap: 20px;
+    }
+
+    .hero-image {
+        margin-top: 20px;
     }
 }
