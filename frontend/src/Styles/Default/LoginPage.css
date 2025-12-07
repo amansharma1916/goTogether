@@ -1,0 +1,187 @@
+.login-page {
+    color: white;
+}
+
+.auth-title {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    color: white;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Form Groups */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #B0B8C4;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    width: 18px;
+    height: 18px;
+    color: #6B7280;
+    pointer-events: none;
+}
+
+.form-input {
+    width: 100%;
+    padding: 9px 12px 9px 38px;
+    background: #3a4452;
+    border: 1px solid #4a5462;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+.form-input::placeholder {
+    color: #6B7280;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #4ADE80;
+    background: #414b5a;
+}
+
+/* Forgot Password */
+.forgot-password {
+    text-align: right;
+    margin-top: -6px;
+}
+
+.forgot-password a {
+    color: #B0B8C4;
+    font-size: 12px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.forgot-password a:hover {
+    color: #4ADE80;
+}
+
+/* Primary Button */
+.btn-primary {
+    width: 100%;
+    padding: 10px;
+    background: #4ADE80;
+    color: #1a2332;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn-primary:hover {
+    background: #3BC970;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* Divider */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 2px 0;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #3a4452;
+}
+
+.divider span {
+    font-size: 12px;
+    color: #6B7280;
+}
+
+/* Social Buttons */
+.social-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-social {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 6px;
+    background: #3a4452;
+    border: 1px solid #4a5462;
+    border-radius: 8px;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-social svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-social:hover {
+    background: #414b5a;
+    border-color: #5a6472;
+}
+
+.btn-phone {
+    color: #60A5FA;
+}
+
+/* Switch Auth */
+.switch-auth {
+    text-align: center;
+    font-size: 12px;
+    color: #B0B8C4;
+    margin-top: 2px;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    color: #4ADE80;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.link-btn:hover {
+    color: #3BC970;
+    text-decoration: underline;
+}

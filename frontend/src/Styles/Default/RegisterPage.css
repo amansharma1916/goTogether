@@ -1,0 +1,56 @@
+.register-page {
+    color: white;
+}
+
+/* Reuse most styles from LoginPage, only add/override specific ones */
+.form-input:not(.input-wrapper .form-input) {
+    padding: 9px 12px;
+}
+
+.form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.form-select option {
+    background: #2a3442;
+    color: white;
+}
+
+/* Register Button */
+.btn-register {
+    background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
+    color: white;
+}
+
+.btn-register:hover {
+    background: linear-gradient(135deg, #9333EA 0%, #6D28D9 100%);
+}
+
+/* Verification Notice */
+.verification-notice {
+    text-align: center;
+    font-size: 11px;
+    color: #6B7280;
+    margin: -6px 0 0 0;
+}
+
+/* Google Sign Up Button */
+.btn-google-signup {
+    width: 100%;
+    background: #3a4452;
+    border: 1px solid #4a5462;
+}
+
+.btn-google-signup:hover {
+    background: #414b5a;
+}
+
+/* Reduce gap for register form */
+.register-page .auth-form {
+    gap: 10px;
+}

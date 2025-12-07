@@ -1,0 +1,218 @@
+.landing-page-container {
+    color: white;
+    /* background-color: #1a2332; */
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.hero-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 60px 80px;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 60px;
+}
+
+.hero-content {
+    flex: 1;
+    max-width: 500px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+}
+
+.logo-text {
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+}
+
+.hero-title {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 24px;
+    color: white;
+}
+
+.hero-description {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #B0B8C4;
+    margin-bottom: 32px;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 16px;
+    
+}
+
+.btn-get-started {
+    background-color: #4ADE80;
+    color: #1a2332;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-get-started:hover {
+    background-color: #3BC970;
+}
+
+.btn-login {
+    background-color: transparent;
+    color: white;
+    padding: 12px 28px;
+    border: 2px solid #4A5A6A;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+.btn-login:hover {
+    border-color: #5A6A7A;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.hero-image {
+    position: absolute;
+    right: 0;
+    top: 0;
+    pointer-events: none;
+}
+
+.car-illustration {
+    background-color: #E8E8E8;
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+}
+
+.car-svg {
+    width: 100%;
+    height: auto;
+}
+
+.features-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    padding: 105px 80px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.feature {
+    text-align: center;
+}
+
+.feature-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    background-color: #2A3A4A;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.feature-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: white;
+}
+
+.feature-description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #B0B8C4;
+}
+
+.footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid #2A3A4A;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.footer a {
+    color: #B0B8C4;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.footer a:hover {
+    color: white;
+}
+
+@media (max-width: 1024px) {
+    .hero-section {
+        padding: 40px 40px;
+        gap: 40px;
+    }
+    
+    .features-section {
+        padding: 60px 40px 40px;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        flex-direction: column;
+        padding: 30px 20px;
+        text-align: center;
+    }
+    
+    .hero-content {
+        max-width: 100%;
+    }
+    
+    .logo-container {
+        justify-content: center;
+    }
+    
+    .cta-buttons {
+        justify-content: center;
+    }
+    
+    .hero-title {
+        font-size: 36px;
+    }
+    
+    .features-section {
+        grid-template-columns: 1fr;
+        padding: 40px 20px 30px;
+    }
+    
+    .footer {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
