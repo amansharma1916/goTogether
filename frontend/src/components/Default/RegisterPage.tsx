@@ -1,16 +1,68 @@
 import { Link } from 'react-router-dom'
 import '../../Styles/Default/RegisterPage.css'
+import { useState } from 'react'
+import axios from 'axios'
 
+const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 interface RegisterPageProps {
   onSwitchToLogin: () => void
 }
 
+interface RegisterFormData {
+  fullname: string
+  email: string
+  password: string
+  confirmPassword: string
+  college: string
+}
+
+
 const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
+  const [formData, setFormData] = useState<RegisterFormData>({
+    fullname: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    college: ''
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormData({
+      fullname: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      college: ''
+    });
+    try{
+      if(formData.password !== formData.confirmPassword){
+        alert('Passwords do not match');
+        return;
+      }
+      const response = await axios.post(`${ServerURL}/api/auth/register`, formData);
+      alert(response.data.message);
+      if(response.status === 201){
+        onSwitchToLogin();
+      }
+    }catch(error){
+      console.error('Registration error:', error);
+    }
+  };
+
   return (
+
     <div className="register-page">
       <h2 className="auth-title">Create your account</h2>
 
-      <form className="auth-form">
+      <form className="auth-form" onSubmit={handleSubmit}>
         {/* Full Name Field */}
         <div className="form-group">
           <label htmlFor="fullname" className="form-label">Full Name</label>
@@ -19,6 +71,8 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
             id="fullname"
             className="form-input"
             placeholder="John Doe"
+            value={formData.fullname}
+            onChange={handleChange}
           />
         </div>
 
@@ -27,9 +81,11 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
           <label htmlFor="reg-email" className="form-label">Email</label>
           <input
             type="email"
-            id="reg-email"
+            id="email"
             className="form-input"
             placeholder="john.doe@example.com"
+            value={formData.email}
+            onChange={handleChange}
           />
         </div>
 
@@ -38,9 +94,11 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
           <label htmlFor="reg-password" className="form-label">Password</label>
           <input
             type="password"
-            id="reg-password"
+            id="password"
             className="form-input"
             placeholder="••••••••"
+            value={formData.password}
+            onChange={handleChange}
           />
         </div>
 
@@ -49,16 +107,18 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
           <label htmlFor="confirm-password" className="form-label">Confirm Password</label>
           <input
             type="password"
-            id="confirm-password"
+            id="confirmPassword"
             className="form-input"
             placeholder="••••••••"
+            value={formData.confirmPassword}
+            onChange={handleChange}
           />
         </div>
 
         {/* College Name Field */}
         <div className="form-group">
           <label htmlFor="college" className="form-label">College Name (Optional)</label>
-          <select id="college" className="form-input form-select">
+          <select id="college" className="form-input form-select" value={formData.college} onChange={handleChange}>
             <option value="">Select your college</option>
             <option value="ucb">University of California, Berkeley</option>
             <option value="stanford">Stanford University</option>
@@ -69,7 +129,7 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
         </div>
 
         {/* Create Account Button */}
-        <button type="submit" className="btn-primary btn-register">
+        <button type="submit" className="btn-primary btn-register" >
           Create Account
         </button>
 
