@@ -1,0 +1,165 @@
+.map-page {
+    /* min-height: 100vh; */
+    /* background: linear-gradient(135deg, #0a1628 0%, #1a2838 100%); */
+}
+
+.map-page-container {
+    display: flex;
+    height: calc(100vh - 110px);
+    width: 100%;
+}
+
+/* Left Side - Search Container (30%) */
+.map-search-container {
+    width: 30%;
+    /* background: rgba(26, 35, 50, 0.95); */
+    /* backdrop-filter: blur(10px); */
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Search Section */
+.map-search-section {
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.map-search-title {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.map-search-input-group {
+    margin-bottom: 20px;
+}
+
+.map-search-label {
+    display: block;
+    color: #B0B8C4;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.map-search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.map-location-icon {
+    position: absolute;
+    left: 14px;
+    color: #6B7280;
+    pointer-events: none;
+}
+
+.map-search-input {
+    width: 100%;
+    padding: 12px 14px 12px 44px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 15px;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+.map-search-input::placeholder {
+    color: #6B7280;
+}
+
+.map-search-input:focus {
+    outline: none;
+    border-color: #4ADE80;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.map-search-button {
+    width: 100%;
+    padding: 14px;
+    background: #4ADE80;
+    color: #1a2332;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    margin-top: 8px;
+}
+
+.map-search-button:hover {
+    background: #3BC970;
+}
+
+.map-search-button:active {
+    transform: scale(0.98);
+}
+
+/* Rides List Section */
+.map-rides-list-section {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.map-rides-title {
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.map-rides-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.map-no-rides {
+    color: #6B7280;
+    font-size: 14px;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+/* Right Side - Map Container (70%) */
+.map-container {
+    width: 70%;
+    height: 100%;
+    position: relative;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .map-search-container {
+        width: 35%;
+    }
+    
+    .map-container {
+        width: 65%;
+    }
+}
+
+@media (max-width: 768px) {
+    .map-page-container {
+        flex-direction: column;
+    }
+    
+    .map-search-container {
+        width: 100%;
+        height: 50vh;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .map-container {
+        width: 100%;
+        height: 50vh;
+    }
+}

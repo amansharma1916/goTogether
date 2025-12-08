@@ -44,7 +44,7 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
         setIsLoggedIn(true);
         console.log(localStorage.getItem('isAuthenticated'))
         // Navigate after state is updated
-        navigate('/home');
+        navigate('/dashboard');
       }
       
     } catch (error) {
