@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import '../../Styles/Default/LoginPage.css'
 import axios from 'axios'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -14,11 +15,14 @@ interface LoginFormData {
   password: string
 }
 
+
 const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: ''
   });
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isAuthenticated') === 'true');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -33,7 +37,16 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
       console.log(formData)
       const response = await axios.post(`${ServerURL}/api/auth/login`, formData);
       alert(response.data.message);
-      // Handle successful login here (e.g., redirect, store token)
+      if(response.data.success){
+        console.log('Login successful');
+        // Set localStorage BEFORE navigation
+        localStorage.setItem('isAuthenticated', 'true');
+        setIsLoggedIn(true);
+        console.log(localStorage.getItem('isAuthenticated'))
+        // Navigate after state is updated
+        navigate('/dashboard');
+      }
+      
     } catch (error) {
       console.error('Login error:', error);
       alert('Login failed. Please check your credentials and try again.');
