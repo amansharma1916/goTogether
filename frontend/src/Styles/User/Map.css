@@ -79,6 +79,37 @@
     background: rgba(0, 0, 0, 0.4);
 }
 
+/* Dropdown Autocomplete */
+.map-dropdown {
+    position: relative;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    margin-top: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+}
+
+.map-dropdown-item {
+    padding: 12px 14px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.2s;
+}
+
+.map-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.map-dropdown-item:hover {
+    background: rgba(74, 222, 128, 0.2);
+}
+
 .map-search-button {
     width: 100%;
     padding: 14px;
