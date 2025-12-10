@@ -209,6 +209,7 @@ const MapComponent = ({
         );
 
         const data = await response.json();
+        console.log('Fetched routes:', data , selectedRouteIndex);
         if (data.features && data.features.length > 0) {
           setRoutes(data.features);
           if (onRoutesUpdate) {
