@@ -110,25 +110,58 @@ const Join = () => {
     setIsTypingOrigin(false);
   };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!originLocation || !destLocation) {
       alert("Please select both origin and destination");
+      return;
+    }
+
+    if (!departureDate) {
+      alert("Please select a departure date");
+      return;
+    }
+
+    if (!pricePerSeat || parseFloat(pricePerSeat) <= 0) {
+      alert("Please enter a valid price per seat");
       return;
     }
 
     const rideData = {
       origin: originLocation,
       destination: destLocation,
+      selectedRouteIndex,
       departureDate,
       departureTime,
       seats,
       pricePerSeat,
       vehicle,
-      notes
+      notes,
+      driverId: "507f1f77bcf86cd799439011" // TODO: Get from auth context
     };
 
-    console.log("Publishing ride:", rideData);
-    // TODO: Send to backend API
+    try {
+      const response = await fetch(`${ServerURL}/api/rides`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': ORS_API_KEY,
+        },
+        body: JSON.stringify(rideData)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`Ride posted successfully! Ride ID: ${data.rideId}`);
+        // Reset form or redirect
+        handleReset();
+      } else {
+        alert(`Failed to post ride: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error publishing ride:", error);
+      alert("Failed to publish ride. Please try again.");
+    }
   };
 
   const handleSaveDraft = () => {
