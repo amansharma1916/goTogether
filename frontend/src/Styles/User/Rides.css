@@ -1,3 +1,362 @@
-.content{
+.rides-page {
+    min-height: 100vh;
+    
+}
+
+.rides-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+
+.rides-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.rides-title-section {
+    flex: 1;
+}
+
+.rides-title {
     color: white;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.rides-subtitle {
+    color: #94a3b8;
+    font-size: 16px;
+    margin: 0;
+}
+
+
+.rides-sort {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sort-label {
+    color: #cbd5e1;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sort-select {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.sort-select:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #4ADE80;
+}
+
+.sort-select:focus {
+    outline: none;
+    border-color: #4ADE80;
+}
+
+.sort-select option {
+    background: #1e293b;
+    color: white;
+}
+
+
+.rides-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    color: #94a3b8;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(74, 222, 128, 0.2);
+    border-top-color: #4ADE80;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+.rides-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 24px;
+}
+
+
+.ride-card {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.ride-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(74, 222, 128, 0.4);
+    box-shadow: 0 12px 24px rgba(74, 222, 128, 0.1);
+}
+
+.ride-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.ride-driver {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.driver-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4ADE80, #3BC970);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a2332;
+    font-size: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.driver-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.driver-name {
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.ride-date {
+    color: #94a3b8;
+    font-size: 14px;
+    margin: 0;
+}
+
+.ride-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.price-amount {
+    color: #4ADE80;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.price-label {
+    color: #64748b;
+    font-size: 12px;
+}
+
+
+.ride-route {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+}
+
+.route-point {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #cbd5e1;
+    font-size: 13px;
+}
+
+.route-point svg {
+    flex-shrink: 0;
+}
+
+.route-line {
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(to bottom, #4ADE80, #EF4444);
+    margin-left: 7px;
+}
+
+
+.ride-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.detail-item.highlight {
+    grid-column: 1 / -1;
+    background: rgba(74, 222, 128, 0.1);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border-left: 3px solid #4ADE80;
+    font-weight: 600;
+    color: #4ADE80;
+}
+
+.detail-item.highlight svg {
+    color: #4ADE80;
+}
+
+.detail-item svg {
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+
+.ride-notes {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.ride-notes p {
+    color: #94a3b8;
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+
+.book-button {
+    width: 100%;
+    padding: 12px;
+    background: rgba(74, 222, 128, 0.1);
+    color: #4ADE80;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.book-button:hover {
+    background: rgba(74, 222, 128, 0.2);
+    border-color: #4ADE80;
+    transform: translateY(-1px);
+}
+
+.book-button:active {
+    transform: translateY(0);
+}
+
+
+.no-rides {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.no-rides svg {
+    color: #475569;
+    margin-bottom: 20px;
+}
+
+.no-rides h3 {
+    color: #cbd5e1;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.no-rides p {
+    color: #64748b;
+    font-size: 16px;
+    margin: 0;
+}
+
+
+@media (max-width: 1024px) {
+    .rides-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .rides-container {
+        padding: 16px;
+    }
+
+    .rides-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .rides-title {
+        font-size: 28px;
+    }
+
+    .rides-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ride-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .rides-title {
+        font-size: 24px;
+    }
+
+    .ride-card {
+        padding: 16px;
+    }
+
+    .price-amount {
+        font-size: 20px;
+    }
 }

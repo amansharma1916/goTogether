@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
 import Navbar from './Assets/Navbar'
 import MapComponent from './Assets/MapComponent'
 import '../../Styles/User/Join.css'
+import { useEffect, useState } from 'react'
 
 interface LocationData {
   lat: number;

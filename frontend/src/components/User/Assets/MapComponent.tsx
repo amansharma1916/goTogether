@@ -21,9 +21,9 @@ interface MapComponentProps {
 
 const ORS_API_KEY = import.meta.env.VITE_ORS_API_KEY || '';
 
-const MapComponent = ({ 
-  pickupLocation, 
-  destinationLocation, 
+const MapComponent = ({
+  pickupLocation,
+  destinationLocation,
   onPickupClick,
   selectedRouteIndex = 0,
   onRouteSelect,
@@ -51,9 +51,10 @@ const MapComponent = ({
             type: "raster",
             tiles: [
               "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-              "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
-              "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+               "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
             ],
+
             tileSize: 256,
             attribution: "© OpenStreetMap contributors",
           },
@@ -80,7 +81,7 @@ const MapComponent = ({
       const clickHandler = async (e: any) => {
         // Check if click was on a route layer
         const features = map.current!.queryRenderedFeatures(e.point);
-        const clickedOnRoute = features.some(feature => 
+        const clickedOnRoute = features.some(feature =>
           feature.layer.id.startsWith('route-')
         );
 
@@ -213,7 +214,7 @@ const MapComponent = ({
         );
 
         const data = await response.json();
-        console.log('Fetched routes:', data , selectedRouteIndex);
+        console.log('Fetched routes:', data, selectedRouteIndex);
         if (data.features && data.features.length > 0) {
           setRoutes(data.features);
           if (onRoutesUpdate) {
@@ -271,7 +272,7 @@ const MapComponent = ({
     for (let i = 0; i < 5; i++) { // Clean up to 5 possible routes
       const layerId = `route-${i}`;
       const sourceId = `route-${i}`;
-      
+
       if (map.current.getLayer(layerId)) {
         map.current.removeLayer(layerId);
       }
@@ -287,7 +288,7 @@ const MapComponent = ({
     routes.forEach((route, index) => {
       const sourceId = `route-${index}`;
       const layerId = `route-${index}`;
-      
+
       // Add source
       map.current!.addSource(sourceId, {
         type: 'geojson',
@@ -342,7 +343,7 @@ const MapComponent = ({
       const bounds = new maplibregl.LngLatBounds();
       bounds.extend([pickupLocation.lng, pickupLocation.lat]);
       bounds.extend([destinationLocation.lng, destinationLocation.lat]);
-      
+
       map.current.fitBounds(bounds, {
         padding: { top: 50, bottom: 50, left: 50, right: 50 },
         duration: 1500
@@ -371,7 +372,7 @@ const MapComponent = ({
     const rideRouteLayerId = 'ride-route';
     const connectionRouteLayerId = 'connection-route';
     const meetingPointLayerId = 'meeting-point';
-    
+
     // Remove existing ride route layer
     if (map.current.getLayer(rideRouteLayerId)) {
       map.current.removeLayer(rideRouteLayerId);
@@ -431,10 +432,10 @@ const MapComponent = ({
             const [lng, lat] = coord;
             // Calculate distance using simple Euclidean distance
             const distance = Math.sqrt(
-              Math.pow(lng - pickupLocation.lng, 2) + 
+              Math.pow(lng - pickupLocation.lng, 2) +
               Math.pow(lat - pickupLocation.lat, 2)
             );
-            
+
             if (distance < minDistance) {
               minDistance = distance;
               nearestPoint = coord;
@@ -461,7 +462,7 @@ const MapComponent = ({
           );
 
           const data = await response.json();
-          
+
           if (data.features && data.features.length > 0) {
             const connectionRoute = data.features[0].geometry;
 
@@ -490,7 +491,7 @@ const MapComponent = ({
 
               // Add a marker at the meeting point (nearest point on ride route)
               const meetingPointLayerId = 'meeting-point';
-              
+
               if (map.current.getLayer(meetingPointLayerId)) {
                 map.current.removeLayer(meetingPointLayerId);
               }
@@ -556,6 +557,10 @@ const MapComponent = ({
         height: "100%",
         borderRadius: "0",
         overflow: "hidden",
+        
+        color: "white",
+        filter: "invert(90%) hue-rotate(120deg) brightness(70%)"
+        
       }}
     />
   )
