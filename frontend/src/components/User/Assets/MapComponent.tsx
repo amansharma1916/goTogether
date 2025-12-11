@@ -15,6 +15,8 @@ interface MapComponentProps {
   selectedRouteIndex?: number;
   onRouteSelect?: (index: number) => void;
   onRoutesUpdate?: (count: number) => void;
+  rideRoute?: { type: string; coordinates: number[][] } | null;
+  showUserRoutes?: boolean; // Control whether to fetch user routes
 }
 
 const ORS_API_KEY = import.meta.env.VITE_ORS_API_KEY || '';
@@ -25,7 +27,9 @@ const MapComponent = ({
   onPickupClick,
   selectedRouteIndex = 0,
   onRouteSelect,
-  onRoutesUpdate
+  onRoutesUpdate,
+  rideRoute,
+  showUserRoutes = true // Default true for Join page
 }: MapComponentProps) => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<maplibregl.Map | null>(null);
@@ -177,7 +181,7 @@ const MapComponent = ({
 
   // Fetch and display routes when both locations are set
   useEffect(() => {
-    if (!map.current) return;
+    if (!map.current || !showUserRoutes) return;
 
     // Clear routes if either location is missing
     if (!pickupLocation || !destinationLocation) {
@@ -359,6 +363,190 @@ const MapComponent = ({
       }
     });
   }, [selectedRouteIndex, routes]);
+
+  // Display ride route when a ride is selected
+  useEffect(() => {
+    if (!map.current) return;
+
+    const rideRouteLayerId = 'ride-route';
+    const connectionRouteLayerId = 'connection-route';
+    const meetingPointLayerId = 'meeting-point';
+    
+    // Remove existing ride route layer
+    if (map.current.getLayer(rideRouteLayerId)) {
+      map.current.removeLayer(rideRouteLayerId);
+    }
+    if (map.current.getSource(rideRouteLayerId)) {
+      map.current.removeSource(rideRouteLayerId);
+    }
+
+    // Remove existing connection route layer
+    if (map.current.getLayer(connectionRouteLayerId)) {
+      map.current.removeLayer(connectionRouteLayerId);
+    }
+    if (map.current.getSource(connectionRouteLayerId)) {
+      map.current.removeSource(connectionRouteLayerId);
+    }
+
+    // Remove existing meeting point marker
+    if (map.current.getLayer(meetingPointLayerId)) {
+      map.current.removeLayer(meetingPointLayerId);
+    }
+    if (map.current.getSource(meetingPointLayerId)) {
+      map.current.removeSource(meetingPointLayerId);
+    }
+
+    // Add new ride route if available
+    if (rideRoute && rideRoute.coordinates && rideRoute.coordinates.length > 0) {
+      map.current.addSource(rideRouteLayerId, {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: rideRoute as any
+        }
+      });
+
+      map.current.addLayer({
+        id: rideRouteLayerId,
+        type: 'line',
+        source: rideRouteLayerId,
+        paint: {
+          'line-color': '#3B82F6', // Blue color for ride route
+          'line-width': 6,
+          'line-opacity': 0.9
+        }
+      });
+
+      // Fetch connection route from user's pickup to nearest point on ride route
+      const fetchConnectionRoute = async () => {
+        if (!pickupLocation || !rideRoute.coordinates || rideRoute.coordinates.length === 0) return;
+
+        try {
+          // Find nearest point on the ride route to user's pickup location
+          let nearestPoint = null;
+          let minDistance = Infinity;
+
+          rideRoute.coordinates.forEach((coord) => {
+            const [lng, lat] = coord;
+            // Calculate distance using simple Euclidean distance
+            const distance = Math.sqrt(
+              Math.pow(lng - pickupLocation.lng, 2) + 
+              Math.pow(lat - pickupLocation.lat, 2)
+            );
+            
+            if (distance < minDistance) {
+              minDistance = distance;
+              nearestPoint = coord;
+            }
+          });
+
+          if (!nearestPoint) return;
+
+          const response = await fetch(
+            "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": ORS_API_KEY,
+              },
+              body: JSON.stringify({
+                coordinates: [
+                  [pickupLocation.lng, pickupLocation.lat],
+                  nearestPoint // Route to nearest point on ride route
+                ]
+              }),
+            }
+          );
+
+          const data = await response.json();
+          
+          if (data.features && data.features.length > 0) {
+            const connectionRoute = data.features[0].geometry;
+
+            // Add connection route to map
+            if (map.current) {
+              map.current.addSource(connectionRouteLayerId, {
+                type: 'geojson',
+                data: {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: connectionRoute
+                }
+              });
+
+              map.current.addLayer({
+                id: connectionRouteLayerId,
+                type: 'line',
+                source: connectionRouteLayerId,
+                paint: {
+                  'line-color': '#4ADE80', // Green color for connection route
+                  'line-width': 5,
+                  'line-opacity': 0.8,
+                  'line-dasharray': [2, 2] // Dashed line to differentiate
+                }
+              });
+
+              // Add a marker at the meeting point (nearest point on ride route)
+              const meetingPointLayerId = 'meeting-point';
+              
+              if (map.current.getLayer(meetingPointLayerId)) {
+                map.current.removeLayer(meetingPointLayerId);
+              }
+              if (map.current.getSource(meetingPointLayerId)) {
+                map.current.removeSource(meetingPointLayerId);
+              }
+
+              map.current.addSource(meetingPointLayerId, {
+                type: 'geojson',
+                data: {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'Point',
+                    coordinates: nearestPoint
+                  }
+                }
+              });
+
+              map.current.addLayer({
+                id: meetingPointLayerId,
+                type: 'circle',
+                source: meetingPointLayerId,
+                paint: {
+                  'circle-radius': 8,
+                  'circle-color': '#F59E0B', // Orange color for meeting point
+                  'circle-stroke-width': 3,
+                  'circle-stroke-color': '#FFFFFF'
+                }
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching connection route:', error);
+        }
+      };
+
+      fetchConnectionRoute();
+
+      // Fit map to show the entire route including pickup location
+      const coordinates = rideRoute.coordinates;
+      const bounds = coordinates.reduce((bounds, coord) => {
+        return bounds.extend(coord as [number, number]);
+      }, new maplibregl.LngLatBounds(coordinates[0] as [number, number], coordinates[0] as [number, number]));
+
+      // Include pickup location in bounds if available
+      if (pickupLocation) {
+        bounds.extend([pickupLocation.lng, pickupLocation.lat]);
+      }
+
+      map.current.fitBounds(bounds, {
+        padding: 50,
+        maxZoom: 15
+      });
+    }
+  }, [rideRoute, pickupLocation]);
 
   return (
     <div

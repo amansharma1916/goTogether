@@ -1,4 +1,5 @@
 import Ride from '../DB/Schema/PostedRidesSchema.js';
+import Registration from '../DB/Schema/registrationSchema.js';
 import simplify from '@turf/simplify';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -145,6 +146,7 @@ export const createRide = async (req, res) => {
     const newRide = new Ride({
       driverId: req.user?.id || req.body.driverId, // Get from auth middleware or body (for testing)
       vehicleId: req.body.vehicleId || null,
+      fullName: req.user?.fullName || "Unknown Driver",
       origin: originPoint,
       destination: destinationPoint,
       route: routeGeometry,
@@ -214,7 +216,6 @@ export const getRides = async (req, res) => {
 
     const rides = await Ride.find(filter)
       .populate('driverId', 'fullName email')
-      .populate('vehicleId')
       .sort({ departureTime: 1 })
       .limit(50);
 
@@ -243,8 +244,7 @@ export const getRideById = async (req, res) => {
     const { id } = req.params;
 
     const ride = await Ride.findById(id)
-      .populate('driverId', 'fullName email')
-      .populate('vehicleId');
+      .populate('driverId', 'fullName email');
 
     if (!ride) {
       return res.status(404).json({
@@ -267,3 +267,68 @@ export const getRideById = async (req, res) => {
     });
   }
 };
+
+/**
+ * POST /api/rides/search
+ * Search for rides near a pickup location
+ */
+export const searchRides = async (req, res) => {
+  try {
+    const { pickup, radiusMeters = 800, timeWindow } = req.body;
+
+    // Validate pickup location
+    if (!pickup || typeof pickup.lat !== 'number' || typeof pickup.lng !== 'number') {
+      return res.status(400).json({
+        success: false,
+        message: "Valid pickup location with lat and lng is required"
+      });
+    }
+
+    // Create GeoJSON Point for the pickup location
+    const pickupPoint = {
+      type: "Point",
+      coordinates: [pickup.lng, pickup.lat] // GeoJSON uses [lng, lat]
+    };
+
+    // Build the query
+    const query = {
+      status: "active",
+      origin: {
+        $near: {
+          $geometry: pickupPoint,
+          $maxDistance: radiusMeters
+        }
+      }
+    };
+
+    // Add time window filter if provided
+    if (timeWindow && timeWindow.from) {
+      query.departureTime = query.departureTime || {};
+      query.departureTime.$gte = new Date(timeWindow.from);
+    }
+    if (timeWindow && timeWindow.to) {
+      query.departureTime = query.departureTime || {};
+      query.departureTime.$lte = new Date(timeWindow.to);
+    }
+
+    // Execute the search
+    const rides = await Ride.find(query)
+      .populate('driverId', 'fullName email')
+      .limit(30);
+
+    return res.status(200).json({
+      success: true,
+      results: rides.length,
+      rides
+    });
+
+  } catch (error) {
+    console.error('Error searching rides:', error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message
+    });
+  }
+};
+

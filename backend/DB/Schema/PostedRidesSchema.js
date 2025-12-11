@@ -51,7 +51,7 @@ const RideSchema = new Schema(
   {
     driverId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Registration",
       required: true
     },
 
@@ -59,6 +59,11 @@ const RideSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Vehicle",
       required: false
+    },
+
+    fullName: {
+      type: String,
+      required: true
     },
 
     // Origin selected by driver

@@ -24,7 +24,6 @@ const Join = () => {
   const [originResults, setOriginResults] = useState<NominatimResult[]>([]);
   const [originLocation, setOriginLocation] = useState<LocationData | null>(null);
   const [isTypingOrigin, setIsTypingOrigin] = useState(false);
-  
   const [destQuery, setDestQuery] = useState("Amity University Ranchi");
   const [destResults, setDestResults] = useState<NominatimResult[]>([]);
   const [destLocation, setDestLocation] = useState<LocationData | null>({
@@ -41,6 +40,8 @@ const Join = () => {
   const [notes, setNotes] = useState("");
   const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(0);
   const [availableRoutes, setAvailableRoutes] = useState<number>(0);
+
+  
 
   // Fetch origin suggestions
   useEffect(() => {
