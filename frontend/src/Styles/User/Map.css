@@ -124,12 +124,17 @@
     margin-top: 8px;
 }
 
-.map-search-button:hover {
+.map-search-button:hover:not(:disabled) {
     background: #3BC970;
 }
 
-.map-search-button:active {
+.map-search-button:active:not(:disabled) {
     transform: scale(0.98);
+}
+
+.map-search-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Rides List Section */
@@ -157,6 +162,147 @@
     font-size: 14px;
     text-align: center;
     padding: 40px 20px;
+}
+
+/* Ride Card Styles */
+.map-ride-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.map-ride-card:hover {
+    border-color: rgba(74, 222, 128, 0.4);
+    box-shadow: 0 4px 12px rgba(74, 222, 128, 0.1);
+    transform: translateY(-2px);
+}
+
+.map-ride-card.selected {
+    border-color: #4ADE80;
+    background: rgba(74, 222, 128, 0.1);
+    box-shadow: 0 4px 16px rgba(74, 222, 128, 0.2);
+}
+
+.map-ride-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.map-ride-driver {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.map-driver-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4ADE80, #3BC970);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a2332;
+    font-size: 18px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.map-driver-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.map-driver-name {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.map-ride-time {
+    color: #B0B8C4;
+    font-size: 13px;
+    margin: 0;
+}
+
+.map-ride-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.map-price-amount {
+    color: #4ADE80;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.map-price-label {
+    color: #6B7280;
+    font-size: 12px;
+}
+
+.map-ride-details {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.map-ride-info-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #B0B8C4;
+    font-size: 13px;
+}
+
+.map-ride-info-item svg {
+    color: #6B7280;
+    flex-shrink: 0;
+}
+
+.map-ride-notes {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+.map-ride-notes p {
+    color: #B0B8C4;
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.map-ride-book-btn {
+    width: 100%;
+    padding: 10px;
+    background: rgba(74, 222, 128, 0.1);
+    color: #4ADE80;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.map-ride-book-btn:hover {
+    background: rgba(74, 222, 128, 0.2);
+    border-color: #4ADE80;
+}
+
+.map-ride-book-btn:active {
+    transform: scale(0.98);
 }
 
 /* Right Side - Map Container (70%) */

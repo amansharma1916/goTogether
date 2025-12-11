@@ -1,10 +1,35 @@
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import '../../../Styles/User/Assets/Navbar.css'
 import logo from '../../../images/logo/gotogetherLogo.png'
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    // Clear authentication data from localStorage
+    localStorage.removeItem('isAuthenticated');
+    // localStorage.removeItem('user');
+    // localStorage.removeItem('userId');
+    
+    // Redirect to login page
+    navigate('/');
+  };
   
   return (
     <div className="Navbar-container">
@@ -29,13 +54,40 @@ const Navbar = () => {
 
         {/* Right - User & Notification Icons */}
         <div className="nav-right">
-          <button className="nav-icon-btn">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              <circle cx="16" cy="16" r="15" stroke="white" strokeWidth="2"/>
-              <circle cx="16" cy="13" r="5" fill="white"/>
-              <path d="M7 27c0-5 4-8 9-8s9 3 9 8" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
+          <div className="user-profile-dropdown" ref={dropdownRef}>
+            <button 
+              className="nav-icon-btn user-profile-btn"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="15" stroke="white" strokeWidth="2"/>
+                <circle cx="16" cy="13" r="5" fill="white"/>
+                <path d="M7 27c0-5 4-8 9-8s9 3 9 8" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </button>
+            
+            {isDropdownOpen && (
+              <div className="dropdown-menu">
+                <div className="dropdown-item user-info">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="9" r="3"/>
+                    <path d="M6 20c0-4 2.5-6 6-6s6 2 6 6"/>
+                  </svg>
+                  <span>My Profile</span>
+                </div>
+                <div className="dropdown-divider"></div>
+                <button className="dropdown-item logout-btn" onClick={handleLogout}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                  </svg>
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
           <button className="nav-icon-btn notification-btn">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
               <path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

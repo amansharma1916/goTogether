@@ -1,4 +1,3 @@
-import React from 'react'
 import Navbar from './Assets/Navbar'
 import MapComponent from '../User/Assets/MapComponent'
 import '../../Styles/User/Map.css'
@@ -17,14 +16,43 @@ interface NominatimResult {
   display_name: string;
 }
 
+interface Ride {
+  _id: string;
+  driverId: {
+    // fullName: string;
+    email: string;
+  };
+  origin: {
+    type: string;
+    coordinates: number[];
+  };
+  destination: {
+    type: string;
+    coordinates: number[];
+  };
+  route: {
+    type: string;
+    coordinates: number[][];
+  };
+  departureTime: string;
+  seatsAvailable: number;
+  pricePerSeat: number;
+  distanceMeters: number;
+  durationSeconds: number;
+  notes?: string;
+}
+
+const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Map = () => {
   const [fromQuery, setFromQuery] = useState("");
   const [fromResults, setFromResults] = useState<NominatimResult[]>([]);
   const [pickupLocation, setPickupLocation] = useState<LocationData | null>(null);
   const [destinationLocation, setDestinationLocation] = useState<LocationData | null>(null);
   
-  const [toQuery, setToQuery] = useState("");
-  const [toResults, setToResults] = useState<NominatimResult[]>([]);
+  const [availableRides, setAvailableRides] = useState<Ride[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedRide, setSelectedRide] = useState<Ride | null>(null);
 
   // Fetch suggestions for "From" location
   useEffect(() => {
@@ -62,8 +90,75 @@ const Map = () => {
     setPickupLocation({ lat, lng, name: item.display_name });
   };
 
-  const handleMapPickupClick = (location: LocationData) => {setFromQuery(location.name);
+  const handleMapPickupClick = (location: LocationData) => {
+    setFromQuery(location.name);
     setPickupLocation(location);
+  };
+
+  const handleSearchRides = async () => {
+    if (!pickupLocation) {
+      alert("Please select a pickup location");
+      return;
+    }
+
+    setIsSearching(true);
+    setAvailableRides([]);
+    setSelectedRide(null);
+
+    try {
+      // Get user ID from localStorage
+      const loggedInUserStr = localStorage.getItem('LoggedInUser');
+      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
+      const userId = loggedInUser?.id;
+
+      const response = await fetch(`${ServerURL}/api/rides/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pickup: {
+            lat: pickupLocation.lat,
+            lng: pickupLocation.lng
+          },
+          radiusMeters: 20000, // 2km radius
+          userId: userId // Send userId to exclude own rides
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setAvailableRides(data.rides);
+      } else {
+        alert(`Search failed: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error searching rides:", error);
+      alert("Failed to search rides. Please try again.");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleRideSelect = (ride: Ride) => {
+    setSelectedRide(ride);
+    // Set destination for the map
+    setDestinationLocation({
+      lat: ride.destination.coordinates[1],
+      lng: ride.destination.coordinates[0],
+      name: "Destination"
+    });
+  };
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   // const handleToLocationSelect = (item: NominatimResult) => {
@@ -122,15 +217,86 @@ const Map = () => {
 
             
 
-            <button className="map-search-button">Search Rides</button>
+            <button 
+              className="map-search-button" 
+              onClick={handleSearchRides}
+              disabled={isSearching || !pickupLocation}
+            >
+              {isSearching ? 'Searching...' : 'Search Rides'}
+            </button>
           </div>
 
           {/* Available Rides Section */}
           <div className="map-rides-list-section">
-            <h4 className="map-rides-title">Available Rides</h4>
+            <h4 className="map-rides-title">Available Rides ({availableRides.length})</h4>
             <div className="map-rides-list">
-              {/* Rides will be displayed here */}
-              <p className="map-no-rides">Search for rides to see available options</p>
+              {isSearching ? (
+                <p className="map-no-rides">Searching for rides...</p>
+              ) : availableRides.length > 0 ? (
+                availableRides.map((ride) => (
+                  <div 
+                    key={ride._id} 
+                    className={`map-ride-card ${selectedRide?._id === ride._id ? 'selected' : ''}`}
+                    onClick={() => handleRideSelect(ride)}
+                  >
+                    <div className="map-ride-header">
+                      <div className="map-ride-driver">
+                        <div className="map-driver-avatar">
+                          {/* {ride.driverId.fullName.charAt(0).toUpperCase()} */}
+                        </div>
+                        <div className="map-driver-info">
+                          {/* <h5 className="map-driver-name">{ride.driverId.fullName}</h5> */}
+                          <p className="map-ride-time">{formatDate(ride.departureTime)} at {formatTime(ride.departureTime)}</p>
+                        </div>
+                      </div>
+                      <div className="map-ride-price">
+                        <span className="map-price-amount">${ride.pricePerSeat}</span>
+                        <span className="map-price-label">per seat</span>
+                      </div>
+                    </div>
+                    
+                    <div className="map-ride-details">
+                      <div className="map-ride-info-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                          <circle cx="9" cy="7" r="4"/>
+                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <span>{ride.seatsAvailable} seats available</span>
+                      </div>
+                      <div className="map-ride-info-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"/>
+                          <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span>{Math.round(ride.durationSeconds / 60)} min</span>
+                      </div>
+                      <div className="map-ride-info-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                          <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                        </svg>
+                        <span>{(ride.distanceMeters / 1000).toFixed(1)} km</span>
+                      </div>
+                    </div>
+                    
+                    {ride.notes && (
+                      <div className="map-ride-notes">
+                        <p>{ride.notes}</p>
+                      </div>
+                    )}
+                    
+                    <button className="map-ride-book-btn" onClick={(e) => { e.stopPropagation(); alert('Booking feature coming soon!'); }}>
+                      Book Ride
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="map-no-rides">
+                  {pickupLocation ? 'No rides found. Try adjusting your pickup location.' : 'Search for rides to see available options'}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -141,6 +307,8 @@ const Map = () => {
             pickupLocation={pickupLocation} 
             destinationLocation={destinationLocation}
             onPickupClick={handleMapPickupClick}
+            rideRoute={selectedRide?.route}
+            showUserRoutes={false}
           />
         </div>
       </div>
