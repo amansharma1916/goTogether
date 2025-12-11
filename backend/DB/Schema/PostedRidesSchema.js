@@ -65,6 +65,11 @@ const RideSchema = new Schema(
       type: String,
       required: true
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "Registration",
+      required: true
+    },
 
     // Origin selected by driver
     origin: {

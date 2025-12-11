@@ -106,6 +106,11 @@ const Map = () => {
     setSelectedRide(null);
 
     try {
+      // Get user ID from localStorage
+      const loggedInUserStr = localStorage.getItem('LoggedInUser');
+      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
+      const userId = loggedInUser?.id;
+
       const response = await fetch(`${ServerURL}/api/rides/search`, {
         method: 'POST',
         headers: {
@@ -116,7 +121,8 @@ const Map = () => {
             lat: pickupLocation.lat,
             lng: pickupLocation.lng
           },
-          radiusMeters: 20000 // 2km radius
+          radiusMeters: 20000, // 2km radius
+          userId: userId // Send userId to exclude own rides
         })
       });
 

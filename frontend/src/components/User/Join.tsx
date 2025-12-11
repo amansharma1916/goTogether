@@ -1,7 +1,7 @@
 import Navbar from './Assets/Navbar'
 import MapComponent from './Assets/MapComponent'
 import '../../Styles/User/Join.css'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 
 interface LocationData {
   lat: number;
@@ -18,6 +18,8 @@ interface NominatimResult {
 
 const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const ORS_API_KEY = import.meta.env.VITE_ORS_API_KEY || '';
+
+
 
 const Join = () => {
   const [originQuery, setOriginQuery] = useState("");
@@ -40,8 +42,12 @@ const Join = () => {
   const [notes, setNotes] = useState("");
   const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(0);
   const [availableRoutes, setAvailableRoutes] = useState<number>(0);
-
-  
+  const [User, setUser] = useState<any>(null);
+  useEffect(() => {
+    const getUser = localStorage.getItem('LoggedInUser');
+    const User = getUser ? JSON.parse(getUser) : null;
+    setUser(User);
+  }, []);
 
   // Fetch origin suggestions
   useEffect(() => {
@@ -111,6 +117,8 @@ const Join = () => {
     setIsTypingOrigin(false);
   };
 
+  
+
   const handlePublish = async () => {
     if (!originLocation || !destLocation) {
       alert("Please select both origin and destination");
@@ -129,6 +137,8 @@ const Join = () => {
 
     const rideData = {
       origin: originLocation,
+      userId: User?.id,
+      fullname: User?.fullname,
       destination: destLocation,
       selectedRouteIndex,
       departureDate,

@@ -64,7 +64,17 @@ const Rides = () => {
   const fetchAllRides = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${ServerURL}/api/rides`);
+      // Get user ID from localStorage
+      const loggedInUserStr = localStorage.getItem('LoggedInUser');
+      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
+      const userId = loggedInUser?.id;
+
+      // Build URL with userId parameter if available
+      const url = userId 
+        ? `${ServerURL}/api/rides?userId=${userId}`
+        : `${ServerURL}/api/rides`;
+
+      const response = await fetch(url);
       const data = await response.json();
 
       if (data.success) {
