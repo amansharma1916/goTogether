@@ -1,7 +1,7 @@
 import Navbar from './Assets/Navbar'
 import MapComponent from './Assets/MapComponent'
 import '../../Styles/User/Join.css'
-import { use, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface LocationData {
   lat: number;
@@ -35,7 +35,7 @@ const Join = () => {
   });
 
   const [departureDate, setDepartureDate] = useState("");
-  const [departureTime, setDepartureTime] = useState("");
+  const [departureTime] = useState("");
   const [seats, setSeats] = useState(3);
   const [pricePerSeat, setPricePerSeat] = useState("");
   const [vehicle, setVehicle] = useState("Toyota Camry (4 seats)");

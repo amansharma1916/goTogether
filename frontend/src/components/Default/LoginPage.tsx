@@ -1,4 +1,4 @@
-import { Link, Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import '../../Styles/Default/LoginPage.css'
 import axios from 'axios'
 import { useState } from 'react'
@@ -22,7 +22,7 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
     password: ''
   });
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isAuthenticated') === 'true');
+  const [, setIsLoggedIn] = useState(localStorage.getItem('isAuthenticated') === 'true');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
