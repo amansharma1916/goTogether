@@ -36,6 +36,7 @@ const Rides = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'distance' | 'time' | 'price'>('distance');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
 
   useEffect(() => {
     
@@ -86,6 +87,47 @@ const Rides = () => {
       console.error('Error fetching rides:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchMyRides = async () => {
+    setIsLoading(true);
+    try {
+      // Get user ID from localStorage
+      const loggedInUserStr = localStorage.getItem('LoggedInUser');
+      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
+      const userId = loggedInUser?.id;
+
+      if (!userId) {
+        console.error('User not logged in');
+        setRides([]);
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch(`${ServerURL}/api/rides/my-rides?userId=${userId}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setRides(data.rides);
+      } else {
+        console.error('Failed to fetch my rides:', data.message);
+        setRides([]);
+      }
+    } catch (error) {
+      console.error('Error fetching my rides:', error);
+      setRides([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleViewModeChange = (mode: 'all' | 'my') => {
+    setViewMode(mode);
+    if (mode === 'all') {
+      fetchAllRides();
+    } else {
+      fetchMyRides();
     }
   };
 
@@ -157,21 +199,40 @@ const Rides = () => {
       <div className="rides-container">
         <div className="rides-header">
           <div className="rides-title-section">
-            <h1 className="rides-title">All Available Rides</h1>
+            <h1 className="rides-title">
+              {viewMode === 'all' ? 'All Available Rides' : 'My Posted Rides'}
+            </h1>
             <p className="rides-subtitle">{rides.length} rides available</p>
           </div>
           
-          <div className="rides-sort">
-            <label className="sort-label">Sort by:</label>
-            <select 
-              className="sort-select"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'distance' | 'time' | 'price')}
-            >
-              <option value="distance">Distance (Shortest First)</option>
-              <option value="time">Departure Time</option>
-              <option value="price">Price (Lowest First)</option>
-            </select>
+          <div className="rides-controls">
+            <div className="view-mode-buttons">
+              <button 
+                className={`view-mode-btn ${viewMode === 'all' ? 'active' : ''}`}
+                onClick={() => handleViewModeChange('all')}
+              >
+                All Rides
+              </button>
+              <button 
+                className={`view-mode-btn ${viewMode === 'my' ? 'active' : ''}`}
+                onClick={() => handleViewModeChange('my')}
+              >
+                My Rides
+              </button>
+            </div>
+            
+            <div className="rides-sort">
+              <label className="sort-label">Sort by:</label>
+              <select 
+                className="sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'distance' | 'time' | 'price')}
+              >
+                <option value="distance">Distance (Shortest First)</option>
+                <option value="time">Departure Time</option>
+                <option value="price">Price (Lowest First)</option>
+              </select>
+            </div>
           </div>
         </div>
 
