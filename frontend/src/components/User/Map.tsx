@@ -2,6 +2,7 @@ import Navbar from './Assets/Navbar'
 import MapComponent from '../User/Assets/MapComponent'
 import '../../Styles/User/Map.css'
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 
 interface LocationData {
   lat: number;
@@ -45,6 +46,7 @@ interface Ride {
 const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Map = () => {
+  const location = useLocation();
   const [fromQuery, setFromQuery] = useState("");
   const [fromResults, setFromResults] = useState<NominatimResult[]>([]);
   const [pickupLocation, setPickupLocation] = useState<LocationData | null>(null);
@@ -53,6 +55,26 @@ const Map = () => {
   const [availableRides, setAvailableRides] = useState<Ride[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedRide, setSelectedRide] = useState<Ride | null>(null);
+
+  // Handle ride passed from Rides page
+  useEffect(() => {
+    if (location.state?.ride) {
+      const ride = location.state.ride as Ride;
+      setSelectedRide(ride);
+      setDestinationLocation({
+        lat: ride.destination.coordinates[1],
+        lng: ride.destination.coordinates[0],
+        name: "Destination"
+      });
+      // Set pickup location to ride origin for display
+      setPickupLocation({
+        lat: ride.origin.coordinates[1],
+        lng: ride.origin.coordinates[0],
+        name: "Origin"
+      });
+      setFromQuery("Origin");
+    }
+  }, [location.state]);
 
   // Fetch suggestions for "From" location
   useEffect(() => {

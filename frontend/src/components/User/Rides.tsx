@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../../Styles/User/Rides.css'
 import Navbar from './Assets/Navbar'
 
@@ -32,6 +33,7 @@ interface Ride {
 const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Rides = () => {
+  const navigate = useNavigate();
   const [rides, setRides] = useState<Ride[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'distance' | 'time' | 'price'>('distance');
@@ -65,12 +67,12 @@ const Rides = () => {
   const fetchAllRides = async () => {
     setIsLoading(true);
     try {
-      // Get user ID from localStorage
+      
       const loggedInUserStr = localStorage.getItem('LoggedInUser');
       const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
       const userId = loggedInUser?.id;
 
-      // Build URL with userId parameter if available
+      
       const url = userId 
         ? `${ServerURL}/api/rides?userId=${userId}`
         : `${ServerURL}/api/rides`;
@@ -93,7 +95,7 @@ const Rides = () => {
   const fetchMyRides = async () => {
     setIsLoading(true);
     try {
-      // Get user ID from localStorage
+      
       const loggedInUserStr = localStorage.getItem('LoggedInUser');
       const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
       const userId = loggedInUser?.id;
@@ -129,6 +131,10 @@ const Rides = () => {
     } else {
       fetchMyRides();
     }
+  };
+
+  const handleViewRide = (ride: Ride) => {
+    navigate('/map', { state: { ride } });
   };
 
   
@@ -244,7 +250,12 @@ const Rides = () => {
         ) : sortedRides.length > 0 ? (
           <div className="rides-grid">
             {sortedRides.map((ride) => (
-              <div key={ride._id} className="ride-card">
+              <div 
+                key={ride._id} 
+                className="ride-card"
+                onClick={() => handleViewRide(ride)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="ride-card-header">
                   <div className="ride-driver">
                     <div className="driver-avatar">
