@@ -4,7 +4,6 @@ import { Routes, Route } from 'react-router-dom'
 import Switcher from "./components/Default/Switcher";
 import ProtectedRoute from "./ProtectedRoute";
 import Dashboard from "./components/User/Dashboard";
-import HomePage from "./components/User/HomePage";
 import Map from "./components/User/Map";
 import Join from "./components/User/Join";
 import Rides from "./components/User/Rides";

@@ -1,9 +1,7 @@
 import '../../Styles/User/HomePage.css'
-import ProtectedRoute from '../../ProtectedRoute.tsx'
 import Navbar from './Assets/Navbar.tsx'
-import { Route , Routes} from 'react-router-dom'
 import HomePage from './HomePage.tsx'
-import { use, useEffect } from 'react'
+import { useEffect } from 'react'
 const Dashboard = () => {
 
   useEffect(() => {
