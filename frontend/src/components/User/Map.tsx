@@ -73,6 +73,9 @@ const Map = () => {
         name: "Origin"
       });
       setFromQuery("Origin");
+    } else if (location.state?.originQuery) {
+      // Set origin query from HomePage search
+      setFromQuery(location.state.originQuery);
     }
   }, [location.state]);
 
