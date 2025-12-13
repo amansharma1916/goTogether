@@ -11,20 +11,17 @@ const Switcher = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        {/* Logo */}
         <div className="auth-logo-container">
           <img src={logo} alt="goTogether Logo" className="auth-logo" />
           <span className="auth-logo-text">goTogether</span>
         </div>
 
-        {/* Toggle Switcher */}
         <div className="auth-switcher">
           <Link to="/login" className={`switcher-btn ${isLogin ? 'active' : ''}`} onClick={() => setIsLogin(true)}>Login</Link>
           <Link to="/register" className={`switcher-btn ${!isLogin ? 'active' : ''}`} onClick={() => setIsLogin(false)}>Sign Up</Link>
           <div className={`switcher-slider ${!isLogin ? 'right' : ''}`} />
         </div>
 
-        {/* Dynamic Content */}
         <div className="auth-content">
           {isLogin ? (
             <LoginPage onSwitchToRegister={() => setIsLogin(false)} />
