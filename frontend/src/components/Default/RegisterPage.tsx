@@ -63,7 +63,7 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
       <h2 className="auth-title">Create your account</h2>
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        {/* Full Name Field */}
+        {}
         <div className="form-group">
           <label htmlFor="fullname" className="form-label">Full Name</label>
           <input
@@ -76,7 +76,7 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
           />
         </div>
 
-        {/* Email Field */}
+        {}
         <div className="form-group">
           <label htmlFor="reg-email" className="form-label">Email</label>
           <input
@@ -89,7 +89,7 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
           />
         </div>
 
-        {/* Password Field */}
+        {}
         <div className="form-group">
           <label htmlFor="reg-password" className="form-label">Password</label>
           <input
@@ -102,7 +102,7 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
           />
         </div>
 
-        {/* Confirm Password Field */}
+        {}
         <div className="form-group">
           <label htmlFor="confirm-password" className="form-label">Confirm Password</label>
           <input
@@ -115,35 +115,31 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
           />
         </div>
 
-        {/* College Name Field */}
+        {}
         <div className="form-group">
           <label htmlFor="college" className="form-label">College Name (Optional)</label>
           <select id="college" className="form-input form-select" value={formData.college} onChange={handleChange}>
             <option value="">Select your college</option>
-            <option value="ucb">University of California, Berkeley</option>
-            <option value="stanford">Stanford University</option>
-            <option value="mit">Massachusetts Institute of Technology</option>
-            <option value="harvard">Harvard University</option>
-            <option value="other">Other</option>
+            <option value="auj">Amity University Jharkhand</option>
           </select>
         </div>
 
-        {/* Create Account Button */}
+        {}
         <button type="submit" className="btn-primary btn-register" >
           Create Account
         </button>
 
-        {/* Verification Notice */}
+        {}
         <p className="verification-notice">
           We will send a verification link to your college email.
         </p>
 
-        {/* Divider */}
+        {}
         <div className="divider">
           <span>or sign up with</span>
         </div>
 
-        {/* Social Sign Up Button */}
+        {}
         <button type="button" className="btn-social btn-google-signup">
           <svg width="20" height="20" viewBox="0 0 20 20">
             <path d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z" fill="#4285F4"/>
@@ -154,7 +150,7 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
           Sign up with Google
         </button>
 
-        {/* Switch to Login */}
+        {}
         <div className="switch-auth">
           Already have an account? <Link to="/login" className="link-btn" onClick={onSwitchToLogin}>Login</Link>
         </div>

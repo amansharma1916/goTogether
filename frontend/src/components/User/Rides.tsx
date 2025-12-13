@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../../Styles/User/Rides.css'
 import Navbar from './Assets/Navbar'
 
@@ -32,10 +33,12 @@ interface Ride {
 const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Rides = () => {
+  const navigate = useNavigate();
   const [rides, setRides] = useState<Ride[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'distance' | 'time' | 'price'>('distance');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
 
   useEffect(() => {
     
@@ -64,12 +67,12 @@ const Rides = () => {
   const fetchAllRides = async () => {
     setIsLoading(true);
     try {
-      // Get user ID from localStorage
+      
       const loggedInUserStr = localStorage.getItem('LoggedInUser');
       const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
       const userId = loggedInUser?.id;
 
-      // Build URL with userId parameter if available
+      
       const url = userId 
         ? `${ServerURL}/api/rides?userId=${userId}`
         : `${ServerURL}/api/rides`;
@@ -86,6 +89,125 @@ const Rides = () => {
       console.error('Error fetching rides:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchMyRides = async () => {
+    setIsLoading(true);
+    try {
+      
+      const loggedInUserStr = localStorage.getItem('LoggedInUser');
+      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
+      const userId = loggedInUser?.id;
+
+      if (!userId) {
+        console.error('User not logged in');
+        setRides([]);
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch(`${ServerURL}/api/rides/my-rides?userId=${userId}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setRides(data.rides);
+      } else {
+        console.error('Failed to fetch my rides:', data.message);
+        setRides([]);
+      }
+    } catch (error) {
+      console.error('Error fetching my rides:', error);
+      setRides([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleViewModeChange = (mode: 'all' | 'my') => {
+    setViewMode(mode);
+    if (mode === 'all') {
+      fetchAllRides();
+    } else {
+      fetchMyRides();
+    }
+  };
+
+  const handleViewRide = (ride: Ride) => {
+    navigate('/map', { state: { ride } });
+  };
+
+  const handleBookRide = async (e: React.MouseEvent, ride: Ride) => {
+    e.stopPropagation(); // Prevent card click event
+
+    try {
+      // Get user info
+      const loggedInUserStr = localStorage.getItem('LoggedInUser');
+      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
+      const userId = loggedInUser?.id;
+
+      if (!userId) {
+        alert('Please log in to book a ride');
+        return;
+      }
+
+      if (!userLocation) {
+        alert('Unable to determine your location. Please enable location services.');
+        return;
+      }
+
+      // Calculate meeting point (nearest point on route)
+      let nearestPoint = null;
+      let minDistance = Infinity;
+      
+      ride.route.coordinates.forEach((coord) => {
+        const [lng, lat] = coord;
+        const distance = calculateDistance(userLocation.lat, userLocation.lng, lat, lng);
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestPoint = { lat, lng };
+        }
+      });
+
+      const bookingData = {
+        rideId: ride._id,
+        riderId: userId,
+        seatsBooked: 1,
+        pickupLocation: {
+          lat: userLocation.lat,
+          lng: userLocation.lng
+        },
+        pickupLocationName: 'My Location',
+        meetingPoint: nearestPoint,
+        distanceToMeetingPoint: minDistance * 1000, // Convert to meters
+        riderNotes: '',
+        paymentMethod: 'cash'
+      };
+
+      const response = await fetch(`${ServerURL}/api/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookingData)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Booking successful! The driver will confirm your request.');
+        // Refresh rides to update seat availability
+        if (viewMode === 'all') {
+          fetchAllRides();
+        } else {
+          fetchMyRides();
+        }
+      } else {
+        alert(`Booking failed: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error booking ride:', error);
+      alert('Failed to book ride. Please try again.');
     }
   };
 
@@ -157,21 +279,40 @@ const Rides = () => {
       <div className="rides-container">
         <div className="rides-header">
           <div className="rides-title-section">
-            <h1 className="rides-title">All Available Rides</h1>
+            <h1 className="rides-title">
+              {viewMode === 'all' ? 'All Available Rides' : 'My Posted Rides'}
+            </h1>
             <p className="rides-subtitle">{rides.length} rides available</p>
           </div>
           
-          <div className="rides-sort">
-            <label className="sort-label">Sort by:</label>
-            <select 
-              className="sort-select"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'distance' | 'time' | 'price')}
-            >
-              <option value="distance">Distance (Shortest First)</option>
-              <option value="time">Departure Time</option>
-              <option value="price">Price (Lowest First)</option>
-            </select>
+          <div className="rides-controls">
+            <div className="view-mode-buttons">
+              <button 
+                className={`view-mode-btn ${viewMode === 'all' ? 'active' : ''}`}
+                onClick={() => handleViewModeChange('all')}
+              >
+                All Rides
+              </button>
+              <button 
+                className={`view-mode-btn ${viewMode === 'my' ? 'active' : ''}`}
+                onClick={() => handleViewModeChange('my')}
+              >
+                My Rides
+              </button>
+            </div>
+            
+            <div className="rides-sort">
+              <label className="sort-label">Sort by:</label>
+              <select 
+                className="sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'distance' | 'time' | 'price')}
+              >
+                <option value="distance">Distance (Shortest First)</option>
+                <option value="time">Departure Time</option>
+                <option value="price">Price (Lowest First)</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -183,7 +324,12 @@ const Rides = () => {
         ) : sortedRides.length > 0 ? (
           <div className="rides-grid">
             {sortedRides.map((ride) => (
-              <div key={ride._id} className="ride-card">
+              <div 
+                key={ride._id} 
+                className="ride-card"
+                onClick={() => handleViewRide(ride)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="ride-card-header">
                   <div className="ride-driver">
                     <div className="driver-avatar">
@@ -264,7 +410,12 @@ const Rides = () => {
                   </div>
                 )}
 
-                <button className="book-button">Book This Ride</button>
+                <button 
+                  className="book-button"
+                  onClick={(e) => handleBookRide(e, ride)}
+                >
+                  Book This Ride
+                </button>
               </div>
             ))}
           </div>

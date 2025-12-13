@@ -2,6 +2,7 @@ import Navbar from './Assets/Navbar'
 import MapComponent from './Assets/MapComponent'
 import '../../Styles/User/Join.css'
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 interface LocationData {
   lat: number;
@@ -22,6 +23,7 @@ const ORS_API_KEY = import.meta.env.VITE_ORS_API_KEY || '';
 
 
 const Join = () => {
+  const location = useLocation();
   const [originQuery, setOriginQuery] = useState("");
   const [originResults, setOriginResults] = useState<NominatimResult[]>([]);
   const [originLocation, setOriginLocation] = useState<LocationData | null>(null);
@@ -43,11 +45,20 @@ const Join = () => {
   const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(0);
   const [availableRoutes, setAvailableRoutes] = useState<number>(0);
   const [User, setUser] = useState<any>(null);
+  
   useEffect(() => {
     const getUser = localStorage.getItem('LoggedInUser');
     const User = getUser ? JSON.parse(getUser) : null;
     setUser(User);
   }, []);
+
+  // Set origin query from navigation state (from HomePage search)
+  useEffect(() => {
+    if (location.state?.originQuery) {
+      setOriginQuery(location.state.originQuery);
+      setIsTypingOrigin(true);
+    }
+  }, [location.state]);
 
   // Fetch origin suggestions
   useEffect(() => {

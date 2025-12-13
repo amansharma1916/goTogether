@@ -49,6 +49,7 @@ const Navbar = () => {
             <Link to="/rides" className={`nav-link ${location.pathname === '/rides' ? 'active' : ''}`}>Rides</Link>
             <Link to="/map" className={`nav-link ${location.pathname === '/map' ? 'active' : ''}`}>Map</Link>
             <Link to="/join" className={`nav-link ${location.pathname === '/join' ? 'active' : ''}`}>Join</Link>
+            <Link to="/bookings" className={`nav-link ${location.pathname === '/bookings' ? 'active' : ''}`}>Bookings</Link>
           </div>
         </div>
 

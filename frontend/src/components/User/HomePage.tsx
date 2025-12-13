@@ -1,6 +1,27 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../../Styles/User/HomePage.css'
 
 const HomePage = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handlePostRides = () => {
+    if (searchQuery.trim()) {
+      navigate('/join', { state: { originQuery: searchQuery } });
+    } else {
+      navigate('/join');
+    }
+  };
+
+  const handleRideNow = () => {
+    if (searchQuery.trim()) {
+      navigate('/map', { state: { originQuery: searchQuery } });
+    } else {
+      navigate('/map');
+    }
+  };
+
   return (
     <div className="homepage-container">
       {/* Hero Section */}
@@ -22,14 +43,16 @@ const HomePage = () => {
                 type="text" 
                 className="search-input" 
                 placeholder="Search for rides, destinations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="action-buttons-homepage">
-            <button className="btn-action btn-first">Post Rides</button>
-            <button className="btn-action btn-ride">Ride now</button>
+            <button className="btn-action btn-first" onClick={handlePostRides}>Post Rides</button>
+            <button className="btn-action btn-ride" onClick={handleRideNow}>Ride now</button>
           </div>
         </div>
       </div>
