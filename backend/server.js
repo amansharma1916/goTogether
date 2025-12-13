@@ -9,7 +9,7 @@ import bookingRoutes from './routes/bookingRoutes.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 app.use(cors(
-    {origin: 'https://gotogetherv1.vercel.app'}
+    {origin: '*'}
 ));
 app.use(express.json());
 
