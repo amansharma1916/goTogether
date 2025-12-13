@@ -173,6 +173,85 @@ const Map = () => {
     });
   };
 
+  const handleBookRide = async (e: React.MouseEvent, ride: Ride) => {
+    e.stopPropagation(); // Prevent card selection
+
+    try {
+      // Get user info
+      const loggedInUserStr = localStorage.getItem('LoggedInUser');
+      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
+      const userId = loggedInUser?.id;
+
+      if (!userId) {
+        alert('Please log in to book a ride');
+        return;
+      }
+
+      if (!pickupLocation) {
+        alert('Please select a pickup location first');
+        return;
+      }
+
+      // Calculate meeting point (nearest point on route to pickup location)
+      let nearestPoint = null;
+      let minDistance = Infinity;
+      
+      ride.route.coordinates.forEach((coord) => {
+        const [lng, lat] = coord;
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat - pickupLocation.lat) * Math.PI / 180;
+        const dLng = (lng - pickupLocation.lng) * Math.PI / 180;
+        const a = 
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(pickupLocation.lat * Math.PI / 180) * Math.cos(lat * Math.PI / 180) *
+          Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c;
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestPoint = { lat, lng };
+        }
+      });
+
+      const bookingData = {
+        rideId: ride._id,
+        riderId: userId,
+        seatsBooked: 1,
+        pickupLocation: {
+          lat: pickupLocation.lat,
+          lng: pickupLocation.lng
+        },
+        pickupLocationName: pickupLocation.name || 'My Location',
+        meetingPoint: nearestPoint,
+        distanceToMeetingPoint: minDistance * 1000, // Convert to meters
+        riderNotes: '',
+        paymentMethod: 'cash'
+      };
+
+      const response = await fetch(`${ServerURL}/api/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookingData)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Booking successful! The driver will confirm your request.');
+        // Refresh rides to update seat availability
+        handleSearchRides();
+      } else {
+        alert(`Booking failed: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error booking ride:', error);
+      alert('Failed to book ride. Please try again.');
+    }
+  };
+
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -309,7 +388,10 @@ const Map = () => {
                       </div>
                     )}
                     
-                    <button className="map-ride-book-btn" onClick={(e) => { e.stopPropagation(); alert('Booking feature coming soon!'); }}>
+                    <button 
+                      className="map-ride-book-btn" 
+                      onClick={(e) => handleBookRide(e, ride)}
+                    >
                       Book Ride
                     </button>
                   </div>

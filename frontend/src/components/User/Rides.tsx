@@ -137,6 +137,80 @@ const Rides = () => {
     navigate('/map', { state: { ride } });
   };
 
+  const handleBookRide = async (e: React.MouseEvent, ride: Ride) => {
+    e.stopPropagation(); // Prevent card click event
+
+    try {
+      // Get user info
+      const loggedInUserStr = localStorage.getItem('LoggedInUser');
+      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
+      const userId = loggedInUser?.id;
+
+      if (!userId) {
+        alert('Please log in to book a ride');
+        return;
+      }
+
+      if (!userLocation) {
+        alert('Unable to determine your location. Please enable location services.');
+        return;
+      }
+
+      // Calculate meeting point (nearest point on route)
+      let nearestPoint = null;
+      let minDistance = Infinity;
+      
+      ride.route.coordinates.forEach((coord) => {
+        const [lng, lat] = coord;
+        const distance = calculateDistance(userLocation.lat, userLocation.lng, lat, lng);
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestPoint = { lat, lng };
+        }
+      });
+
+      const bookingData = {
+        rideId: ride._id,
+        riderId: userId,
+        seatsBooked: 1,
+        pickupLocation: {
+          lat: userLocation.lat,
+          lng: userLocation.lng
+        },
+        pickupLocationName: 'My Location',
+        meetingPoint: nearestPoint,
+        distanceToMeetingPoint: minDistance * 1000, // Convert to meters
+        riderNotes: '',
+        paymentMethod: 'cash'
+      };
+
+      const response = await fetch(`${ServerURL}/api/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookingData)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Booking successful! The driver will confirm your request.');
+        // Refresh rides to update seat availability
+        if (viewMode === 'all') {
+          fetchAllRides();
+        } else {
+          fetchMyRides();
+        }
+      } else {
+        alert(`Booking failed: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error booking ride:', error);
+      alert('Failed to book ride. Please try again.');
+    }
+  };
+
   
   const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
     const R = 6371; 
@@ -336,7 +410,12 @@ const Rides = () => {
                   </div>
                 )}
 
-                <button className="book-button">Book This Ride</button>
+                <button 
+                  className="book-button"
+                  onClick={(e) => handleBookRide(e, ride)}
+                >
+                  Book This Ride
+                </button>
               </div>
             ))}
           </div>

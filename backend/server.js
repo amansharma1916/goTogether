@@ -3,6 +3,7 @@ import cors from 'cors';
 import connectDB from './DB/db.js';
 import authRoutes from './Auth/Routes/authRoutes.js';
 import rideRoutes from './routes/rideRoutes.js';
+import bookingRoutes from './routes/bookingRoutes.js';
 
 
 const app = express();
@@ -20,6 +21,7 @@ connectDB();
 
 app.use('/api/auth', authRoutes);
 app.use('/api/rides', rideRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
