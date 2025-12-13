@@ -76,7 +76,7 @@ const Bookings = () => {
   const fetchReceivedBookings = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/bookings/received?userId=${userId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/received?userId=${userId}`);
       const data = await response.json();
       if (data.success) {
         setReceivedBookings(data.bookings);
@@ -94,7 +94,7 @@ const Bookings = () => {
   const fetchMyBookings = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/bookings/my-bookings?userId=${userId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/my-bookings?userId=${userId}`);
       const data = await response.json();
       if (data.success) {
         setMyBookings(data.bookings);
@@ -111,7 +111,7 @@ const Bookings = () => {
 
   const handleConfirm = async (bookingId: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}/confirm`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/confirm`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -136,7 +136,7 @@ const Bookings = () => {
     if (!reason) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}/cancel`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/cancel`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -166,7 +166,7 @@ const Bookings = () => {
 
   const handleComplete = async (bookingId: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}/complete`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/complete`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
