@@ -208,10 +208,10 @@ Before you begin, ensure you have the following installed:
 ```env
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/gotogether
+VITE_ORS_API_KEY=your_openrouteservice_api_key
 # OR use MongoDB Atlas
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/gotogether
-JWT_SECRET=your_super_secret_jwt_key_here
-NODE_ENV=development
+VITE_ORS_API_KEY=your_openrouteservice_api_key
 ```
 
 #### Frontend `.env`
