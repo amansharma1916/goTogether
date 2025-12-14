@@ -54,7 +54,6 @@ const MapComponent = ({
                "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
             ],
-
             tileSize: 256,
             attribution: "© OpenStreetMap contributors",
           },

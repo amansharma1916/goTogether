@@ -9,7 +9,6 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -22,19 +21,15 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    // Clear authentication data from localStorage
     localStorage.removeItem('isAuthenticated');
-    // localStorage.removeItem('user');
-    // localStorage.removeItem('userId');
+    localStorage.removeItem('LoggedInUser');
     
-    // Redirect to login page
-    navigate('/');
+    navigate('/login');
   };
   
   return (
     <div className="Navbar-container">
       <nav className="top-navbar">
-        {/* Left - App Logo */}
         <div className="nav-left">
           <div className="logo-container-nav">
             <img src={logo} alt="GoTogether" className="app-logo" />
@@ -42,7 +37,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Center - Navigation Links */}
         <div className="nav-center">
           <div className="nav-links">
             <Link to="/home" className={`nav-link ${location.pathname === '/home' ? 'active' : ''}`}>Home</Link>
@@ -53,7 +47,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Right - User & Notification Icons */}
         <div className="nav-right">
           <div className="user-profile-dropdown" ref={dropdownRef}>
             <button 
