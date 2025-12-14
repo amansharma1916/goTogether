@@ -1,9 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 
-// ----------------------
-// GeoJSON Subschemas
-// ----------------------
-
 const PointSchema = new Schema({
   type: {
     type: String,
@@ -12,7 +8,7 @@ const PointSchema = new Schema({
     default: "Point"
   },
   coordinates: {
-    type: [Number], // [lng, lat]
+    type: [Number], 
     required: true
   }
 });
@@ -25,7 +21,7 @@ const LineStringSchema = new Schema({
     default: "LineString"
   },
   coordinates: {
-    type: [[Number]], // array of [lng, lat]
+    type: [[Number]], 
     required: true
   }
 });
@@ -38,14 +34,14 @@ const PolygonSchema = new Schema({
     default: "Polygon"
   },
   coordinates: {
-    type: [[[Number]]], // polygon array
+    type: [[[Number]]], 
     required: true
   }
 });
 
-// ----------------------
-// Ride Schema
-// ----------------------
+
+
+
 
 const RideSchema = new Schema(
   {
@@ -71,37 +67,37 @@ const RideSchema = new Schema(
       required: true
     },
 
-    // Origin selected by driver
+    
     origin: {
       type: PointSchema,
       required: true
     },
 
-    // Destination (fixed college)
+    
     destination: {
       type: PointSchema,
       required: true
     },
 
-    // FULL route selected by user (from ORS)
+    
     route: {
       type: LineStringSchema,
       required: true
     },
 
-    // Simplified polyline for fast frontend preview + matching
+    
     simplifiedRoute: {
       type: LineStringSchema,
       required: false
     },
 
-    // Bounding box polygon for fast DB spatial filtering
+    
     bbox: {
       type: PolygonSchema,
       required: false
     },
 
-    // Distance and Duration
+    
     distanceMeters: {
       type: Number,
       required: true
@@ -112,7 +108,7 @@ const RideSchema = new Schema(
       required: true
     },
 
-    // Ride Form Fields
+    
     departureTime: {
       type: Date,
       required: true
@@ -135,7 +131,7 @@ const RideSchema = new Schema(
       default: ""
     },
 
-    // Ride lifecycle
+    
     status: {
       type: String,
       enum: ["active", "cancelled", "completed"],
@@ -143,13 +139,9 @@ const RideSchema = new Schema(
     }
   },
   {
-    timestamps: true // adds createdAt, updatedAt
+    timestamps: true 
   }
 );
-
-// ----------------------
-// Indexes for fast search
-// ----------------------
 
 RideSchema.index({ origin: "2dsphere" });
 RideSchema.index({ route: "2dsphere" });

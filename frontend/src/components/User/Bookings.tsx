@@ -55,7 +55,6 @@ const Bookings = () => {
   const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
-    // Get user ID from localStorage
     const loggedInUser = localStorage.getItem('LoggedInUser');
     if (loggedInUser) {
       const user = JSON.parse(loggedInUser);

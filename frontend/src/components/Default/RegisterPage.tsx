@@ -89,7 +89,7 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
           />
         </div>
 
-        {}
+        
         <div className="form-group">
           <label htmlFor="reg-password" className="form-label">Password</label>
           <input
