@@ -1,10 +1,7 @@
 import BookedRide from '../DB/Schema/BookedRideSchema.js';
 import Ride from '../DB/Schema/PostedRidesSchema.js';
 
-/**
- * POST /api/bookings
- * Create a new ride booking
- */
+
 export const createBooking = async (req, res) => {
   try {
     const {
@@ -19,7 +16,7 @@ export const createBooking = async (req, res) => {
       paymentMethod = 'cash'
     } = req.body;
 
-    // Validate required fields
+    
     if (!rideId || !riderId) {
       return res.status(400).json({
         success: false,
@@ -34,7 +31,7 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Fetch the ride details
+    
     const ride = await Ride.findById(rideId);
     if (!ride) {
       return res.status(404).json({
@@ -43,7 +40,7 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Check if ride is active
+    
     if (ride.status !== 'active') {
       return res.status(400).json({
         success: false,
@@ -51,7 +48,7 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Check if user is trying to book their own ride
+    
     if (ride.userId.toString() === riderId) {
       return res.status(400).json({
         success: false,
@@ -59,7 +56,7 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Check if enough seats are available
+    
     const existingBookings = await BookedRide.find({
       rideId: rideId,
       status: { $in: ['pending', 'confirmed'] }
@@ -75,7 +72,7 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Check if user has already booked this ride
+    
     const existingBooking = await BookedRide.findOne({
       rideId: rideId,
       riderId: riderId,
@@ -89,16 +86,16 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Calculate total amount
+    
     const totalAmount = ride.pricePerSeat * seatsBooked;
 
-    // Create pickup location GeoJSON
+    
     const pickupPointGeoJSON = {
       type: "Point",
       coordinates: [pickupLocation.lng, pickupLocation.lat]
     };
 
-    // Create meeting point GeoJSON if provided
+    
     let meetingPointGeoJSON = null;
     if (meetingPoint && meetingPoint.lat && meetingPoint.lng) {
       meetingPointGeoJSON = {
@@ -107,7 +104,7 @@ export const createBooking = async (req, res) => {
       };
     }
 
-    // Create the booking
+    
     const newBooking = new BookedRide({
       rideId,
       riderId,
@@ -128,11 +125,11 @@ export const createBooking = async (req, res) => {
 
     await newBooking.save();
 
-    // Decrease available seats in the ride
+    
     ride.seatsAvailable -= seatsBooked;
     await ride.save();
 
-    // Populate references before sending response
+    
     await newBooking.populate([
       { path: 'rideId' },
       { path: 'riderId', select: 'fullName email phone' },
@@ -155,10 +152,7 @@ export const createBooking = async (req, res) => {
   }
 };
 
-/**
- * GET /api/bookings/my-bookings
- * Get current user's bookings (as a rider)
- */
+
 export const getMyBookings = async (req, res) => {
   try {
     const { userId, status } = req.query;
@@ -188,10 +182,7 @@ export const getMyBookings = async (req, res) => {
   }
 };
 
-/**
- * GET /api/bookings/received
- * Get bookings received by driver for their rides
- */
+
 export const getReceivedBookings = async (req, res) => {
   try {
     const { userId, status } = req.query;
@@ -221,10 +212,7 @@ export const getReceivedBookings = async (req, res) => {
   }
 };
 
-/**
- * GET /api/bookings/ride/:rideId
- * Get all bookings for a specific ride
- */
+
 export const getRideBookings = async (req, res) => {
   try {
     const { rideId } = req.params;
@@ -256,10 +244,7 @@ export const getRideBookings = async (req, res) => {
   }
 };
 
-/**
- * GET /api/bookings/:id
- * Get a specific booking by ID
- */
+
 export const getBookingById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -291,10 +276,7 @@ export const getBookingById = async (req, res) => {
   }
 };
 
-/**
- * PATCH /api/bookings/:id/confirm
- * Confirm a booking (driver action)
- */
+
 export const confirmBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -309,7 +291,7 @@ export const confirmBooking = async (req, res) => {
       });
     }
 
-    // Verify the user is the driver
+    
     if (booking.driverId.toString() !== userId) {
       return res.status(403).json({
         success: false,
@@ -343,10 +325,7 @@ export const confirmBooking = async (req, res) => {
   }
 };
 
-/**
- * PATCH /api/bookings/:id/cancel
- * Cancel a booking
- */
+
 export const cancelBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -361,7 +340,7 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
-    // Verify the user is either the rider or the driver
+    
     const isRider = booking.riderId.toString() === userId;
     const isDriver = booking.driverId.toString() === userId;
 
@@ -388,7 +367,7 @@ export const cancelBooking = async (req, res) => {
 
     await booking.save();
 
-    // Restore available seats in the ride
+    
     const ride = await Ride.findById(booking.rideId);
     if (ride) {
       ride.seatsAvailable += booking.seatsBooked;
@@ -411,10 +390,7 @@ export const cancelBooking = async (req, res) => {
   }
 };
 
-/**
- * PATCH /api/bookings/:id/complete
- * Mark booking as completed (driver action)
- */
+
 export const completeBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -429,7 +405,7 @@ export const completeBooking = async (req, res) => {
       });
     }
 
-    // Verify the user is the driver
+    
     if (booking.driverId.toString() !== userId) {
       return res.status(403).json({
         success: false,
@@ -463,10 +439,7 @@ export const completeBooking = async (req, res) => {
   }
 };
 
-/**
- * PATCH /api/bookings/:id/rate
- * Add rating and review for completed booking (rider action)
- */
+
 export const rateBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -481,7 +454,7 @@ export const rateBooking = async (req, res) => {
       });
     }
 
-    // Verify the user is the rider
+    
     if (booking.riderId.toString() !== userId) {
       return res.status(403).json({
         success: false,
@@ -503,7 +476,7 @@ export const rateBooking = async (req, res) => {
       });
     }
 
-    // Validate rating
+    
     if (!ratingForDriver || ratingForDriver < 1 || ratingForDriver > 5) {
       return res.status(400).json({
         success: false,
@@ -535,10 +508,7 @@ export const rateBooking = async (req, res) => {
   }
 };
 
-/**
- * PATCH /api/bookings/:id/payment
- * Update payment status
- */
+
 export const updatePaymentStatus = async (req, res) => {
   try {
     const { id } = req.params;

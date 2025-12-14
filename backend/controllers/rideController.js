@@ -6,17 +6,14 @@ import bboxPolygon from '@turf/bbox-polygon';
 
 const ORS_API_KEY = process.env.ORS_API_KEY || '';
 
-/**
- * POST /api/rides
- * Create a new ride posting
- */
+
 export const createRide = async (req, res) => {
   try {
     const {
       origin,
       userId,
       fullName,
-      destination,      // { lat, lng, name }
+      destination,      
       selectedRouteIndex = 0,
       departureDate,
       departureTime,
@@ -26,7 +23,7 @@ export const createRide = async (req, res) => {
       notes
     } = req.body;
 
-    // 1. Validate required fields
+    
     if (!origin || !destination || !origin.lat || !origin.lng || !destination.lat || !destination.lng) {
       return res.status(400).json({
         success: false,
@@ -48,7 +45,7 @@ export const createRide = async (req, res) => {
       });
     }
 
-    // 2. Combine date and time into departureTime
+    
     let departureDateTimeObj;
     if (departureDate && departureTime) {
       departureDateTimeObj = new Date(`${departureDate}T${departureTime}`);
@@ -61,7 +58,7 @@ export const createRide = async (req, res) => {
       });
     }
 
-    // Check if a ride with the same departure time already exists
+    
     const existingRide = await Ride.findOne({
       driverId: req.user?.id || req.body.driverId,
       departureTime: departureDateTimeObj
@@ -74,7 +71,7 @@ export const createRide = async (req, res) => {
       });
     }
 
-    // 3. Fetch routes from OpenRouteService
+    
     let routesData;
     try {
       const response = await fetch(
@@ -114,26 +111,26 @@ export const createRide = async (req, res) => {
       });
     }
 
-    // 4. Select the route based on selectedRouteIndex
+    
     const selectedRoute = routesData.features[selectedRouteIndex] || routesData.features[0];
     const routeGeometry = selectedRoute.geometry;
     const routeProperties = selectedRoute.properties;
 
-    // 5. Extract distance and duration from route properties
+    
     const distanceMeters = routeProperties.segments?.[0]?.distance || routeProperties.summary?.distance || 0;
     const durationSeconds = routeProperties.segments?.[0]?.duration || routeProperties.summary?.duration || 0;
 
-    // 6. Create simplified route for faster frontend rendering
+    
     const simplifiedRouteGeometry = simplify(routeGeometry, {
       tolerance: 0.001,
       highQuality: false
     });
 
-    // 7. Create bounding box polygon for spatial filtering
-    const bboxArray = bbox(routeGeometry); // [minLng, minLat, maxLng, maxLat]
+    
+    const bboxArray = bbox(routeGeometry); 
     const bboxPolygonGeometry = bboxPolygon(bboxArray).geometry;
 
-    // 8. Create GeoJSON Point objects for origin and destination
+    
     const originPoint = {
       type: "Point",
       coordinates: [origin.lng, origin.lat]
@@ -144,9 +141,9 @@ export const createRide = async (req, res) => {
       coordinates: [destination.lng, destination.lat]
     };
 
-    // 9. Create the ride document
+    
     const newRide = new Ride({
-      driverId: req.user?.id || req.body.driverId, // Get from auth middleware or body (for testing)
+      driverId: req.user?.id || req.body.driverId, 
       vehicleId: req.body.vehicleId || null,
       fullName: req.user?.fullName || "Unknown Driver",
       userId: userId,
@@ -164,10 +161,10 @@ export const createRide = async (req, res) => {
       status: "active"
     });
 
-    // 10. Save to database
+    
     await newRide.save();
 
-    // 11. Return success response
+    
     return res.status(201).json({
       success: true,
       rideId: newRide._id,
@@ -194,23 +191,19 @@ export const createRide = async (req, res) => {
   }
 };
 
-/**
- * GET /api/rides
- * Get all active rides (with optional filters)
- * Excludes rides posted by the current user
- */
+
 export const getRides = async (req, res) => {
   try {
     const { departureDate, maxDistance, userId } = req.query;
 
     const filter = { status: "active" };
 
-    // Exclude current user's rides if userId is provided
+    
     if (userId) {
       filter.userId = { $ne: userId };
     }
 
-    // Filter by departure date if provided
+    
     if (departureDate) {
       const startOfDay = new Date(departureDate);
       startOfDay.setHours(0, 0, 0, 0);
@@ -244,10 +237,7 @@ export const getRides = async (req, res) => {
   }
 };
 
-/**
- * GET /api/rides/:id
- * Get a specific ride by ID
- */
+
 export const getRideById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -277,16 +267,12 @@ export const getRideById = async (req, res) => {
   }
 };
 
-/**
- * POST /api/rides/search
- * Search for rides near a pickup location
- * Excludes rides posted by the current user
- */
+
 export const searchRides = async (req, res) => {
   try {
     const { pickup, radiusMeters = 800, timeWindow, userId } = req.body;
 
-    // Validate pickup location
+    
     if (!pickup || typeof pickup.lat !== 'number' || typeof pickup.lng !== 'number') {
       return res.status(400).json({
         success: false,
@@ -294,13 +280,13 @@ export const searchRides = async (req, res) => {
       });
     }
 
-    // Create GeoJSON Point for the pickup location
+    
     const pickupPoint = {
       type: "Point",
-      coordinates: [pickup.lng, pickup.lat] // GeoJSON uses [lng, lat]
+      coordinates: [pickup.lng, pickup.lat] 
     };
 
-    // Build the query
+    
     const query = {
       status: "active",
       origin: {
@@ -311,12 +297,12 @@ export const searchRides = async (req, res) => {
       }
     };
 
-    // Exclude current user's rides if userId is provided
+    
     if (userId) {
       query.userId = { $ne: userId };
     }
 
-    // Add time window filter if provided
+    
     if (timeWindow && timeWindow.from) {
       query.departureTime = query.departureTime || {};
       query.departureTime.$gte = new Date(timeWindow.from);
@@ -326,7 +312,7 @@ export const searchRides = async (req, res) => {
       query.departureTime.$lte = new Date(timeWindow.to);
     }
 
-    // Execute the search
+    
     const rides = await Ride.find(query)
       .populate('driverId', 'fullName email')
       .limit(30);
@@ -347,10 +333,7 @@ export const searchRides = async (req, res) => {
   }
 };
 
-/**
- * GET /api/rides/my-rides
- * Get rides posted by the current user
- */
+
 export const getMyRides = async (req, res) => {
   try {
     const { userId } = req.query;

@@ -1,8 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 
-// ----------------------
-// GeoJSON Point Schema for pickup location
-// ----------------------
+
+
+
 const PointSchema = new Schema({
   type: {
     type: String,
@@ -11,14 +11,14 @@ const PointSchema = new Schema({
     default: "Point"
   },
   coordinates: {
-    type: [Number], // [lng, lat]
+    type: [Number], 
     required: true
   }
 });
 
-// ----------------------
-// Booked Ride Schema
-// ----------------------
+
+
+
 const BookedRideSchema = new Schema(
   {
     rideId: {
@@ -97,14 +97,14 @@ const BookedRideSchema = new Schema(
       }
     },
 
-    // Rider's special requests or notes
+    
     riderNotes: {
       type: String,
       maxlength: 500,
       default: ""
     },
 
-    // Cancellation information
+    
     cancellation: {
       cancelledBy: {
         type: String,
@@ -122,7 +122,7 @@ const BookedRideSchema = new Schema(
       }
     },
 
-    // Rating and review (after ride completion)
+    
     rating: {
       ratingForDriver: {
         type: Number,
@@ -141,7 +141,7 @@ const BookedRideSchema = new Schema(
       }
     },
 
-    // Timestamps for booking lifecycle
+    
     bookedAt: {
       type: Date,
       default: Date.now
@@ -158,52 +158,45 @@ const BookedRideSchema = new Schema(
     }
   },
   {
-    timestamps: true // Adds createdAt and updatedAt automatically
+    timestamps: true 
   }
 );
 
-// ----------------------
-// Indexes for better query performance
-// ----------------------
 
-// Index for finding bookings by rider
+
+
+
+
 BookedRideSchema.index({ riderId: 1, status: 1 });
 
-// Index for finding bookings by driver
+
 BookedRideSchema.index({ driverId: 1, status: 1 });
 
-// Index for finding bookings by ride
+
 BookedRideSchema.index({ rideId: 1, status: 1 });
 
-// Index for finding bookings by booking date
+
 BookedRideSchema.index({ bookedAt: -1 });
 
-// Geospatial index for pickup location
+
 BookedRideSchema.index({ pickupLocation: "2dsphere" });
 
-// ----------------------
-// Instance Methods
-// ----------------------
 
-// Calculate refund amount based on cancellation time
+
+
+
+
 BookedRideSchema.methods.calculateRefundAmount = function() {
   if (this.status !== 'cancelled') return 0;
   if (this.payment.paymentStatus !== 'paid') return 0;
-
-  // Example refund policy:
-  // - More than 24 hours before ride: 100% refund
-  // - 12-24 hours before ride: 50% refund
-  // - Less than 12 hours: No refund
-  
-  // This would need the ride's departure time, so you'd need to populate rideId first
-  return this.payment.totalAmount; // Placeholder
+  return this.payment.totalAmount; 
 };
 
-// ----------------------
-// Static Methods
-// ----------------------
 
-// Find active bookings for a ride
+
+
+
+
 BookedRideSchema.statics.findActiveBookingsForRide = function(rideId) {
   return this.find({
     rideId: rideId,
@@ -211,7 +204,7 @@ BookedRideSchema.statics.findActiveBookingsForRide = function(rideId) {
   }).populate('riderId', 'fullName email phone');
 };
 
-// Find user's booking history
+
 BookedRideSchema.statics.findUserBookings = function(userId, status = null) {
   const query = { riderId: userId };
   if (status) query.status = status;
@@ -222,7 +215,7 @@ BookedRideSchema.statics.findUserBookings = function(userId, status = null) {
     .sort({ bookedAt: -1 });
 };
 
-// Find driver's received bookings
+
 BookedRideSchema.statics.findDriverBookings = function(driverId, status = null) {
   const query = { driverId: driverId };
   if (status) query.status = status;
@@ -233,30 +226,28 @@ BookedRideSchema.statics.findDriverBookings = function(driverId, status = null) 
     .sort({ bookedAt: -1 });
 };
 
-// ----------------------
-// Pre-save Middleware
-// ----------------------
+
 
 BookedRideSchema.pre('save', function() {
-  // Set confirmed timestamp when status changes to confirmed
+  
   if (this.isModified('status') && this.status === 'confirmed' && !this.confirmedAt) {
     this.confirmedAt = new Date();
   }
   
-  // Set completed timestamp when status changes to completed
+  
   if (this.isModified('status') && this.status === 'completed' && !this.completedAt) {
     this.completedAt = new Date();
   }
   
-  // Set cancellation timestamp when status changes to cancelled
+  
   if (this.isModified('status') && this.status === 'cancelled' && !this.cancellation.cancelledAt) {
     this.cancellation.cancelledAt = new Date();
   }
 });
 
-// ----------------------
-// Export Model
-// ----------------------
+
+
+
 
 const BookedRide = mongoose.model("BookedRide", BookedRideSchema);
 
