@@ -558,7 +558,7 @@ const MapComponent = ({
         overflow: "hidden",
         
         color: "white",
-        filter: "invert(90%) hue-rotate(120deg) brightness(70%)"
+        // filter: "invert(90%) hue-rotate(120deg) brightness(70%)"
         
       }}
     />
