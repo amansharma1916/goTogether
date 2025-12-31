@@ -3,6 +3,7 @@ import MapComponent from './Assets/MapComponent'
 import '../../Styles/User/Join.css'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import Loader from './Assets/Loader'
 
 interface LocationData {
   lat: number;
@@ -45,6 +46,7 @@ const Join = () => {
   const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(0);
   const [availableRoutes, setAvailableRoutes] = useState<number>(0);
   const [User, setUser] = useState<any>(null);
+  const [isPublishing, setIsPublishing] = useState(false);
   
   useEffect(() => {
     const getUser = localStorage.getItem('LoggedInUser');
@@ -147,6 +149,8 @@ const Join = () => {
       return;
     }
 
+    setIsPublishing(true);
+
     const rideData = {
       origin: originLocation,
       userId: User?.id,
@@ -163,7 +167,7 @@ const Join = () => {
     };
 
     console.log("Publishing ride with data:", rideData);
-
+    
     try {
       const response = await fetch(`${ServerURL}/api/rides`, {
         method: 'POST',
@@ -186,6 +190,8 @@ const Join = () => {
     } catch (error) {
       console.error("Error publishing ride:", error);
       alert("Failed to publish ride. Please try again.");
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -230,6 +236,7 @@ const Join = () => {
 
   return (
     <div className="join-page">
+      {isPublishing && <Loader />}
       <Navbar />
       <div className="join-content">
         <div className="join-map-container">
