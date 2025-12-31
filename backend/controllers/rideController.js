@@ -23,6 +23,7 @@ export const createRide = async (req, res) => {
       notes
     } = req.body;
 
+    console.log("CreateRide request body:", req.body);
     
     if (!origin || !destination || !origin.lat || !origin.lng || !destination.lat || !destination.lng) {
       return res.status(400).json({
@@ -145,7 +146,7 @@ export const createRide = async (req, res) => {
     const newRide = new Ride({
       driverId: req.user?.id || req.body.driverId, 
       vehicleId: req.body.vehicleId || null,
-      fullName: req.user?.fullName || "Unknown Driver",
+      fullName: req.body.fullname,
       userId: userId,
       origin: originPoint,
       destination: destinationPoint,
