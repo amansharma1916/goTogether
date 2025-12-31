@@ -5,6 +5,8 @@ import Navbar from './Assets/Navbar'
 
 interface Ride {
   _id: string;
+  fullName: string;
+  userId: string;
   driverId: {
     
     email: string;
@@ -32,6 +34,8 @@ interface Ride {
 
 const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+
+
 const Rides = () => {
   const navigate = useNavigate();
   const [rides, setRides] = useState<Ride[]>([]);
@@ -39,8 +43,10 @@ const Rides = () => {
   const [sortBy, setSortBy] = useState<'distance' | 'time' | 'price'>('distance');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
+  const LoggedInUser = localStorage.getItem('LoggedInUser');
 
   useEffect(() => {
+
     
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -333,10 +339,10 @@ const Rides = () => {
                 <div className="ride-card-header">
                   <div className="ride-driver">
                     <div className="driver-avatar">
-                      {}
+                      {ride.fullName.charAt(0).toUpperCase()}
                     </div>
                     <div className="driver-info">
-                      {}
+                      {ride.fullName}
                       <p className="ride-date">{formatDate(ride.departureTime)}</p>
                     </div>
                   </div>
@@ -409,13 +415,21 @@ const Rides = () => {
                     <p>{ride.notes}</p>
                   </div>
                 )}
+              {LoggedInUser && JSON.parse(LoggedInUser).id === ride.userId ? <button 
+                className="book-button"
+                onClick={(e) => e.preventDefault()}
+                >
+                  View Your Rides
+                </button> :
 
                 <button 
-                  className="book-button"
-                  onClick={(e) => handleBookRide(e, ride)}
+                className="book-button"
+                onClick={(e) => handleBookRide(e, ride)}
                 >
                   Book This Ride
                 </button>
+                }
+                
               </div>
             ))}
           </div>

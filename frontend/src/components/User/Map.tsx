@@ -19,6 +19,7 @@ interface NominatimResult {
 
 interface Ride {
   _id: string;
+  fullName: string;
   driverId: {
     // fullName: string;
     email: string;
@@ -155,6 +156,7 @@ const Map = () => {
 
       if (data.success) {
         setAvailableRides(data.rides);
+        console.log("Found rides:", data.rides[0].fullName);
       } else {
         alert(`Search failed: ${data.message}`);
       }
@@ -279,6 +281,7 @@ const Map = () => {
   //   setDestinationLocation({ lat, lng, name: item.display_name });
   // };
 
+  
   return (
     <div className="map-page">
       <Navbar />
@@ -338,7 +341,8 @@ const Map = () => {
                 <p className="map-no-rides">Searching for rides...</p>
               ) : availableRides.length > 0 ? (
                 availableRides.map((ride) => (
-                  <div 
+                  
+                  <div
                     key={ride._id} 
                     className={`map-ride-card ${selectedRide?._id === ride._id ? 'selected' : ''}`}
                     onClick={() => handleRideSelect(ride)}
@@ -346,10 +350,11 @@ const Map = () => {
                     <div className="map-ride-header">
                       <div className="map-ride-driver">
                         <div className="map-driver-avatar">
-                          {/* {ride.driverId.fullName.charAt(0).toUpperCase()} */}
+                          
+                          {ride.fullName.charAt(0).toUpperCase()}
                         </div>
                         <div className="map-driver-info">
-                          {/* <h5 className="map-driver-name">{ride.driverId.fullName}</h5> */}
+                          <h5 className="map-driver-name">{ride.fullName}</h5>
                           <p className="map-ride-time">{formatDate(ride.departureTime)} at {formatTime(ride.departureTime)}</p>
                         </div>
                       </div>

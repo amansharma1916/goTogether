@@ -50,6 +50,7 @@ const Join = () => {
     const getUser = localStorage.getItem('LoggedInUser');
     const User = getUser ? JSON.parse(getUser) : null;
     setUser(User);
+    console.log("LoggedInUser:", User);
   }, []);
 
   // Set origin query from navigation state (from HomePage search)
@@ -149,7 +150,7 @@ const Join = () => {
     const rideData = {
       origin: originLocation,
       userId: User?.id,
-      fullname: User?.fullname,
+      fullname: User.fullname,
       destination: destLocation,
       selectedRouteIndex,
       departureDate,
@@ -160,6 +161,8 @@ const Join = () => {
       notes,
       driverId: "507f1f77bcf86cd799439011" // TODO: Get from auth context
     };
+
+    console.log("Publishing ride with data:", rideData);
 
     try {
       const response = await fetch(`${ServerURL}/api/rides`, {
