@@ -55,7 +55,7 @@ const Join = () => {
     console.log("LoggedInUser:", User);
   }, []);
 
-  // Set origin query from navigation state (from HomePage search)
+  
   useEffect(() => {
     if (location.state?.originQuery) {
       setOriginQuery(location.state.originQuery);
@@ -63,7 +63,7 @@ const Join = () => {
     }
   }, [location.state]);
 
-  // Fetch origin suggestions
+  
   useEffect(() => {
     if (originQuery.length < 3) {
       setOriginResults([]);
