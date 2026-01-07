@@ -62,7 +62,6 @@ const Join = () => {
       setIsTypingOrigin(true);
     }
   }, [location.state]);
-
   
   useEffect(() => {
     if (originQuery.length < 3) {
@@ -82,7 +81,6 @@ const Join = () => {
     return () => clearTimeout(delay);
   }, [originQuery]);
 
-  // Fetch destination suggestions
   useEffect(() => {
     if (destQuery.length < 3) {
       setDestResults([]);
@@ -182,7 +180,6 @@ const Join = () => {
 
       if (data.success) {
         alert(`Ride posted successfully! Ride ID: ${data.rideId}`);
-        // Reset form or redirect
         handleReset();
       } else {
         alert(`Failed to post ride: ${data.message}`);
@@ -197,7 +194,6 @@ const Join = () => {
 
   const handleSaveDraft = () => {
     console.log("Saving draft...");
-    // TODO: Save draft to backend
   };
 
   const handleReset = () => {
