@@ -423,13 +423,11 @@ const MapComponent = ({
         if (!pickupLocation || !rideRoute.coordinates || rideRoute.coordinates.length === 0) return;
 
         try {
-          // Find nearest point on the ride route to user's pickup location
           let nearestPoint = null;
           let minDistance = Infinity;
 
           rideRoute.coordinates.forEach((coord) => {
             const [lng, lat] = coord;
-            // Calculate distance using simple Euclidean distance
             const distance = Math.sqrt(
               Math.pow(lng - pickupLocation.lng, 2) +
               Math.pow(lat - pickupLocation.lat, 2)
@@ -465,7 +463,6 @@ const MapComponent = ({
           if (data.features && data.features.length > 0) {
             const connectionRoute = data.features[0].geometry;
 
-            // Add connection route to map
             if (map.current) {
               map.current.addSource(connectionRouteLayerId, {
                 type: 'geojson',
@@ -488,7 +485,6 @@ const MapComponent = ({
                 }
               });
 
-              // Add a marker at the meeting point (nearest point on ride route)
               const meetingPointLayerId = 'meeting-point';
 
               if (map.current.getLayer(meetingPointLayerId)) {
@@ -530,13 +526,11 @@ const MapComponent = ({
 
       fetchConnectionRoute();
 
-      // Fit map to show the entire route including pickup location
       const coordinates = rideRoute.coordinates;
       const bounds = coordinates.reduce((bounds, coord) => {
         return bounds.extend(coord as [number, number]);
       }, new maplibregl.LngLatBounds(coordinates[0] as [number, number], coordinates[0] as [number, number]));
 
-      // Include pickup location in bounds if available
       if (pickupLocation) {
         bounds.extend([pickupLocation.lng, pickupLocation.lat]);
       }
@@ -558,6 +552,7 @@ const MapComponent = ({
         overflow: "hidden",
         
         color: "white",
+
         // filter: "invert(90%) hue-rotate(120deg) brightness(70%)"
         
       }}
