@@ -59,7 +59,55 @@ const Map = () => {
 
   // Handle ride passed from Rides page
   useEffect(() => {
-    if (location.state?.ride) {
+    if (location.state?.booking) {
+      // Booking data from Bookings page - show full route with meeting point
+      const booking = location.state.booking;
+      setSelectedRide({
+        _id: booking.rideId._id,
+        fullName: booking.rideId.fullName || '',
+        driverId: {
+          email: booking.driverId?.email || ''
+        },
+        origin: {
+          type: 'Point',
+          coordinates: booking.rideId.origin?.coordinates || [0, 0]
+        },
+        destination: {
+          type: 'Point',
+          coordinates: booking.rideId.destination?.coordinates || [0, 0]
+        },
+        route: booking.rideId.route || { type: 'LineString', coordinates: [] },
+        departureTime: booking.rideId.departureTime,
+        seatsAvailable: booking.rideId.seatsAvailable,
+        pricePerSeat: booking.rideId.pricePerSeat,
+        distanceMeters: 0,
+        durationSeconds: 0
+      } as Ride);
+
+      // Set pickup to meeting point if available
+      if (booking.meetingPoint?.coordinates) {
+        setPickupLocation({
+          lat: booking.meetingPoint.coordinates[1],
+          lng: booking.meetingPoint.coordinates[0],
+          name: booking.pickupLocationName || 'Pickup Point'
+        });
+      } else {
+        setPickupLocation({
+          lat: booking.rideId.origin?.coordinates[1] || 0,
+          lng: booking.rideId.origin?.coordinates[0] || 0,
+          name: 'Origin'
+        });
+      }
+
+      // Set destination
+      setDestinationLocation({
+        lat: booking.rideId.destination?.coordinates[1] || 0,
+        lng: booking.rideId.destination?.coordinates[0] || 0,
+        name: booking.rideId.destination?.name || 'Destination'
+      });
+
+      setFromQuery(booking.pickupLocationName || 'Pickup Point');
+    } else if (location.state?.ride) {
       const ride = location.state.ride as Ride;
       setSelectedRide(ride);
       setDestinationLocation({
