@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import "../../Styles/User/Bookings.css";
 import Navbar from './Assets/Navbar';
 
@@ -6,11 +7,12 @@ interface Booking {
   _id: string;
   rideId: {
     _id: string;
-    origin: { name: string };
-    destination: { name: string };
+    origin: { name: string; coordinates?: [number, number] };
+    destination: { name: string; coordinates?: [number, number] };
     departureTime: string;
     pricePerSeat: number;
     seatsAvailable: number;
+    route?: { type: string; coordinates: [number, number][] };
   };
   riderId: {
     _id: string;
@@ -26,6 +28,7 @@ interface Booking {
   };
   seatsBooked: number;
   pickupLocationName: string;
+  meetingPoint?: { type: string; coordinates: [number, number] };
   distanceToMeetingPoint: number;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'rejected';
   payment: {
@@ -48,6 +51,7 @@ interface Booking {
 }
 
 const Bookings = () => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'received' | 'sent'>('received');
   const [receivedBookings, setReceivedBookings] = useState<Booking[]>([]);
   const [myBookings, setMyBookings] = useState<Booking[]>([]);
@@ -213,6 +217,16 @@ const Bookings = () => {
     }
   };
 
+  const openMapModal = (booking: Booking) => {
+    // Navigate to Map with booking data
+    navigate('/map', {
+      state: {
+        booking: booking,
+        showMeetingPoint: true
+      }
+    });
+  };
+
   const renderBookingCard = (booking: Booking, isReceived: boolean) => {
     return (
       <div key={booking._id} className="booking-card">
@@ -226,6 +240,29 @@ const Bookings = () => {
             {booking.status.toUpperCase()}
           </span>
         </div>
+
+        {isReceived && (
+          <div className="location-section">
+            <div className="location-header">
+              <h4>📍 Pickup Location</h4>
+              <button 
+                className="btn-view-map"
+                onClick={() => openMapModal(booking)}
+                title="View pickup location on map"
+              >
+                View on Map
+              </button>
+            </div>
+            <div className="location-info">
+              <p className="location-name">{booking.pickupLocationName}</p>
+              {booking.distanceToMeetingPoint && (
+                <p className="distance-info">
+                  📏 {(booking.distanceToMeetingPoint / 1000).toFixed(2)} km from route
+                </p>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="booking-details">
           <div className="detail-row">
@@ -276,13 +313,6 @@ const Bookings = () => {
             <span className="detail-label">Payment Method:</span>
             <span className="detail-value">{booking.payment.paymentMethod.toUpperCase()}</span>
           </div>
-
-          {booking.distanceToMeetingPoint && (
-            <div className="detail-row">
-              <span className="detail-label">Distance to Meeting Point:</span>
-              <span className="detail-value">{(booking.distanceToMeetingPoint / 1000).toFixed(2)} km</span>
-            </div>
-          )}
 
           <div className="detail-row">
             <span className="detail-label">Booked At:</span>

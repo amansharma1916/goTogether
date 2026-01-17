@@ -223,6 +223,7 @@ BookedRideSchema.statics.findDriverBookings = function(driverId, status = null) 
   return this.find(query)
     .populate('rideId')
     .populate('riderId', 'fullName email phone')
+    .populate('driverId', 'fullName email phone')
     .sort({ bookedAt: -1 });
 };
 
