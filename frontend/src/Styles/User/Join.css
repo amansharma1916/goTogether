@@ -266,13 +266,30 @@
   font-size: 14px;
 }
 
-.join-datetime-group {
-  display: flex;
-  gap: 12px;
+.join-date-input {
+  width: 100%;
 }
 
-.join-datetime-group input {
-  flex: 1;
+.join-date-input input {
+  width: 90%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.join-date-input input:focus {
+  outline: none;
+  border-color: #4ADE80;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.join-date-input input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
 }
 
 .join-time-note,
@@ -331,6 +348,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .join-currency {
@@ -342,7 +360,20 @@
 }
 
 .join-price-input input {
-  padding-left: 36px;
+  width: 90%;
+  padding: 12px 16px 12px 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.join-price-input input:focus {
+  border-color: #4ADE80;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .join-actions {

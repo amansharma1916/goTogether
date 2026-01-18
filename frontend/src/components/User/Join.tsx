@@ -38,10 +38,8 @@ const Join = () => {
   });
 
   const [departureDate, setDepartureDate] = useState("");
-  const [departureTime] = useState("");
   const [seats, setSeats] = useState(3);
   const [pricePerSeat, setPricePerSeat] = useState("");
-  const [vehicle, setVehicle] = useState("Toyota Camry (4 seats)");
   const [notes, setNotes] = useState("");
   const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(0);
   const [availableRoutes, setAvailableRoutes] = useState<number>(0);
@@ -156,10 +154,9 @@ const Join = () => {
       destination: destLocation,
       selectedRouteIndex,
       departureDate,
-      departureTime,
       seats,
       pricePerSeat,
-      vehicle,
+      vehicle: "Bike",
       notes,
       driverId: "507f1f77bcf86cd799439011" // TODO: Get from auth context
     };
@@ -382,17 +379,24 @@ const Join = () => {
 
             {/* Date & Time */}
             <div className="join-form-group">
-              <label>Departure Date & Time</label>
-              <div className="join-datetime-group">
+              <label>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <span>Departure Date</span>
+              </label>
+              <div className="join-date-input">
                 <input
                   type="date"
                   value={departureDate}
                   onChange={(e) => setDepartureDate(e.target.value)}
-                  placeholder="Oct 28, 2023"
+                  min={new Date().toISOString().split('T')[0]}
                 />
-
               </div>
-              <p className="join-time-note">Select a departure time.</p>
+              <p className="join-time-note">Select departure date for your ride.</p>
             </div>
 
             {/* Seats & Price */}
@@ -410,7 +414,7 @@ const Join = () => {
               <div className="join-form-group">
                 <label>Price per Seat</label>
                 <div className="join-price-input">
-                  <span className="join-currency">$</span>
+                  <span className="join-currency">Rs</span>
                   <input
                     type="text"
                     value={pricePerSeat}
@@ -420,17 +424,6 @@ const Join = () => {
                 </div>
                 <p className="join-price-note">Enter a valid price.</p>
               </div>
-            </div>
-
-            {/* Vehicle */}
-            <div className="join-form-group">
-              <label>Vehicle</label>
-              <select value={vehicle} onChange={(e) => setVehicle(e.target.value)}>
-                <option>Toyota Camry (4 seats)</option>
-                <option>Honda Accord (4 seats)</option>
-                <option>Tesla Model 3 (4 seats)</option>
-                <option>Ford Explorer (7 seats)</option>
-              </select>
             </div>
 
             {/* Notes */}
