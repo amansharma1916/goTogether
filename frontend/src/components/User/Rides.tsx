@@ -364,7 +364,7 @@ const Rides = () => {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#EF4444">
                       <circle cx="12" cy="12" r="8"/>
                     </svg>
-                    <span>Destination: {ride.destination.coordinates[1].toFixed(4)}, {ride.destination.coordinates[0].toFixed(4)}</span>
+                    <span>Destination: Amity University Jharkhand : {ride.destination.coordinates[1].toFixed(4)}, {ride.destination.coordinates[0].toFixed(4)}</span>
                   </div>
                 </div>
 
