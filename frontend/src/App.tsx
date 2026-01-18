@@ -8,6 +8,7 @@ import Map from "./components/User/Map";
 import Join from "./components/User/Join";
 import Rides from "./components/User/Rides";
 import Bookings from "./components/User/Bookings";
+import ActiveRidesPage from "./components/User/ActiveRidesPage";
 
 const App = () => {
   useEffect(() => {
@@ -67,6 +68,15 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Bookings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/active-rides"
+          element={
+            <ProtectedRoute>
+              <ActiveRidesPage />
             </ProtectedRoute>
           }
         />

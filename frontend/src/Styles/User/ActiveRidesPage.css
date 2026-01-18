@@ -1,0 +1,504 @@
+.active-rides-page {
+  min-height: calc(100vh - 80px);
+  padding: 40px 20px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 40, 0.8) 100%);
+}
+
+.page-header {
+  max-width: 1400px;
+  margin: 0 auto 40px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid rgba(76, 175, 80, 0.2);
+}
+
+.back-button {
+  background: rgba(76, 175, 80, 0.6);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.back-button:hover {
+  background: rgba(76, 175, 80, 0.8);
+  transform: translateX(-2px);
+}
+
+.page-header h1 {
+  margin: 0;
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 700;
+  flex: 1;
+}
+
+.rides-count {
+  background: rgba(76, 175, 80, 0.3);
+  color: #4caf50;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  border: 1px solid rgba(76, 175, 80, 0.5);
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  gap: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(76, 175, 80, 0.2);
+  border-top-color: #4caf50;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  max-width: 600px;
+  margin: 0 auto;
+  gap: 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 5rem;
+  opacity: 0.5;
+}
+
+.empty-state h2 {
+  margin: 0;
+  color: white;
+  font-size: 2rem;
+}
+
+.empty-state p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.1rem;
+}
+
+.btn-browse {
+  margin-top: 20px;
+  padding: 14px 40px;
+  background: rgba(76, 175, 80, 0.6);
+  color: white;
+  border: 1px solid rgba(76, 175, 80, 0.8);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-browse:hover {
+  background: rgba(76, 175, 80, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+}
+
+.rides-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 24px;
+}
+
+.ride-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.ride-card:hover {
+  border-color: rgba(76, 175, 80, 0.6);
+  box-shadow: 0 8px 32px rgba(76, 175, 80, 0.2);
+  transform: translateY(-4px);
+}
+
+/* Card Header */
+.card-header {
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.route-display {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.location-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.location-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.location-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.location-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.location-name {
+  font-size: 0.95rem;
+  color: white;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.route-divider {
+  width: 2px;
+  height: 40px;
+  background: linear-gradient(180deg, rgba(76, 175, 80, 0.6) 0%, rgba(76, 175, 80, 0.2) 100%);
+  flex-shrink: 0;
+}
+
+.status-label {
+  background: rgba(76, 175, 80, 0.3);
+  color: #4caf50;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  border: 1px solid rgba(76, 175, 80, 0.5);
+}
+
+/* Card Body */
+.card-body {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-title {
+  margin: 0;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.person-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 10px;
+  border-left: 3px solid rgba(76, 175, 80, 0.6);
+}
+
+.person-name {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.detail-key {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+
+.detail-value {
+  font-size: 0.95rem;
+  color: white;
+  font-weight: 600;
+}
+
+.payment-info {
+  display: flex;
+  gap: 12px;
+}
+
+.price-box {
+  flex: 1;
+  background: rgba(76, 175, 80, 0.2);
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(76, 175, 80, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.price-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+
+.price-amount {
+  font-size: 1.4rem;
+  color: #4caf50;
+  font-weight: 700;
+}
+
+.payment-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.payment-status {
+  font-size: 0.8rem;
+  color: #ffc107;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.payment-method {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+}
+
+/* Card Footer */
+.card-footer {
+  padding: 16px 24px;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(76, 175, 80, 0.2);
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.primary-btn {
+  background: rgba(76, 175, 80, 0.6);
+  color: white;
+  border: 1px solid rgba(76, 175, 80, 0.8);
+}
+
+.primary-btn:hover {
+  background: rgba(76, 175, 80, 0.8);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  transform: translateY(-2px);
+}
+
+.secondary-btn {
+  background: rgba(33, 150, 243, 0.6);
+  color: white;
+  border: 1px solid rgba(33, 150, 243, 0.8);
+}
+
+.secondary-btn:hover {
+  background: rgba(33, 150, 243, 0.8);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .rides-grid {
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .active-rides-page {
+    padding: 24px 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    width: 100%;
+  }
+
+  .rides-count {
+    width: 100%;
+    text-align: center;
+  }
+
+  .rides-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .route-display {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .route-divider {
+    width: 30px;
+    height: 2px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .status-label {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .active-rides-page {
+    padding: 16px 12px;
+  }
+
+  .page-header {
+    gap: 8px;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .back-button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+
+  .card-body {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .card-header {
+    padding: 16px;
+  }
+
+  .card-footer {
+    padding: 12px 16px;
+    flex-direction: column;
+  }
+
+  .action-btn {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .details-grid {
+    gap: 8px;
+  }
+
+  .detail-row {
+    padding: 8px;
+  }
+
+  .location-name {
+    font-size: 0.85rem;
+  }
+
+  .person-name {
+    font-size: 0.9rem;
+  }
+}

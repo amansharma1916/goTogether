@@ -53,6 +53,9 @@ const HomePage = () => {
           <div className="action-buttons-homepage">
             <button className="btn-action btn-first" onClick={handlePostRides}>Post Rides</button>
             <button className="btn-action btn-ride" onClick={handleRideNow}>Ride now</button>
+            <button className="btn-action btn-active-rides" onClick={() => navigate('/active-rides')}>
+              My Active Rides
+            </button>
           </div>
         </div>
       </div>
