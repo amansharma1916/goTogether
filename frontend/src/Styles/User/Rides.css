@@ -193,6 +193,7 @@
 .driver-info {
     display: flex;
     flex-direction: column;
+    color: white;
     gap: 4px;
 }
 

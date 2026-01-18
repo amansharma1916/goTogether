@@ -9,7 +9,8 @@ import {
   cancelBooking,
   completeBooking,
   rateBooking,
-  updatePaymentStatus
+  updatePaymentStatus,
+  updateRideStatus
 } from '../controllers/bookingController.js';
 
 const router = express.Router();
@@ -43,5 +44,8 @@ router.patch('/:id/rate', rateBooking);
 
 
 router.patch('/:id/payment', updatePaymentStatus);
+
+
+router.patch('/:id/status', updateRideStatus);
 
 export default router;
