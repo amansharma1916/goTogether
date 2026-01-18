@@ -37,6 +37,11 @@ const ActiveRidesPage = () => {
   const [activeRides, setActiveRides] = useState<ActiveRide[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string>('');
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedRide, setSelectedRide] = useState<ActiveRide | null>(null);
+  const [statusAction, setStatusAction] = useState<'payment' | 'complete' | 'cancel'>('payment');
+  const [cancellationReason, setCancellationReason] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('LoggedInUser');
@@ -99,6 +104,66 @@ const ActiveRidesPage = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const handleStatusUpdate = async () => {
+    if (!selectedRide) return;
+
+    setIsUpdating(true);
+    try {
+      let status = 'confirmed';
+      let paymentStatus = undefined;
+      let reason = undefined;
+
+      if (statusAction === 'payment') {
+        paymentStatus = 'paid';
+      } else if (statusAction === 'complete') {
+        status = 'completed';
+      } else if (statusAction === 'cancel') {
+        status = 'cancelled';
+        reason = cancellationReason || 'Emergency cancellation';
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/bookings/${selectedRide._id}/status`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId,
+            status,
+            paymentStatus,
+            cancellationReason: reason
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Refresh active rides
+        await fetchActiveRides();
+        setShowStatusModal(false);
+        setSelectedRide(null);
+        setCancellationReason('');
+        alert(`Ride ${statusAction === 'payment' ? 'payment marked as done' : statusAction === 'complete' ? 'completed' : 'cancelled'} successfully!`);
+      } else {
+        alert(data.message || 'Failed to update ride status');
+      }
+    } catch (error) {
+      console.error('Error updating ride status:', error);
+      alert('Error updating ride status');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const openStatusModal = (ride: ActiveRide, action: 'payment' | 'complete' | 'cancel') => {
+    setSelectedRide(ride);
+    setStatusAction(action);
+    setShowStatusModal(true);
   };
 
   return (
@@ -224,11 +289,109 @@ const ActiveRidesPage = () => {
                     >
                       View on Map
                     </button>
-                    <button className="action-btn secondary-btn">Chat</button>
+                    
+                    {/* Status Update Buttons */}
+                    <div className="status-actions">
+                      {ride.payment.paymentStatus === 'pending' && (
+                        <button 
+                          className="status-btn payment-btn"
+                          onClick={() => openStatusModal(ride, 'payment')}
+                        >
+                          💳 Payment Done
+                        </button>
+                      )}
+                      
+                      {ride.payment.paymentStatus === 'paid' && (
+                        <button 
+                          className="status-btn complete-btn"
+                          onClick={() => openStatusModal(ride, 'complete')}
+                        >
+                          ✅ Complete Ride
+                        </button>
+                      )}
+                      
+                      <button 
+                        className="status-btn cancel-btn"
+                        onClick={() => openStatusModal(ride, 'cancel')}
+                      >
+                        ⚠️ Emergency Cancel
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Status Update Modal */}
+        {showStatusModal && selectedRide && (
+          <div className="modal-overlay" onClick={() => setShowStatusModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>
+                  {statusAction === 'payment' && '💳 Mark Payment as Done'}
+                  {statusAction === 'complete' && '✅ Complete Ride'}
+                  {statusAction === 'cancel' && '⚠️ Emergency Cancel Ride'}
+                </h3>
+                <button 
+                  className="close-btn"
+                  onClick={() => setShowStatusModal(false)}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="modal-body">
+                <div className="ride-summary">
+                  <p><strong>Route:</strong> {selectedRide.rideId.origin.name} → {selectedRide.rideId.destination.name}</p>
+                  <p><strong>Amount:</strong> ₹{selectedRide.payment.totalAmount}</p>
+                  <p><strong>{selectedRide.riderId._id === userId ? 'Driver' : 'Passenger'}:</strong> {selectedRide.riderId._id === userId ? selectedRide.driverId.fullName : selectedRide.riderId.fullName}</p>
+                </div>
+
+                {statusAction === 'payment' && (
+                  <div className="confirmation-text">
+                    <p>Confirm that the payment of ₹{selectedRide.payment.totalAmount} has been completed?</p>
+                  </div>
+                )}
+
+                {statusAction === 'complete' && (
+                  <div className="confirmation-text">
+                    <p>Mark this ride as completed? This action cannot be undone.</p>
+                  </div>
+                )}
+
+                {statusAction === 'cancel' && (
+                  <div className="cancellation-section">
+                    <p className="warning-text">⚠️ This is an emergency cancellation. Please provide a reason:</p>
+                    <textarea
+                      className="cancellation-input"
+                      placeholder="Reason for cancellation (optional)"
+                      value={cancellationReason}
+                      onChange={(e) => setCancellationReason(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="modal-footer">
+                <button 
+                  className="btn-cancel"
+                  onClick={() => setShowStatusModal(false)}
+                  disabled={isUpdating}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className={`btn-confirm ${statusAction === 'cancel' ? 'btn-danger' : ''}`}
+                  onClick={handleStatusUpdate}
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? 'Updating...' : 'Confirm'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

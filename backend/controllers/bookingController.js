@@ -555,3 +555,104 @@ export const updatePaymentStatus = async (req, res) => {
     });
   }
 };
+
+
+// New controller for updating ride status
+export const updateRideStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, status, paymentStatus, cancellationReason } = req.body;
+
+    const booking = await BookedRide.findById(id).populate('rideId');
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found"
+      });
+    }
+
+    // Check if user is authorized (either rider or driver)
+    const isRider = booking.riderId.toString() === userId;
+    const isDriver = booking.driverId.toString() === userId;
+
+    if (!isRider && !isDriver) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to update this booking"
+      });
+    }
+
+    // Validate status transition
+    const validStatuses = ['confirmed', 'completed', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status"
+      });
+    }
+
+    // Handle status update
+    if (status === 'cancelled') {
+      if (booking.status === 'completed') {
+        return res.status(400).json({
+          success: false,
+          message: "Cannot cancel a completed ride"
+        });
+      }
+
+      booking.status = 'cancelled';
+      booking.cancellation = {
+        cancelledBy: isRider ? 'rider' : 'driver',
+        cancellationReason: cancellationReason || "Emergency cancellation",
+        cancelledAt: new Date()
+      };
+
+      // Restore seats to the ride
+      const ride = await Ride.findById(booking.rideId);
+      if (ride) {
+        ride.seatsAvailable += booking.seatsBooked;
+        await ride.save();
+      }
+    } else if (status === 'completed') {
+      if (booking.status !== 'confirmed') {
+        return res.status(400).json({
+          success: false,
+          message: "Only confirmed rides can be completed"
+        });
+      }
+      booking.status = 'completed';
+      booking.completedAt = new Date();
+    }
+
+    // Update payment status if provided
+    if (paymentStatus && ['pending', 'paid'].includes(paymentStatus)) {
+      booking.payment.paymentStatus = paymentStatus;
+      if (paymentStatus === 'paid') {
+        booking.payment.paidAt = new Date();
+      }
+    }
+
+    await booking.save();
+
+    // Populate booking data for response
+    await booking.populate([
+      { path: 'riderId', select: 'fullName email phone' },
+      { path: 'driverId', select: 'fullName email phone' }
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Ride status updated successfully",
+      booking
+    });
+
+  } catch (error) {
+    console.error('Error updating ride status:', error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message
+    });
+  }
+};
