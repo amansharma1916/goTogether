@@ -8,7 +8,6 @@ interface Ride {
   fullName: string;
   userId: string;
   driverId: {
-    
     email: string;
   };
   origin: {
