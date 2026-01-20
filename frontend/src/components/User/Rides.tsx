@@ -43,7 +43,7 @@ const Rides = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const ridesPerPage = 6;
+  const ridesPerPage = 4;
   const [totalRides, setTotalRides] = useState(0);
   const LoggedInUser = localStorage.getItem('LoggedInUser');
 

@@ -195,7 +195,7 @@ export const createRide = async (req, res) => {
 
 export const getRides = async (req, res) => {
   try {
-    const { departureDate, maxDistance, userId, page = 1, limit = 6 } = req.query;
+    const { departureDate, maxDistance, userId, page = 1, limit = 4 } = req.query;
 
     const filter = { status: "active" };
 
@@ -354,7 +354,7 @@ export const searchRides = async (req, res) => {
 
 export const getMyRides = async (req, res) => {
   try {
-    const { userId, page = 1, limit = 6 } = req.query;
+    const { userId, page = 1, limit = 4 } = req.query;
 
     if (!userId) {
       return res.status(400).json({

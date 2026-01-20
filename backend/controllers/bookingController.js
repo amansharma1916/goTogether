@@ -155,7 +155,7 @@ export const createBooking = async (req, res) => {
 
 export const getMyBookings = async (req, res) => {
   try {
-    const { userId, status } = req.query;
+    const { userId, status, page = 1, limit = 4 } = req.query;
 
     if (!userId) {
       return res.status(400).json({
@@ -164,12 +164,43 @@ export const getMyBookings = async (req, res) => {
       });
     }
 
-    const bookings = await BookedRide.findUserBookings(userId, status || null);
+    // Pagination calculations
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Build filter
+    const filter = { riderId: userId };
+    if (status) {
+      filter.status = status;
+    }
+
+    // Get total count
+    const totalBookings = await BookedRide.countDocuments(filter);
+
+    // Fetch bookings with pagination
+    const bookings = await BookedRide.find(filter)
+      .populate([
+        { path: 'rideId' },
+        { path: 'riderId', select: 'fullName email phone' },
+        { path: 'driverId', select: 'fullName email phone' }
+      ])
+      .sort({ bookedAt: -1 })
+      .skip(skip)
+      .limit(limitNum);
 
     return res.status(200).json({
       success: true,
       count: bookings.length,
-      bookings
+      bookings,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalBookings / limitNum),
+        totalBookings,
+        bookingsPerPage: limitNum,
+        hasNextPage: pageNum < Math.ceil(totalBookings / limitNum),
+        hasPrevPage: pageNum > 1
+      }
     });
 
   } catch (error) {
@@ -185,7 +216,7 @@ export const getMyBookings = async (req, res) => {
 
 export const getReceivedBookings = async (req, res) => {
   try {
-    const { userId, status } = req.query;
+    const { userId, status, page = 1, limit = 4 } = req.query;
 
     if (!userId) {
       return res.status(400).json({
@@ -194,12 +225,43 @@ export const getReceivedBookings = async (req, res) => {
       });
     }
 
-    const bookings = await BookedRide.findDriverBookings(userId, status || null);
+    // Pagination calculations
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Build filter
+    const filter = { driverId: userId };
+    if (status) {
+      filter.status = status;
+    }
+
+    // Get total count
+    const totalBookings = await BookedRide.countDocuments(filter);
+
+    // Fetch bookings with pagination
+    const bookings = await BookedRide.find(filter)
+      .populate([
+        { path: 'rideId' },
+        { path: 'riderId', select: 'fullName email phone' },
+        { path: 'driverId', select: 'fullName email phone' }
+      ])
+      .sort({ bookedAt: -1 })
+      .skip(skip)
+      .limit(limitNum);
 
     return res.status(200).json({
       success: true,
       count: bookings.length,
-      bookings
+      bookings,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalBookings / limitNum),
+        totalBookings,
+        bookingsPerPage: limitNum,
+        hasNextPage: pageNum < Math.ceil(totalBookings / limitNum),
+        hasPrevPage: pageNum > 1
+      }
     });
 
   } catch (error) {
