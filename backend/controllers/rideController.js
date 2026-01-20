@@ -195,7 +195,7 @@ export const createRide = async (req, res) => {
 
 export const getRides = async (req, res) => {
   try {
-    const { departureDate, maxDistance, userId } = req.query;
+    const { departureDate, maxDistance, userId, page = 1, limit = 4 } = req.query;
 
     const filter = { status: "active" };
 
@@ -217,15 +217,32 @@ export const getRides = async (req, res) => {
       };
     }
 
+    // Pagination calculations
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Get total count for pagination metadata
+    const totalRides = await Ride.countDocuments(filter);
+
     const rides = await Ride.find(filter)
       .populate('driverId', 'fullName email')
       .sort({ departureTime: 1 })
-      .limit(50);
+      .skip(skip)
+      .limit(limitNum);
 
     return res.status(200).json({
       success: true,
       count: rides.length,
-      rides
+      rides,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalRides / limitNum),
+        totalRides,
+        ridesPerPage: limitNum,
+        hasNextPage: pageNum < Math.ceil(totalRides / limitNum),
+        hasPrevPage: pageNum > 1
+      }
     });
 
   } catch (error) {
@@ -337,7 +354,7 @@ export const searchRides = async (req, res) => {
 
 export const getMyRides = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { userId, page = 1, limit = 4 } = req.query;
 
     if (!userId) {
       return res.status(400).json({
@@ -346,18 +363,37 @@ export const getMyRides = async (req, res) => {
       });
     }
 
-    const rides = await Ride.find({ 
+    const filter = { 
       userId: userId,
       status: { $in: ["active", "completed", "cancelled"] }
-    })
+    };
+
+    // Pagination calculations
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Get total count for pagination metadata
+    const totalRides = await Ride.countDocuments(filter);
+
+    const rides = await Ride.find(filter)
       .populate('driverId', 'fullName email')
       .sort({ departureTime: -1 })
-      .limit(50);
+      .skip(skip)
+      .limit(limitNum);
 
     return res.status(200).json({
       success: true,
       count: rides.length,
-      rides
+      rides,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalRides / limitNum),
+        totalRides,
+        ridesPerPage: limitNum,
+        hasNextPage: pageNum < Math.ceil(totalRides / limitNum),
+        hasPrevPage: pageNum > 1
+      }
     });
 
   } catch (error) {

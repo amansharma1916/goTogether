@@ -3,6 +3,7 @@ import '../../Styles/Default/LoginPage.css'
 import axios from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AuthLoader from './AuthLoader'
 
 const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -23,6 +24,7 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
   });
   const navigate = useNavigate();
   const [, setIsLoggedIn] = useState(localStorage.getItem('isAuthenticated') === 'true');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -33,10 +35,10 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       console.log(formData)
       const response = await axios.post(`${ServerURL}/api/auth/login`, formData);
-      alert(response.data.message);
       if(response.data.success){
         console.log('Login successful');
         // Set localStorage BEFORE navigation
@@ -59,12 +61,14 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
       
     } catch (error) {
       console.error('Login error:', error);
-      alert('Login failed. Please check your credentials and try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="login-page">
+      {isLoading && <AuthLoader text="Logging in..." />}
       <h2 className="auth-title">Login to your account</h2>
 
       <form className="auth-form" onSubmit={handleSubmit}>
@@ -111,8 +115,8 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
         </div>
 
         {/* Login Button */}
-        <button type="submit" className="btn-primary">
-          Login
+        <button type="submit" className="btn-primary" disabled={isLoading}>
+          {isLoading ? 'Logging in...' : 'Login'}
         </button>
 
         {/* Divider */}

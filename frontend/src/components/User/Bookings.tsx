@@ -57,6 +57,10 @@ const Bookings = () => {
   const [myBookings, setMyBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const bookingsPerPage = 4;
+  const [totalReceivedBookings, setTotalReceivedBookings] = useState(0);
+  const [totalMyBookings, setTotalMyBookings] = useState(0);
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('LoggedInUser');
@@ -68,45 +72,46 @@ const Bookings = () => {
 
   useEffect(() => {
     if (userId) {
+      setCurrentPage(1);
       if (viewMode === 'received') {
-        fetchReceivedBookings();
+        fetchReceivedBookings(1);
       } else {
-        fetchMyBookings();
+        fetchMyBookings(1);
       }
     }
   }, [userId, viewMode]);
 
-  const fetchReceivedBookings = async () => {
+  const fetchReceivedBookings = async (page = 1) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/received?userId=${userId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/received?userId=${userId}&page=${page}&limit=${bookingsPerPage}`);
       const data = await response.json();
       if (data.success) {
         setReceivedBookings(data.bookings);
+        setTotalReceivedBookings(data.pagination?.totalBookings || data.bookings.length);
       } else {
         console.error('Failed to fetch received bookings:', data.message);
       }
     } catch (error) {
       console.error('Error fetching received bookings:', error);
-      alert('Failed to load received bookings');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchMyBookings = async () => {
+  const fetchMyBookings = async (page = 1) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/my-bookings?userId=${userId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/my-bookings?userId=${userId}&page=${page}&limit=${bookingsPerPage}`);
       const data = await response.json();
       if (data.success) {
         setMyBookings(data.bookings);
+        setTotalMyBookings(data.pagination?.totalBookings || data.bookings.length);
       } else {
         console.error('Failed to fetch my bookings:', data.message);
       }
     } catch (error) {
       console.error('Error fetching my bookings:', error);
-      alert('Failed to load your bookings');
     } finally {
       setIsLoading(false);
     }
@@ -123,14 +128,10 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
-        alert('Booking confirmed successfully!');
-        fetchReceivedBookings();
-      } else {
-        alert(data.message || 'Failed to confirm booking');
+        fetchReceivedBookings(currentPage);
       }
     } catch (error) {
       console.error('Error confirming booking:', error);
-      alert('Failed to confirm booking');
     }
   };
 
@@ -152,18 +153,14 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
-        alert('Booking cancelled successfully');
         if (isDriver) {
-          fetchReceivedBookings();
+          fetchReceivedBookings(currentPage);
         } else {
-          fetchMyBookings();
+          fetchMyBookings(currentPage);
         }
-      } else {
-        alert(data.message || 'Failed to cancel booking');
       }
     } catch (error) {
       console.error('Error cancelling booking:', error);
-      alert('Failed to cancel booking');
     }
   };
 
@@ -178,14 +175,10 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
-        alert('Booking marked as completed!');
-        fetchReceivedBookings();
-      } else {
-        alert(data.message || 'Failed to complete booking');
+        fetchReceivedBookings(currentPage);
       }
     } catch (error) {
       console.error('Error completing booking:', error);
-      alert('Failed to complete booking');
     }
   };
 
@@ -369,6 +362,44 @@ const Bookings = () => {
   };
 
   const currentBookings = viewMode === 'received' ? receivedBookings : myBookings;
+  const totalBookings = viewMode === 'received' ? totalReceivedBookings : totalMyBookings;
+  const totalPages = Math.ceil(totalBookings / bookingsPerPage);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    if (viewMode === 'received') {
+      fetchReceivedBookings(pageNumber);
+    } else {
+      fetchMyBookings(pageNumber);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+      if (viewMode === 'received') {
+        fetchReceivedBookings(newPage);
+      } else {
+        fetchMyBookings(newPage);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+      if (viewMode === 'received') {
+        fetchReceivedBookings(newPage);
+      } else {
+        fetchMyBookings(newPage);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <>
@@ -403,9 +434,49 @@ const Bookings = () => {
           </p>
         </div>
       ) : (
+        <>
         <div className="bookings-grid">
           {currentBookings.map((booking) => renderBookingCard(booking, viewMode === 'received'))}
         </div>
+        
+        {totalPages > 1 && (
+          <div className="pagination-container">
+            <button 
+              className="pagination-btn"
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+              Previous
+            </button>
+
+            <div className="pagination-numbers">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  className={`pagination-number ${currentPage === page ? 'active' : ''}`}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+
+            <button 
+              className="pagination-btn"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+            >
+              Next
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+          </div>
+        )}
+        </>
       )}
     </div>
     </>
