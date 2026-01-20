@@ -42,6 +42,9 @@ const Rides = () => {
   const [sortBy, setSortBy] = useState<'distance' | 'time' | 'price'>('distance');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ridesPerPage = 6;
+  const [totalRides, setTotalRides] = useState(0);
   const LoggedInUser = localStorage.getItem('LoggedInUser');
 
   useEffect(() => {
@@ -69,7 +72,7 @@ const Rides = () => {
     fetchAllRides();
   }, []);
 
-  const fetchAllRides = async () => {
+  const fetchAllRides = async (page = 1) => {
     setIsLoading(true);
     try {
       
@@ -79,14 +82,15 @@ const Rides = () => {
 
       
       const url = userId 
-        ? `${ServerURL}/api/rides?userId=${userId}`
-        : `${ServerURL}/api/rides`;
+        ? `${ServerURL}/api/rides?userId=${userId}&page=${page}&limit=${ridesPerPage}`
+        : `${ServerURL}/api/rides?page=${page}&limit=${ridesPerPage}`;
 
       const response = await fetch(url);
       const data = await response.json();
 
       if (data.success) {
         setRides(data.rides);
+        setTotalRides(data.pagination?.totalRides || data.rides.length);
       } else {
         console.error('Failed to fetch rides:', data.message);
       }
@@ -97,7 +101,7 @@ const Rides = () => {
     }
   };
 
-  const fetchMyRides = async () => {
+  const fetchMyRides = async (page = 1) => {
     setIsLoading(true);
     try {
       
@@ -108,22 +112,26 @@ const Rides = () => {
       if (!userId) {
         console.error('User not logged in');
         setRides([]);
+        setTotalRides(0);
         setIsLoading(false);
         return;
       }
 
-      const response = await fetch(`${ServerURL}/api/rides/my-rides?userId=${userId}`);
+      const response = await fetch(`${ServerURL}/api/rides/my-rides?userId=${userId}&page=${page}&limit=${ridesPerPage}`);
       const data = await response.json();
 
       if (data.success) {
         setRides(data.rides);
+        setTotalRides(data.pagination?.totalRides || data.rides.length);
       } else {
         console.error('Failed to fetch my rides:', data.message);
         setRides([]);
+        setTotalRides(0);
       }
     } catch (error) {
       console.error('Error fetching my rides:', error);
       setRides([]);
+      setTotalRides(0);
     } finally {
       setIsLoading(false);
     }
@@ -131,10 +139,11 @@ const Rides = () => {
 
   const handleViewModeChange = (mode: 'all' | 'my') => {
     setViewMode(mode);
+    setCurrentPage(1);
     if (mode === 'all') {
-      fetchAllRides();
+      fetchAllRides(1);
     } else {
-      fetchMyRides();
+      fetchMyRides(1);
     }
   };
 
@@ -203,9 +212,9 @@ const Rides = () => {
         alert('Booking successful! The driver will confirm your request.');
         // Refresh rides to update seat availability
         if (viewMode === 'all') {
-          fetchAllRides();
+          fetchAllRides(currentPage);
         } else {
-          fetchMyRides();
+          fetchMyRides(currentPage);
         }
       } else {
         alert(`Booking failed: ${data.message}`);
@@ -278,6 +287,45 @@ const Rides = () => {
 
   const sortedRides = sortRides(rides);
 
+  // Server-side pagination - calculate based on total rides from server
+  const totalPages = Math.ceil(totalRides / ridesPerPage);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    if (viewMode === 'all') {
+      fetchAllRides(pageNumber);
+    } else {
+      fetchMyRides(pageNumber);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+      if (viewMode === 'all') {
+        fetchAllRides(newPage);
+      } else {
+        fetchMyRides(newPage);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+      if (viewMode === 'all') {
+        fetchAllRides(newPage);
+      } else {
+        fetchMyRides(newPage);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="rides-page">
       <Navbar />
@@ -287,7 +335,9 @@ const Rides = () => {
             <h1 className="rides-title">
               {viewMode === 'all' ? 'All Available Rides' : 'My Posted Rides'}
             </h1>
-            <p className="rides-subtitle">{rides.length} rides available</p>
+            <p className="rides-subtitle">
+              Showing {totalRides > 0 ? ((currentPage - 1) * ridesPerPage) + 1 : 0}-{Math.min(currentPage * ridesPerPage, totalRides)} of {totalRides} rides
+            </p>
           </div>
           
           <div className="rides-controls">
@@ -311,7 +361,10 @@ const Rides = () => {
               <select 
                 className="sort-select"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'distance' | 'time' | 'price')}
+                onChange={(e) => {
+                  setSortBy(e.target.value as 'distance' | 'time' | 'price');
+                  setCurrentPage(1);
+                }}
               >
                 <option value="distance">Distance (Shortest First)</option>
                 <option value="time">Departure Time</option>
@@ -327,6 +380,7 @@ const Rides = () => {
             <p>Loading rides...</p>
           </div>
         ) : sortedRides.length > 0 ? (
+          <>
           <div className="rides-grid">
             {sortedRides.map((ride) => (
               <div 
@@ -432,6 +486,45 @@ const Rides = () => {
               </div>
             ))}
           </div>
+
+          {totalPages > 1 && (
+            <div className="pagination-container">
+              <button 
+                className="pagination-btn"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+                Previous
+              </button>
+
+              <div className="pagination-numbers">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    className={`pagination-number ${currentPage === page ? 'active' : ''}`}
+                    onClick={() => handlePageChange(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button 
+                className="pagination-btn"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+            </div>
+          )}
+          </>
         ) : (
           <div className="no-rides">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
