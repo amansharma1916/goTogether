@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import '../../Styles/Default/RegisterPage.css'
 import { useState } from 'react'
 import axios from 'axios'
+import AuthLoader from './AuthLoader'
 
 const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 interface RegisterPageProps {
@@ -25,6 +26,7 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
     confirmPassword: '',
     college: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
@@ -35,31 +37,35 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setFormData({
-      fullname: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      college: ''
-    });
+    
+    if(formData.password !== formData.confirmPassword){
+      return;
+    }
+    
+    setIsLoading(true);
     try{
-      if(formData.password !== formData.confirmPassword){
-        alert('Passwords do not match');
-        return;
-      }
       const response = await axios.post(`${ServerURL}/api/auth/register`, formData);
-      alert(response.data.message);
       if(response.status === 201){
+        setFormData({
+          fullname: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          college: ''
+        });
         onSwitchToLogin();
       }
     }catch(error){
       console.error('Registration error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
 
     <div className="register-page">
+      {isLoading && <AuthLoader text="Creating your account..." />}
       <h2 className="auth-title">Create your account</h2>
 
       <form className="auth-form" onSubmit={handleSubmit}>
@@ -125,8 +131,8 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
         </div>
 
         {}
-        <button type="submit" className="btn-primary btn-register" >
-          Create Account
+        <button type="submit" className="btn-primary btn-register" disabled={isLoading}>
+          {isLoading ? 'Creating Account...' : 'Create Account'}
         </button>
 
         {}

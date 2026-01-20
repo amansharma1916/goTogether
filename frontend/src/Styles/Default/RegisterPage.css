@@ -1,5 +1,6 @@
 .register-page {
     color: white;
+    position: relative;
 }
 
 /* Reuse most styles from LoginPage, only add/override specific ones */
@@ -53,4 +54,14 @@
 /* Reduce gap for register form */
 .register-page .auth-form {
     gap: 10px;
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-register:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }

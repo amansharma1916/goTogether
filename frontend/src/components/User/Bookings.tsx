@@ -94,7 +94,6 @@ const Bookings = () => {
       }
     } catch (error) {
       console.error('Error fetching received bookings:', error);
-      alert('Failed to load received bookings');
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +112,6 @@ const Bookings = () => {
       }
     } catch (error) {
       console.error('Error fetching my bookings:', error);
-      alert('Failed to load your bookings');
     } finally {
       setIsLoading(false);
     }
@@ -130,14 +128,10 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
-        alert('Booking confirmed successfully!');
         fetchReceivedBookings(currentPage);
-      } else {
-        alert(data.message || 'Failed to confirm booking');
       }
     } catch (error) {
       console.error('Error confirming booking:', error);
-      alert('Failed to confirm booking');
     }
   };
 
@@ -159,18 +153,14 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
-        alert('Booking cancelled successfully');
         if (isDriver) {
           fetchReceivedBookings(currentPage);
         } else {
           fetchMyBookings(currentPage);
         }
-      } else {
-        alert(data.message || 'Failed to cancel booking');
       }
     } catch (error) {
       console.error('Error cancelling booking:', error);
-      alert('Failed to cancel booking');
     }
   };
 
@@ -185,14 +175,10 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
-        alert('Booking marked as completed!');
         fetchReceivedBookings(currentPage);
-      } else {
-        alert(data.message || 'Failed to complete booking');
       }
     } catch (error) {
       console.error('Error completing booking:', error);
-      alert('Failed to complete booking');
     }
   };
 

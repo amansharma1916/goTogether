@@ -1,5 +1,6 @@
 .login-page {
     color: white;
+    position: relative;
 }
 
 .auth-title {
@@ -184,4 +185,14 @@
 .link-btn:hover {
     color: #3BC970;
     text-decoration: underline;
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-register:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }

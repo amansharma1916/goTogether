@@ -161,12 +161,10 @@ const Rides = () => {
       const userId = loggedInUser?.id;
 
       if (!userId) {
-        alert('Please log in to book a ride');
         return;
       }
 
       if (!userLocation) {
-        alert('Unable to determine your location. Please enable location services.');
         return;
       }
 
@@ -209,19 +207,15 @@ const Rides = () => {
       const data = await response.json();
 
       if (data.success) {
-        alert('Booking successful! The driver will confirm your request.');
         // Refresh rides to update seat availability
         if (viewMode === 'all') {
           fetchAllRides(currentPage);
         } else {
           fetchMyRides(currentPage);
         }
-      } else {
-        alert(`Booking failed: ${data.message}`);
       }
     } catch (error) {
       console.error('Error booking ride:', error);
-      alert('Failed to book ride. Please try again.');
     }
   };
 
