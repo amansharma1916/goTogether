@@ -9,6 +9,7 @@ import Join from "./components/User/Join";
 import Rides from "./components/User/Rides";
 import Bookings from "./components/User/Bookings";
 import ActiveRidesPage from "./components/User/ActiveRidesPage";
+import Profile from "./components/User/Profile";
 
 const App = () => {
   useEffect(() => {
@@ -77,6 +78,15 @@ const App = () => {
           element={
             <ProtectedRoute>
               <ActiveRidesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
