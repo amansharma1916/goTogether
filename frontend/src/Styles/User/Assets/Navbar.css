@@ -92,6 +92,8 @@
     gap: 16px;
 }
 
+
+
 /* User Profile Dropdown */
 .user-profile-dropdown {
     position: relative;
@@ -100,6 +102,20 @@
 
 .user-profile-btn {
     cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.user-profile-btn:hover {
+    transform: scale(1.15) rotate(5deg);
+}
+
+.user-profile-btn:hover svg {
+    filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.6));
+}
+
+.user-profile-btn:active {
+    transform: scale(0.95);
 }
 
 .dropdown-menu {
@@ -156,13 +172,14 @@
 }
 
 .dropdown-item.user-info {
-    cursor: default;
+    
     color: white;
     font-weight: 600;
 }
 
 .dropdown-item.user-info:hover {
-    background: transparent;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);  
 }
 
 .dropdown-item.logout-btn {

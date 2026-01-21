@@ -62,14 +62,14 @@ const Navbar = () => {
             
             {isDropdownOpen && (
               <div className="dropdown-menu">
-                <div className="dropdown-item user-info">
+                <Link to="/profile" className="dropdown-item user-info" onClick={() => setIsDropdownOpen(false)}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <circle cx="12" cy="12" r="10"/>
                     <circle cx="12" cy="9" r="3"/>
                     <path d="M6 20c0-4 2.5-6 6-6s6 2 6 6"/>
                   </svg>
                   <span>My Profile</span>
-                </div>
+                </Link>
                 <div className="dropdown-divider"></div>
                 <button className="dropdown-item logout-btn" onClick={handleLogout}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
