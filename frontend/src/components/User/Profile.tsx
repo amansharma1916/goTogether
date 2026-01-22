@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Assets/Navbar';
 import '../../Styles/User/Profile.css';
+import { useNotifications } from '../../context/NotificationContext';
 
 interface UserData {
-  id?: string;
+  _id?: string;
   fullname: string;
   email: string;
   college?: string;
@@ -16,6 +17,7 @@ const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { addNotification } = useNotifications();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<UserData>({
@@ -63,7 +65,7 @@ const Profile = () => {
   const handleSave = async () => {
     console.log('Saving edited data:', editedData);
     console.log('Current user data:', userData);
-    if (!userData?.id) {
+    if (!userData?._id) {
       setError('User ID not found. Please log in again.');
       return;
     }
@@ -91,7 +93,7 @@ const Profile = () => {
     setSuccessMessage(null);
 
     try {
-      const response = await fetch(`${ServerURL}/api/auth/update-profile/${userData.id}`, {
+      const response = await fetch(`${ServerURL}/api/auth/update-profile/${userData._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -116,6 +118,11 @@ const Profile = () => {
         setUserData(updatedUser);
         setIsEditing(false);
         setSuccessMessage('Profile updated successfully!');
+        addNotification({
+          title: 'Profile updated',
+          message: 'Your account details were saved successfully.',
+          type: 'success',
+        });
         
         // Clear success message after 3 seconds
         setTimeout(() => setSuccessMessage(null), 3000);
