@@ -130,10 +130,26 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
+        addNotification({
+          title: 'Booking confirmed',
+          message: 'You have confirmed the booking request.',
+          type: 'success',
+        });
         fetchReceivedBookings(currentPage);
+      } else {
+        addNotification({
+          title: 'Confirmation failed',
+          message: data.message || 'Unable to confirm booking.',
+          type: 'warning',
+        });
       }
     } catch (error) {
       console.error('Error confirming booking:', error);
+      addNotification({
+        title: 'Confirmation error',
+        message: 'Something went wrong while confirming the booking.',
+        type: 'warning',
+      });
     }
   };
 
@@ -155,14 +171,30 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
+        addNotification({
+          title: 'Booking cancelled',
+          message: `The booking has been cancelled. Reason: ${reason}`,
+          type: 'info',
+        });
         if (isDriver) {
           fetchReceivedBookings(currentPage);
         } else {
           fetchMyBookings(currentPage);
         }
+      } else {
+        addNotification({
+          title: 'Cancellation failed',
+          message: data.message || 'Unable to cancel booking.',
+          type: 'warning',
+        });
       }
     } catch (error) {
       console.error('Error cancelling booking:', error);
+      addNotification({
+        title: 'Cancellation error',
+        message: 'Something went wrong while cancelling the booking.',
+        type: 'warning',
+      });
     }
   };
 
@@ -177,10 +209,26 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
+        addNotification({
+          title: 'Ride completed',
+          message: 'The ride has been marked as completed.',
+          type: 'success',
+        });
         fetchReceivedBookings(currentPage);
+      } else {
+        addNotification({
+          title: 'Completion failed',
+          message: data.message || 'Unable to complete booking.',
+          type: 'warning',
+        });
       }
     } catch (error) {
       console.error('Error completing booking:', error);
+      addNotification({
+        title: 'Completion error',
+        message: 'Something went wrong while completing the booking.',
+        type: 'warning',
+      });
     }
   };
 
