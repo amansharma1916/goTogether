@@ -4,11 +4,15 @@ import Navbar from './Assets/Navbar';
 import '../../Styles/User/Profile.css';
 
 interface UserData {
+  id?: string;
   fullname: string;
   email: string;
   college?: string;
   createdAt?: string;
 }
+
+const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -19,6 +23,9 @@ const Profile = () => {
     email: '',
     college: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const user = localStorage.getItem('LoggedInUser');
@@ -26,6 +33,7 @@ const Profile = () => {
       try {
         const parsedUser = JSON.parse(user);
         setUserData(parsedUser);
+        console.log('Fetched user data:', parsedUser);
         setEditedData({
           fullname: parsedUser.fullname || '',
           email: parsedUser.email || '',
@@ -52,17 +60,75 @@ const Profile = () => {
     }
   };
 
-  const handleSave = () => {
-    // Update localStorage
-    const updatedUser = { ...userData, ...editedData };
-    localStorage.setItem('LoggedInUser', JSON.stringify(updatedUser));
-    setUserData(updatedUser);
-    setIsEditing(false);
-    
-    // TODO: Add API call to update user profile in backend
-    console.log('Profile updated:', updatedUser);
-  };
+  const handleSave = async () => {
+    console.log('Saving edited data:', editedData);
+    console.log('Current user data:', userData);
+    if (!userData?.id) {
+      setError('User ID not found. Please log in again.');
+      return;
+    }
 
+    // Basic validation
+    if (!editedData.fullname.trim()) {
+      setError('Full name is required');
+      return;
+    }
+
+    if (!editedData.email.trim()) {
+      setError('Email is required');
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(editedData.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      const response = await fetch(`${ServerURL}/api/auth/update-profile/${userData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullname: editedData.fullname,
+          email: editedData.email,
+          college: editedData.college,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update profile');
+      }
+
+      if (data.success) {
+        // Update localStorage with new user data
+        const updatedUser = { ...userData, ...data.user };
+        localStorage.setItem('LoggedInUser', JSON.stringify(updatedUser));
+        setUserData(updatedUser);
+        setIsEditing(false);
+        setSuccessMessage('Profile updated successfully!');
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        throw new Error(data.message || 'Failed to update profile');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while updating profile');
+      console.error('Error updating profile:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const handleLogout = () => {
     localStorage.removeItem('LoggedInUser');
     localStorage.removeItem('token');
@@ -115,11 +181,25 @@ const Profile = () => {
               </button>
             ) : (
               <div className="edit-actions">
-                <button className="btn-cancel" onClick={handleCancel}>Cancel</button>
-                <button className="btn-save" onClick={handleSave}>Save Changes</button>
+                <button className="btn-cancel" onClick={handleCancel} disabled={isLoading}>Cancel</button>
+                <button className="btn-save" onClick={handleSave} disabled={isLoading}>
+                  {isLoading ? 'Saving...' : 'Save Changes'}
+                </button>
               </div>
             )}
           </div>
+
+          {error && (
+            <div className="alert alert-error">
+              {error}
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="alert alert-success">
+              {successMessage}
+            </div>
+          )}
 
           <div className="profile-info">
             <div className="info-group">
