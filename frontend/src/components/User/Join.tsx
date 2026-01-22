@@ -4,6 +4,7 @@ import '../../Styles/User/Join.css'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Loader from './Assets/Loader'
+import { useNotifications } from '../../context/NotificationContext'
 
 interface LocationData {
   lat: number;
@@ -25,6 +26,7 @@ const ORS_API_KEY = import.meta.env.VITE_ORS_API_KEY || '';
 
 const Join = () => {
   const location = useLocation();
+  const { addNotification } = useNotifications();
   const [originQuery, setOriginQuery] = useState("");
   const [originResults, setOriginResults] = useState<NominatimResult[]>([]);
   const [originLocation, setOriginLocation] = useState<LocationData | null>(null);
@@ -176,9 +178,19 @@ const Join = () => {
       const data = await response.json();
 
       if (data.success) {
+        addNotification({
+          title: 'Ride posted',
+          message: 'Your ride was posted successfully.',
+          type: 'success',
+        });
         alert(`Ride posted successfully! Ride ID: ${data.rideId}`);
         handleReset();
       } else {
+        addNotification({
+          title: 'Ride posting failed',
+          message: data.message || 'Unable to post your ride. Please try again.',
+          type: 'warning',
+        });
         alert(`Failed to post ride: ${data.message}`);
       }
     } catch (error) {

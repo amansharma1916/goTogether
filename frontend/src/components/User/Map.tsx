@@ -3,6 +3,7 @@ import MapComponent from '../User/Assets/MapComponent'
 import '../../Styles/User/Map.css'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { useNotifications } from '../../context/NotificationContext'
 
 interface LocationData {
   lat: number;
@@ -48,6 +49,7 @@ const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Map = () => {
   const location = useLocation();
+  const { addNotification } = useNotifications();
   const [fromQuery, setFromQuery] = useState("");
   const [fromResults, setFromResults] = useState<NominatimResult[]>([]);
   const [pickupLocation, setPickupLocation] = useState<LocationData | null>(null);
@@ -293,14 +295,29 @@ const Map = () => {
       const data = await response.json();
 
       if (data.success) {
+        addNotification({
+          title: 'Ride booked',
+          message: 'Your booking was successful. Driver will confirm soon.',
+          type: 'success',
+        });
         alert('Booking successful! The driver will confirm your request.');
         // Refresh rides to update seat availability
         handleSearchRides();
       } else {
+        addNotification({
+          title: 'Booking failed',
+          message: data.message || 'Unable to book this ride at the moment.',
+          type: 'warning',
+        });
         alert(`Booking failed: ${data.message}`);
       }
     } catch (error) {
       console.error('Error booking ride:', error);
+      addNotification({
+        title: 'Booking error',
+        message: 'Something went wrong. Please try again.',
+        type: 'warning',
+      });
       alert('Failed to book ride. Please try again.');
     }
   };

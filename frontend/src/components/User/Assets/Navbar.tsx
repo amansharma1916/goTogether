@@ -2,17 +2,29 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import '../../../Styles/User/Assets/Navbar.css'
 import logo from '../../../images/logo/gotogetherLogo.png'
+import NotificationPanel from './NotificationPanel'
+import { useNotifications } from '../../../context/NotificationContext'
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { notifications, unreadCount, markAllAsRead, removeNotification } = useNotifications();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const clickOutsideDropdown = dropdownRef.current && !dropdownRef.current.contains(target);
+      const clickOutsideNotifications = notificationRef.current && !notificationRef.current.contains(target);
+
+      if (clickOutsideDropdown) {
         setIsDropdownOpen(false);
+      }
+      if (clickOutsideNotifications) {
+        setIsNotificationsOpen(false);
       }
     };
 
@@ -51,7 +63,10 @@ const Navbar = () => {
           <div className="user-profile-dropdown" ref={dropdownRef}>
             <button 
               className="nav-icon-btn user-profile-btn"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onClick={() => {
+                setIsDropdownOpen(!isDropdownOpen);
+                setIsNotificationsOpen(false);
+              }}
             >
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                 <circle cx="16" cy="16" r="15" stroke="white" strokeWidth="2"/>
@@ -82,13 +97,34 @@ const Navbar = () => {
               </div>
             )}
           </div>
-          <button className="nav-icon-btn notification-btn">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="notification-badge"></span>
-          </button>
+          <div className="notification-wrapper" ref={notificationRef}>
+            <button
+              className="nav-icon-btn notification-btn"
+              onClick={() => {
+                const nextOpen = !isNotificationsOpen;
+                setIsNotificationsOpen(nextOpen);
+                setIsDropdownOpen(false);
+                if (nextOpen) {
+                  markAllAsRead();
+                }
+              }}
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className={`notification-badge ${unreadCount ? 'visible' : ''}`}>
+                {unreadCount > 9 ? '9+' : unreadCount || ''}
+              </span>
+            </button>
+            {isNotificationsOpen && (
+              <NotificationPanel
+                notifications={notifications}
+                onMarkAll={markAllAsRead}
+                onRemove={removeNotification}
+              />
+            )}
+          </div>
         </div>
       </nav>
     </div>

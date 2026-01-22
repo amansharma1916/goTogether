@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../../Styles/User/Bookings.css";
 import Navbar from './Assets/Navbar';
+import { useNotifications } from '../../context/NotificationContext';
 
 interface Booking {
   _id: string;
@@ -52,6 +53,7 @@ interface Booking {
 
 const Bookings = () => {
   const navigate = useNavigate();
+  const { addNotification } = useNotifications();
   const [viewMode, setViewMode] = useState<'received' | 'sent'>('received');
   const [receivedBookings, setReceivedBookings] = useState<Booking[]>([]);
   const [myBookings, setMyBookings] = useState<Booking[]>([]);

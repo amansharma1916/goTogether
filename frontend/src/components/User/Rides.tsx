@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../../Styles/User/Rides.css'
 import Navbar from './Assets/Navbar'
+import { useNotifications } from '../../context/NotificationContext'
 
 interface Ride {
   _id: string;
@@ -37,6 +38,7 @@ const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Rides = () => {
   const navigate = useNavigate();
+  const { addNotification } = useNotifications();
   const [rides, setRides] = useState<Ride[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'distance' | 'time' | 'price'>('distance');
@@ -207,15 +209,31 @@ const Rides = () => {
       const data = await response.json();
 
       if (data.success) {
+        addNotification({
+          title: 'Ride joined',
+          message: 'You successfully requested this ride.',
+          type: 'success',
+        });
         // Refresh rides to update seat availability
         if (viewMode === 'all') {
           fetchAllRides(currentPage);
         } else {
           fetchMyRides(currentPage);
         }
+      } else {
+        addNotification({
+          title: 'Ride booking failed',
+          message: data.message || 'Unable to book the ride right now.',
+          type: 'warning',
+        });
       }
     } catch (error) {
       console.error('Error booking ride:', error);
+      addNotification({
+        title: 'Ride booking failed',
+        message: 'There was an error while booking the ride.',
+        type: 'warning',
+      });
     }
   };
 
