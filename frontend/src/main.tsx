@@ -5,14 +5,17 @@ import './index.css'
 import App from './App.tsx'
 import ParticleTheme from './theme/ParticleTheme.tsx'
 import { NotificationProvider } from './context/NotificationContext'
+import { GlobalLoaderProvider } from './context/GlobalLoaderContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ParticleTheme />
     <NotificationProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <GlobalLoaderProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </GlobalLoaderProvider>
     </NotificationProvider>
   </StrictMode>,
 )

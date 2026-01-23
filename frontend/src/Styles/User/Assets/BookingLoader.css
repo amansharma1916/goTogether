@@ -1,0 +1,84 @@
+.booking-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.booking-loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 240, 240, 0.95));
+  padding: 48px 40px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.booking-loader-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner-circle {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 165, 0, 0.2);
+  border-top: 4px solid #ffa500;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.booking-loader-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+ 
+@media (max-width: 480px) {
+  .booking-loader-content {
+    padding: 40px 30px;
+    gap: 20px;
+  }
+
+  .spinner-circle {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+
+  .booking-loader-text {
+    font-size: 16px;
+  }
+}
