@@ -30,6 +30,7 @@ const HomePage = () => {
           <h1 className="hero-title-homepage">
             Student Rideshare Platform.<br />
             Find your ride today!
+            
           </h1>
           
           {/* Search Bar */}
