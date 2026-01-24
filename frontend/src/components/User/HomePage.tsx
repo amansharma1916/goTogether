@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../../Styles/User/HomePage.css'
-import { motion } from 'framer-motion'
 import { ShieldCheck, IndianRupee, Route, Users, Bike, Wallet } from 'lucide-react'
 
 // Simple CountUp Component
@@ -102,14 +101,9 @@ const HomePage = () => {
       </div>
 
       {/* Features Section */}
-    {/* Features Section */}
 <div className="features-section">
-  <motion.div
+  <div
     className="feature-card"
-    initial={{ opacity: 0, y: 40 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6 }}
-    viewport={{ once: true }}
   >
     <ShieldCheck size={36} className="feature-icon" />
     <h3>Verified Students</h3>
@@ -118,14 +112,10 @@ const HomePage = () => {
     <div className="feature-hover">
       <span>Learn more →</span>
     </div>
-  </motion.div>
+  </div>
 
-  <motion.div
+  <div
     className="feature-card"
-    initial={{ opacity: 0, y: 40 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6, delay: 0.15 }}
-    viewport={{ once: true }}
   >
     <IndianRupee size={36} className="feature-icon" />
     <h3>Low Cost Travel</h3>
@@ -134,14 +124,10 @@ const HomePage = () => {
     <div className="feature-hover">
       <span>Learn more →</span>
     </div>
-  </motion.div>
+  </div>
 
-  <motion.div
+  <div
     className="feature-card"
-    initial={{ opacity: 0, y: 40 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6, delay: 0.3 }}
-    viewport={{ once: true }}
   >
     <Route size={36} className="feature-icon" />
     <h3>Same Route Matching</h3>
@@ -150,19 +136,15 @@ const HomePage = () => {
     <div className="feature-hover">
       <span>Learn more →</span>
     </div>
-  </motion.div>
+  </div>
 </div>
 
 <div className="stats-divider-accent"></div>
 
       {/* Stats Section */}
       {/* Enhanced Stats Section */}
-<motion.div
+<div
   className="stats-section"
-  initial={{ opacity: 0, y: 30 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.8 }}
-  viewport={{ once: true }}
 >
   <div className="stat-card">
     <Users size={32} className="stat-icon" />
@@ -181,7 +163,7 @@ const HomePage = () => {
     <h2>₹40</h2>
     <span>Average Fare</span>
   </div>
-</motion.div>
+</div>
     </div>
   )
 }
