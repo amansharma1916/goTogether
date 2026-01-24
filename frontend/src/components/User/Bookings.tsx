@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import "../../Styles/User/Bookings.css";
 import Navbar from './Assets/Navbar';
 import { useNotifications } from '../../context/NotificationContext';
+import { useGlobalLoader } from '../../context/GlobalLoaderContext';
 
 interface Booking {
   _id: string;
@@ -63,6 +64,7 @@ const Bookings = () => {
   const bookingsPerPage = 4;
   const [totalReceivedBookings, setTotalReceivedBookings] = useState(0);
   const [totalMyBookings, setTotalMyBookings] = useState(0);
+  const { show, hide } = useGlobalLoader();
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('LoggedInUser');
@@ -120,7 +122,9 @@ const Bookings = () => {
   };
 
   const handleConfirm = async (bookingId: string) => {
+    
     try {
+      show('Confirming booking...');
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/confirm`, {
         method: 'PATCH',
         headers: {
@@ -137,6 +141,7 @@ const Bookings = () => {
           type: 'success',
         });
         alert(successMsg);
+        hide();
         fetchReceivedBookings(currentPage);
       } else {
         const warnMsg = data.message || 'Unable to confirm booking.';
@@ -146,6 +151,7 @@ const Bookings = () => {
           type: 'warning',
         });
         alert(warnMsg);
+        hide();
       }
     } catch (error) {
       console.error('Error confirming booking:', error);
@@ -156,6 +162,7 @@ const Bookings = () => {
         type: 'warning',
       });
       alert(errorMsg);
+      hide();
     }
   };
 
@@ -164,6 +171,7 @@ const Bookings = () => {
     if (!reason) return;
 
     try {
+      show('Cancelling booking...');
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/cancel`, {
         method: 'PATCH',
         headers: {
@@ -184,6 +192,7 @@ const Bookings = () => {
           type: 'info',
         });
         alert(infoMsg);
+        hide();
         if (isDriver) {
           fetchReceivedBookings(currentPage);
         } else {
@@ -197,6 +206,7 @@ const Bookings = () => {
           type: 'warning',
         });
         alert(warnMsg);
+        hide();
       }
     } catch (error) {
       console.error('Error cancelling booking:', error);
@@ -207,11 +217,13 @@ const Bookings = () => {
         type: 'warning',
       });
       alert(errorMsg);
+      hide();
     }
   };
 
   const handleComplete = async (bookingId: string) => {
     try {
+      show('Completing ride...');
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/complete`, {
         method: 'PATCH',
         headers: {
@@ -228,6 +240,7 @@ const Bookings = () => {
           type: 'success',
         });
         alert(successMsg);
+        hide();
         fetchReceivedBookings(currentPage);
       } else {
         const warnMsg = data.message || 'Unable to complete booking.';
@@ -237,6 +250,7 @@ const Bookings = () => {
           type: 'warning',
         });
         alert(warnMsg);
+        hide();
       }
     } catch (error) {
       console.error('Error completing booking:', error);
@@ -247,6 +261,7 @@ const Bookings = () => {
         type: 'warning',
       });
       alert(errorMsg);
+      hide();
     }
   };
 

@@ -251,6 +251,8 @@ const Map = () => {
         return;
       }
 
+      show('Booking your ride...');
+
       // Calculate meeting point (nearest point on route to pickup location)
       let nearestPoint = null;
       let minDistance = Infinity;
@@ -314,6 +316,7 @@ const Map = () => {
           type: 'warning',
         });
         alert(`Booking failed: ${data.message}`);
+        hide();
       }
     } catch (error) {
       console.error('Error booking ride:', error);
@@ -323,6 +326,7 @@ const Map = () => {
         type: 'warning',
       });
       alert('Failed to book ride. Please try again.');
+      hide();
     }
   };
 
