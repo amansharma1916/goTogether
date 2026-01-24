@@ -130,26 +130,32 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
+        const successMsg = data.message || 'You have confirmed the booking request.';
         addNotification({
           title: 'Booking confirmed',
-          message: 'You have confirmed the booking request.',
+          message: successMsg,
           type: 'success',
         });
+        alert(successMsg);
         fetchReceivedBookings(currentPage);
       } else {
+        const warnMsg = data.message || 'Unable to confirm booking.';
         addNotification({
           title: 'Confirmation failed',
-          message: data.message || 'Unable to confirm booking.',
+          message: warnMsg,
           type: 'warning',
         });
+        alert(warnMsg);
       }
     } catch (error) {
       console.error('Error confirming booking:', error);
+      const errorMsg = 'Something went wrong while confirming the booking.';
       addNotification({
         title: 'Confirmation error',
-        message: 'Something went wrong while confirming the booking.',
+        message: errorMsg,
         type: 'warning',
       });
+      alert(errorMsg);
     }
   };
 
@@ -171,30 +177,36 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
+        const infoMsg = data.message || `The booking has been cancelled. Reason: ${reason}`;
         addNotification({
           title: 'Booking cancelled',
-          message: `The booking has been cancelled. Reason: ${reason}`,
+          message: infoMsg,
           type: 'info',
         });
+        alert(infoMsg);
         if (isDriver) {
           fetchReceivedBookings(currentPage);
         } else {
           fetchMyBookings(currentPage);
         }
       } else {
+        const warnMsg = data.message || 'Unable to cancel booking.';
         addNotification({
           title: 'Cancellation failed',
-          message: data.message || 'Unable to cancel booking.',
+          message: warnMsg,
           type: 'warning',
         });
+        alert(warnMsg);
       }
     } catch (error) {
       console.error('Error cancelling booking:', error);
+      const errorMsg = 'Something went wrong while cancelling the booking.';
       addNotification({
         title: 'Cancellation error',
-        message: 'Something went wrong while cancelling the booking.',
+        message: errorMsg,
         type: 'warning',
       });
+      alert(errorMsg);
     }
   };
 
@@ -209,26 +221,32 @@ const Bookings = () => {
       });
       const data = await response.json();
       if (data.success) {
+        const successMsg = data.message || 'The ride has been marked as completed.';
         addNotification({
           title: 'Ride completed',
-          message: 'The ride has been marked as completed.',
+          message: successMsg,
           type: 'success',
         });
+        alert(successMsg);
         fetchReceivedBookings(currentPage);
       } else {
+        const warnMsg = data.message || 'Unable to complete booking.';
         addNotification({
           title: 'Completion failed',
-          message: data.message || 'Unable to complete booking.',
+          message: warnMsg,
           type: 'warning',
         });
+        alert(warnMsg);
       }
     } catch (error) {
       console.error('Error completing booking:', error);
+      const errorMsg = 'Something went wrong while completing the booking.';
       addNotification({
         title: 'Completion error',
-        message: 'Something went wrong while completing the booking.',
+        message: errorMsg,
         type: 'warning',
       });
+      alert(errorMsg);
     }
   };
 

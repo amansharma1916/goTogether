@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Loader from './Assets/Loader'
 import { useNotifications } from '../../context/NotificationContext'
+import { useGlobalLoader } from '../../context/GlobalLoaderContext'
 
 interface LocationData {
   lat: number;
@@ -27,6 +28,7 @@ const ORS_API_KEY = import.meta.env.VITE_ORS_API_KEY || '';
 const Join = () => {
   const location = useLocation();
   const { addNotification } = useNotifications();
+  const { show, hide } = useGlobalLoader();
   const [originQuery, setOriginQuery] = useState("");
   const [originResults, setOriginResults] = useState<NominatimResult[]>([]);
   const [originLocation, setOriginLocation] = useState<LocationData | null>(null);
@@ -148,6 +150,7 @@ const Join = () => {
     }
 
     setIsPublishing(true);
+    show('Publishing your ride...');
 
     const rideData = {
       origin: originLocation,
@@ -197,6 +200,7 @@ const Join = () => {
       console.error("Error publishing ride:", error);
       alert("Failed to publish ride. Please try again.");
     } finally {
+      hide();
       setIsPublishing(false);
     }
   };

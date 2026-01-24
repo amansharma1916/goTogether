@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import '../../Styles/User/Rides.css'
 import Navbar from './Assets/Navbar'
 import { useNotifications } from '../../context/NotificationContext'
+import { useGlobalLoader } from '../../context/GlobalLoaderContext'
 
 interface Ride {
   _id: string;
@@ -39,6 +40,7 @@ const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const Rides = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotifications();
+  const { show, hide } = useGlobalLoader();
   const [rides, setRides] = useState<Ride[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'distance' | 'time' | 'price'>('distance');
@@ -155,6 +157,8 @@ const Rides = () => {
 
   const handleBookRide = async (e: React.MouseEvent, ride: Ride) => {
     e.stopPropagation(); // Prevent card click event
+    
+    show('Booking your ride...');
 
     try {
       // Get user info
@@ -163,10 +167,12 @@ const Rides = () => {
       const userId = loggedInUser?.id;
 
       if (!userId) {
+        hide();
         return;
       }
 
       if (!userLocation) {
+        hide();
         return;
       }
 
@@ -209,11 +215,14 @@ const Rides = () => {
       const data = await response.json();
 
       if (data.success) {
+        hide();
+        const successMsg = data.message || 'You successfully requested this ride.';
         addNotification({
           title: 'Ride joined',
-          message: 'You successfully requested this ride.',
+          message: successMsg,
           type: 'success',
         });
+        alert(successMsg);
         // Refresh rides to update seat availability
         if (viewMode === 'all') {
           fetchAllRides(currentPage);
@@ -221,19 +230,25 @@ const Rides = () => {
           fetchMyRides(currentPage);
         }
       } else {
+        hide();
+        const errorMsg = data.message || 'Unable to book the ride right now.';
         addNotification({
           title: 'Ride booking failed',
-          message: data.message || 'Unable to book the ride right now.',
+          message: errorMsg,
           type: 'warning',
         });
+        alert(errorMsg);
       }
     } catch (error) {
+      hide();
       console.error('Error booking ride:', error);
+      const errorMsg = 'There was an error while booking the ride.';
       addNotification({
         title: 'Ride booking failed',
-        message: 'There was an error while booking the ride.',
+        message: errorMsg,
         type: 'warning',
       });
+      alert(errorMsg);
     }
   };
 

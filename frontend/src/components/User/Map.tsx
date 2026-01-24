@@ -4,6 +4,7 @@ import '../../Styles/User/Map.css'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useNotifications } from '../../context/NotificationContext'
+import { useGlobalLoader } from '../../context/GlobalLoaderContext'
 
 interface LocationData {
   lat: number;
@@ -50,6 +51,7 @@ const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const Map = () => {
   const location = useLocation();
   const { addNotification } = useNotifications();
+  const { show, hide } = useGlobalLoader();
   const [fromQuery, setFromQuery] = useState("");
   const [fromResults, setFromResults] = useState<NominatimResult[]>([]);
   const [pickupLocation, setPickupLocation] = useState<LocationData | null>(null);
@@ -178,6 +180,7 @@ const Map = () => {
     }
 
     setIsSearching(true);
+    show('Searching rides...');
     setAvailableRides([]);
     setSelectedRide(null);
 
@@ -206,7 +209,7 @@ const Map = () => {
 
       if (data.success) {
         setAvailableRides(data.rides);
-        console.log("Found rides:", data.rides[0].fullName);
+        console.log("Found rides:", data.rides[0]?.fullName);
       } else {
         alert(`Search failed: ${data.message}`);
       }
@@ -214,6 +217,7 @@ const Map = () => {
       console.error("Error searching rides:", error);
       alert("Failed to search rides. Please try again.");
     } finally {
+      hide();
       setIsSearching(false);
     }
   };

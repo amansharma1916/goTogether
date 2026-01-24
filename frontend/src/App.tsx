@@ -10,6 +10,7 @@ import Rides from "./components/User/Rides";
 import Bookings from "./components/User/Bookings";
 import ActiveRidesPage from "./components/User/ActiveRidesPage";
 import Profile from "./components/User/Profile";
+import GlobalLoader from "./components/GlobalLoader";
 
 const App = () => {
   useEffect(() => {
@@ -18,6 +19,7 @@ const App = () => {
 
   return (
     <div>
+      <GlobalLoader />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Switcher />} />
