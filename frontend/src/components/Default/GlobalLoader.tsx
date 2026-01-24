@@ -1,4 +1,4 @@
-import { useGlobalLoader } from '../context/GlobalLoaderContext';
+import { useGlobalLoader } from '../../context/GlobalLoaderContext';
 import '../Styles/GlobalLoader.css';
 
 const GlobalLoader = () => {
