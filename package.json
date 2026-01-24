@@ -21,6 +21,8 @@
   "homepage": "https://github.com/amansharma1916/goTogether#readme",
   "dependencies": {
     "concurrently": "^9.2.1",
+    "framer-motion": "^12.29.0",
+    "lucide-react": "^0.563.0",
     "nodemon": "^3.0.2"
   }
 }
