@@ -44,7 +44,7 @@ const HomePage = () => {
 
   return (
     <div className="homepage-container">
-
+     
       {/* Hero Section */}
       <div className="hero-section-homepage">
         <div className="hero-content-homepage">
@@ -130,7 +130,7 @@ const HomePage = () => {
     className="feature-card"
   >
     <Route size={36} className="feature-icon" />
-    <h3>Same Route Matching</h3>
+    <h3>Same Route Mating</h3>
     <p>Match with students traveling your route.</p>
 
     <div className="feature-hover">
