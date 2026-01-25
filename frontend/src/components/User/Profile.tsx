@@ -6,7 +6,7 @@ import { useNotifications } from '../../context/NotificationContext';
 import apiClient from '../../services/api';
 
 interface UserData {
-  _id?: string;
+  id?: string;
   fullname: string;
   email: string;
   college?: string;
@@ -35,6 +35,7 @@ const Profile = () => {
         const parsedUser = JSON.parse(user);
         setUserData(parsedUser);
         console.log('Fetched user data:', parsedUser);
+        
         setEditedData({
           fullname: parsedUser.fullname || '',
           email: parsedUser.email || '',
@@ -64,7 +65,7 @@ const Profile = () => {
   const handleSave = async () => {
     console.log('Saving edited data:', editedData);
     console.log('Current user data:', userData);
-    if (!userData?._id) {
+    if (!userData?.id) {
       setError('User ID not found. Please log in again.');
       return;
     }
@@ -92,7 +93,7 @@ const Profile = () => {
     setSuccessMessage(null);
 
     try {
-      const response = await apiClient.put(`/auth/update-profile/${userData._id}`, {
+      const response = await apiClient.put(`/auth/update-profile/${userData.id}`, {
         fullname: editedData.fullname,
         email: editedData.email,
         college: editedData.college,

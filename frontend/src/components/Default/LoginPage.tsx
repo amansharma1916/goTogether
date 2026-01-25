@@ -37,9 +37,10 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
     setError('');
     try {
       const data = await loginApi(formData.email, formData.password);
+      
       localStorage.setItem('token', data.token);
       localStorage.setItem('LoggedInUser', JSON.stringify(data.user));
-      console.log('Login successful, token stored.', data.user);
+      
       navigate('/dashboard');
     } catch (err) {
       console.error('Login error:', err);
