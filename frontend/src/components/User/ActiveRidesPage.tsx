@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Assets/Navbar';
 import '../../Styles/User/ActiveRidesPage.css';
+import apiClient from '../../services/api';
 
 interface ActiveRide {
   _id: string;
@@ -61,19 +62,15 @@ const ActiveRidesPage = () => {
     setIsLoading(true);
     try {
       // Fetch confirmed bookings where user is rider
-      const riderResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/bookings/my-bookings?userId=${userId}`
-      );
-      const riderData = await riderResponse.json();
+      const riderResponse = await apiClient.get('/bookings/my-bookings');
+      const riderData = riderResponse.data;
       const riderRides = riderData.success
         ? riderData.bookings.filter((b: ActiveRide) => b.status === 'confirmed')
         : [];
 
       // Fetch confirmed bookings where user is driver
-      const driverResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/bookings/received?userId=${userId}`
-      );
-      const driverData = await driverResponse.json();
+      const driverResponse = await apiClient.get('/bookings/received');
+      const driverData = driverResponse.data;
       const driverRides = driverData.success
         ? driverData.bookings.filter((b: ActiveRide) => b.status === 'confirmed')
         : [];
@@ -124,23 +121,16 @@ const ActiveRidesPage = () => {
         reason = cancellationReason || 'Emergency cancellation';
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/bookings/${selectedRide._id}/status`,
+      const response = await apiClient.patch(
+        `/bookings/${selectedRide._id}/status`,
         {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId,
-            status,
-            paymentStatus,
-            cancellationReason: reason
-          })
+          status,
+          paymentStatus,
+          cancellationReason: reason
         }
       );
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.success) {
         // Refresh active rides

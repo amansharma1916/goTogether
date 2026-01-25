@@ -1,9 +1,12 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import connectDB from './DB/db.js';
 import authRoutes from './Auth/Routes/authRoutes.js';
 import rideRoutes from './routes/rideRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
+
+dotenv.config();
 
 
 const app = express();

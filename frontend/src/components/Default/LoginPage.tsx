@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom'
 import '../../Styles/Default/LoginPage.css'
-import axios from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthLoader from './AuthLoader'
-
-const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { loginApi } from '../../services/auth'
 
 interface LoginPageProps {
   onSwitchToRegister: () => void
@@ -16,51 +14,36 @@ interface LoginFormData {
   password: string
 }
 
-
 const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: ''
   });
   const navigate = useNavigate();
-  const [, setIsLoggedIn] = useState(localStorage.getItem('isAuthenticated') === 'true');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value
     });
+    setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     try {
-      console.log(formData)
-      const response = await axios.post(`${ServerURL}/api/auth/login`, formData);
-      if(response.data.success){
-        console.log('Login successful');
-        // Set localStorage BEFORE navigation
-        localStorage.setItem('isAuthenticated', 'true');
-        // console.log(response.data.user);
-        const LoginUser = {
-          id: response.data.user._id,
-          fullname: response.data.user.fullname,
-          email: response.data.user.email,
-          college: response.data.user.college
-
-        }
-        localStorage.setItem('LoggedInUser', JSON.stringify(LoginUser));
-        console.log('User data stored in localStorage:', LoginUser);
-        setIsLoggedIn(true);
-        console.log(localStorage.getItem('isAuthenticated'))
-        // Navigate after state is updated
-        navigate('/dashboard');
-      }
-      
-    } catch (error) {
-      console.error('Login error:', error);
+      const data = await loginApi(formData.email, formData.password);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('LoggedInUser', JSON.stringify(data.user));
+      console.log('Login successful, token stored.', data.user);
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsLoading(false);
     }
@@ -70,6 +53,8 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
     <div className="login-page">
       {isLoading && <AuthLoader text="Logging in..." />}
       <h2 className="auth-title">Login to your account</h2>
+
+      {error && <div className="error-message" style={{color: 'red', marginBottom: '1rem', textAlign: 'center'}}>{error}</div>}
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="form-group">

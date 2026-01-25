@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Assets/Navbar';
 import '../../Styles/User/Profile.css';
 import { useNotifications } from '../../context/NotificationContext';
+import apiClient from '../../services/api';
 
 interface UserData {
   _id?: string;
@@ -93,23 +94,13 @@ const Profile = () => {
     setSuccessMessage(null);
 
     try {
-      const response = await fetch(`${ServerURL}/api/auth/update-profile/${userData._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullname: editedData.fullname,
-          email: editedData.email,
-          college: editedData.college,
-        }),
+      const response = await apiClient.put(`/auth/update-profile/${userData._id}`, {
+        fullname: editedData.fullname,
+        email: editedData.email,
+        college: editedData.college,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to update profile');
-      }
+      const data = response.data;
 
       if (data.success) {
         // Update localStorage with new user data

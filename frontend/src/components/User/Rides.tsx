@@ -4,6 +4,7 @@ import '../../Styles/User/Rides.css'
 import Navbar from './Assets/Navbar'
 import { useNotifications } from '../../context/NotificationContext'
 import { useGlobalLoader } from '../../context/GlobalLoaderContext'
+import apiClient from '../../services/api'
 
 interface Ride {
   _id: string;
@@ -79,18 +80,10 @@ const Rides = () => {
   const fetchAllRides = async (page = 1) => {
     setIsLoading(true);
     try {
-      
-      const loggedInUserStr = localStorage.getItem('LoggedInUser');
-      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
-      const userId = loggedInUser?.id;
-
-      
-      const url = userId 
-        ? `${ServerURL}/api/rides?userId=${userId}&page=${page}&limit=${ridesPerPage}`
-        : `${ServerURL}/api/rides?page=${page}&limit=${ridesPerPage}`;
-
-      const response = await fetch(url);
-      const data = await response.json();
+      const response = await apiClient.get('/rides', {
+        params: { page, limit: ridesPerPage }
+      });
+      const data = response.data;
 
       if (data.success) {
         setRides(data.rides);
@@ -108,21 +101,10 @@ const Rides = () => {
   const fetchMyRides = async (page = 1) => {
     setIsLoading(true);
     try {
-      
-      const loggedInUserStr = localStorage.getItem('LoggedInUser');
-      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
-      const userId = loggedInUser?.id;
-
-      if (!userId) {
-        console.error('User not logged in');
-        setRides([]);
-        setTotalRides(0);
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await fetch(`${ServerURL}/api/rides/my-rides?userId=${userId}&page=${page}&limit=${ridesPerPage}`);
-      const data = await response.json();
+      const response = await apiClient.get('/rides/my-rides', {
+        params: { page, limit: ridesPerPage }
+      });
+      const data = response.data;
 
       if (data.success) {
         setRides(data.rides);
@@ -161,16 +143,6 @@ const Rides = () => {
     show('Booking your ride...');
 
     try {
-      // Get user info
-      const loggedInUserStr = localStorage.getItem('LoggedInUser');
-      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
-      const userId = loggedInUser?.id;
-
-      if (!userId) {
-        hide();
-        return;
-      }
-
       if (!userLocation) {
         hide();
         return;
@@ -191,7 +163,6 @@ const Rides = () => {
 
       const bookingData = {
         rideId: ride._id,
-        riderId: userId,
         seatsBooked: 1,
         pickupLocation: {
           lat: userLocation.lat,
@@ -204,15 +175,8 @@ const Rides = () => {
         paymentMethod: 'cash'
       };
 
-      const response = await fetch(`${ServerURL}/api/bookings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bookingData)
-      });
-
-      const data = await response.json();
+      const response = await apiClient.post('/bookings', bookingData);
+      const data = response.data;
 
       if (data.success) {
         hide();

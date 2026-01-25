@@ -12,40 +12,41 @@ import {
   updatePaymentStatus,
   updateRideStatus
 } from '../controllers/bookingController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 
-router.post('/', createBooking);
+router.post('/', authMiddleware, createBooking);
 
 
-router.get('/my-bookings', getMyBookings);
+router.get('/my-bookings', authMiddleware, getMyBookings);
 
 
-router.get('/received', getReceivedBookings);
+router.get('/received', authMiddleware, getReceivedBookings);
 
 
 router.get('/ride/:rideId', getRideBookings);
 
 
-router.get('/:id', getBookingById);
+router.get('/:id', authMiddleware, getBookingById);
 
 
-router.patch('/:id/confirm', confirmBooking);
+router.patch('/:id/confirm', authMiddleware, confirmBooking);
 
 
-router.patch('/:id/cancel', cancelBooking);
+router.patch('/:id/cancel', authMiddleware, cancelBooking);
 
 
-router.patch('/:id/complete', completeBooking);
+router.patch('/:id/complete', authMiddleware, completeBooking);
 
 
-router.patch('/:id/rate', rateBooking);
+router.patch('/:id/rate', authMiddleware, rateBooking);
 
 
-router.patch('/:id/payment', updatePaymentStatus);
+router.patch('/:id/payment', authMiddleware, updatePaymentStatus);
 
 
-router.patch('/:id/status', updateRideStatus);
+router.patch('/:id/status', authMiddleware, updateRideStatus);
 
 export default router;

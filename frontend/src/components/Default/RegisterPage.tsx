@@ -1,10 +1,9 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import '../../Styles/Default/RegisterPage.css'
 import { useState } from 'react'
-import axios from 'axios'
 import AuthLoader from './AuthLoader'
+import { registerApi } from '../../services/auth'
 
-const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 interface RegisterPageProps {
   onSwitchToLogin: () => void
 }
@@ -17,7 +16,6 @@ interface RegisterFormData {
   college: string
 }
 
-
 const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
   const [formData, setFormData] = useState<RegisterFormData>({
     fullname: '',
@@ -27,36 +25,34 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
     college: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value
     });
+    setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError('');
     
     if(formData.password !== formData.confirmPassword){
+      setError('Passwords do not match');
       return;
     }
     
     setIsLoading(true);
     try{
-      const response = await axios.post(`${ServerURL}/api/auth/register`, formData);
-      if(response.status === 201){
-        setFormData({
-          fullname: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          college: ''
-        });
-        onSwitchToLogin();
-      }
-    }catch(error){
-      console.error('Registration error:', error);
+      const data = await registerApi(formData.fullname, formData.email, formData.password, formData.college);
+      localStorage.setItem('token', data.token);
+      navigate('/dashboard');
+    }catch(err){
+      console.error('Registration error:', err);
+      setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +63,8 @@ const RegisterPage = ({ onSwitchToLogin }: RegisterPageProps) => {
     <div className="register-page">
       {isLoading && <AuthLoader text="Creating your account..." />}
       <h2 className="auth-title">Create your account</h2>
+
+      {error && <div className="error-message" style={{color: 'red', marginBottom: '1rem', textAlign: 'center'}}>{error}</div>}
 
       <form className="auth-form" onSubmit={handleSubmit}>
         {}

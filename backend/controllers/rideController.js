@@ -11,7 +11,6 @@ export const createRide = async (req, res) => {
   try {
     const {
       origin,
-      userId,
       fullName,
       destination,      
       selectedRouteIndex = 0,
@@ -22,6 +21,16 @@ export const createRide = async (req, res) => {
       vehicle,
       notes
     } = req.body;
+
+    // Get userId from JWT token
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated"
+      });
+    }
 
     console.log("CreateRide request body:", req.body);
     
@@ -61,7 +70,7 @@ export const createRide = async (req, res) => {
 
     
     const existingRide = await Ride.findOne({
-      driverId: req.user?.id || req.body.driverId,
+      driverId: userId,
       departureTime: departureDateTimeObj
     });
 
@@ -144,7 +153,7 @@ export const createRide = async (req, res) => {
 
     
     const newRide = new Ride({
-      driverId: req.user?.id || req.body.driverId, 
+      driverId: userId, 
       vehicleId: req.body.vehicleId || null,
       fullName: req.body.fullname,
       userId: userId,
@@ -354,14 +363,17 @@ export const searchRides = async (req, res) => {
 
 export const getMyRides = async (req, res) => {
   try {
-    const { userId, page = 1, limit = 4 } = req.query;
+    // Get userId from JWT token
+    const userId = req.user?.userId;
 
     if (!userId) {
-      return res.status(400).json({
+      return res.status(401).json({
         success: false,
-        message: "User ID is required"
+        message: "User not authenticated"
       });
     }
+
+    const { page = 1, limit = 4 } = req.query;
 
     const filter = { 
       userId: userId,

@@ -4,6 +4,7 @@ import "../../Styles/User/Bookings.css";
 import Navbar from './Assets/Navbar';
 import { useNotifications } from '../../context/NotificationContext';
 import { useGlobalLoader } from '../../context/GlobalLoaderContext';
+import apiClient from '../../services/api';
 
 interface Booking {
   _id: string;
@@ -68,6 +69,7 @@ const Bookings = () => {
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('LoggedInUser');
+    console.log('LoggedInUser from localStorage:', loggedInUser);
     if (loggedInUser) {
       const user = JSON.parse(loggedInUser);
       setUserId(user.id);
@@ -88,13 +90,14 @@ const Bookings = () => {
   const fetchReceivedBookings = async (page = 1) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/received?userId=${userId}&page=${page}&limit=${bookingsPerPage}`);
-      const data = await response.json();
-      if (data.success) {
-        setReceivedBookings(data.bookings);
-        setTotalReceivedBookings(data.pagination?.totalBookings || data.bookings.length);
+      const response = await apiClient.get('/bookings/received', {
+        params: { page, limit: bookingsPerPage }
+      });
+      if (response.data.success) {
+        setReceivedBookings(response.data.bookings);
+        setTotalReceivedBookings(response.data.pagination?.totalBookings || response.data.bookings.length);
       } else {
-        console.error('Failed to fetch received bookings:', data.message);
+        console.error('Failed to fetch received bookings:', response.data.message);
       }
     } catch (error) {
       console.error('Error fetching received bookings:', error);
@@ -106,13 +109,14 @@ const Bookings = () => {
   const fetchMyBookings = async (page = 1) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/my-bookings?userId=${userId}&page=${page}&limit=${bookingsPerPage}`);
-      const data = await response.json();
-      if (data.success) {
-        setMyBookings(data.bookings);
-        setTotalMyBookings(data.pagination?.totalBookings || data.bookings.length);
+      const response = await apiClient.get('/bookings/my-bookings', {
+        params: { page, limit: bookingsPerPage }
+      });
+      if (response.data.success) {
+        setMyBookings(response.data.bookings);
+        setTotalMyBookings(response.data.pagination?.totalBookings || response.data.bookings.length);
       } else {
-        console.error('Failed to fetch my bookings:', data.message);
+        console.error('Failed to fetch my bookings:', response.data.message);
       }
     } catch (error) {
       console.error('Error fetching my bookings:', error);
@@ -125,14 +129,8 @@ const Bookings = () => {
     
     try {
       show('Confirming booking...');
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/confirm`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ userId })
-      });
-      const data = await response.json();
+      const response = await apiClient.patch(`/bookings/${bookingId}/confirm`);
+      const data = response.data;
       if (data.success) {
         const successMsg = data.message || 'You have confirmed the booking request.';
         addNotification({
@@ -172,18 +170,11 @@ const Bookings = () => {
 
     try {
       show('Cancelling booking...');
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/cancel`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          userId,
-          cancelledBy: isDriver ? 'driver' : 'rider',
-          cancellationReason: reason
-        })
+      const response = await apiClient.patch(`/bookings/${bookingId}/cancel`, {
+        cancelledBy: isDriver ? 'driver' : 'rider',
+        cancellationReason: reason
       });
-      const data = await response.json();
+      const data = response.data;
       if (data.success) {
         const infoMsg = data.message || `The booking has been cancelled. Reason: ${reason}`;
         addNotification({
@@ -224,14 +215,8 @@ const Bookings = () => {
   const handleComplete = async (bookingId: string) => {
     try {
       show('Completing ride...');
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${bookingId}/complete`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ userId })
-      });
-      const data = await response.json();
+      const response = await apiClient.patch(`/bookings/${bookingId}/complete`);
+      const data = response.data;
       if (data.success) {
         const successMsg = data.message || 'The ride has been marked as completed.';
         addNotification({

@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useNotifications } from '../../context/NotificationContext'
 import { useGlobalLoader } from '../../context/GlobalLoaderContext'
+import apiClient from '../../services/api'
 
 interface LocationData {
   lat: number;
@@ -185,27 +186,15 @@ const Map = () => {
     setSelectedRide(null);
 
     try {
-      // Get user ID from localStorage
-      const loggedInUserStr = localStorage.getItem('LoggedInUser');
-      const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
-      const userId = loggedInUser?.id;
-
-      const response = await fetch(`${ServerURL}/api/rides/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await apiClient.post('/rides/search', {
+        pickup: {
+          lat: pickupLocation.lat,
+          lng: pickupLocation.lng
         },
-        body: JSON.stringify({
-          pickup: {
-            lat: pickupLocation.lat,
-            lng: pickupLocation.lng
-          },
-          radiusMeters: 20000, // 2km radius
-          userId: userId // Send userId to exclude own rides
-        })
+        radiusMeters: 20000, // 2km radius
       });
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.success) {
         setAvailableRides(data.rides);
@@ -277,7 +266,6 @@ const Map = () => {
 
       const bookingData = {
         rideId: ride._id,
-        riderId: userId,
         seatsBooked: 1,
         pickupLocation: {
           lat: pickupLocation.lat,
@@ -290,15 +278,9 @@ const Map = () => {
         paymentMethod: 'cash'
       };
 
-      const response = await fetch(`${ServerURL}/api/bookings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bookingData)
-      });
+      const response = await apiClient.post('/bookings', bookingData);
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.success) {
         addNotification({

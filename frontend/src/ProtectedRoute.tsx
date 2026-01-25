@@ -1,15 +1,17 @@
 import { Navigate } from "react-router-dom";
 import type { JSX } from "react/jsx-dev-runtime";
+import useAuth from "./hooks/useAuth";
 
 type ProtectedRouteProps = {
   children: JSX.Element;
 };
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  // Check localStorage directly inside the component to get the latest value
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  
-  if (!isAuthenticated) {
+  const { isAuth, loading } = useAuth();
+
+  if (loading) return <div>Checking auth...</div>;
+
+  if (!isAuth) {
     return <Navigate to="/login" replace />;
   }
 
