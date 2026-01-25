@@ -356,7 +356,15 @@ export const getBookingById = async (req, res) => {
 export const confirmBooking = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId } = req.body;
+    // Get userId from JWT token
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated"
+      });
+    }
 
     const booking = await BookedRide.findById(id).populate('rideId');
 
@@ -405,7 +413,17 @@ export const confirmBooking = async (req, res) => {
 export const cancelBooking = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId, cancelledBy, cancellationReason } = req.body;
+    const { cancelledBy, cancellationReason } = req.body;
+    // Get userId from JWT token
+    const userId = req.user?.userId;
+    
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated"
+      });
+    }
 
     const booking = await BookedRide.findById(id);
 
@@ -470,7 +488,15 @@ export const cancelBooking = async (req, res) => {
 export const completeBooking = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId } = req.body;
+    // Get userId from JWT token
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated"
+      });
+    }
 
     const booking = await BookedRide.findById(id);
 
@@ -519,7 +545,16 @@ export const completeBooking = async (req, res) => {
 export const rateBooking = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId, ratingForDriver, reviewForDriver } = req.body;
+    const { ratingForDriver, reviewForDriver } = req.body;
+    // Get userId from JWT token
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated"
+      });
+    }
 
     const booking = await BookedRide.findById(id);
 
@@ -637,7 +672,16 @@ export const updatePaymentStatus = async (req, res) => {
 export const updateRideStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId, status, paymentStatus, cancellationReason } = req.body;
+    const { status, paymentStatus, cancellationReason } = req.body;
+    // Get userId from JWT token
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated"
+      });
+    }
 
     const booking = await BookedRide.findById(id).populate('rideId');
 

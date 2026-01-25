@@ -47,7 +47,6 @@ interface Ride {
   notes?: string;
 }
 
-const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Map = () => {
   const location = useLocation();

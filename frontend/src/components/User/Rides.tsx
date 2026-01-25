@@ -34,9 +34,6 @@ interface Ride {
   distanceToMeetPoint?: number; 
 }
 
-const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-
 
 const Rides = () => {
   const navigate = useNavigate();

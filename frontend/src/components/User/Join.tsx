@@ -21,11 +21,6 @@ interface NominatimResult {
   display_name: string;
 }
 
-const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const ORS_API_KEY = import.meta.env.VITE_ORS_API_KEY || '';
-
-
-
 const Join = () => {
   const location = useLocation();
   const { addNotification } = useNotifications();
