@@ -61,10 +61,8 @@ const Map = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedRide, setSelectedRide] = useState<Ride | null>(null);
 
-  // Handle ride passed from Rides page
   useEffect(() => {
     if (location.state?.booking) {
-      // Booking data from Bookings page - show full route with meeting point
       const booking = location.state.booking;
       setSelectedRide({
         _id: booking.rideId._id,
@@ -88,7 +86,6 @@ const Map = () => {
         durationSeconds: 0
       } as Ride);
 
-      // Set pickup to meeting point if available
       if (booking.meetingPoint?.coordinates) {
         setPickupLocation({
           lat: booking.meetingPoint.coordinates[1],
@@ -103,7 +100,6 @@ const Map = () => {
         });
       }
 
-      // Set destination
       setDestinationLocation({
         lat: booking.rideId.destination?.coordinates[1] || 0,
         lng: booking.rideId.destination?.coordinates[0] || 0,
@@ -119,7 +115,6 @@ const Map = () => {
         lng: ride.destination.coordinates[0],
         name: "Destination"
       });
-      // Set pickup location to ride origin for display
       setPickupLocation({
         lat: ride.origin.coordinates[1],
         lng: ride.origin.coordinates[0],
@@ -127,12 +122,10 @@ const Map = () => {
       });
       setFromQuery("Origin");
     } else if (location.state?.originQuery) {
-      // Set origin query from HomePage search
       setFromQuery(location.state.originQuery);
     }
   }, [location.state]);
 
-  // Fetch suggestions for "From" location
   useEffect(() => {
     if (fromQuery.length < 3) {
       setFromResults([]);
@@ -190,7 +183,7 @@ const Map = () => {
           lat: pickupLocation.lat,
           lng: pickupLocation.lng
         },
-        radiusMeters: 20000, // 2km radius
+        radiusMeters: 20000,
       });
 
       const data = response.data;
@@ -212,7 +205,6 @@ const Map = () => {
 
   const handleRideSelect = (ride: Ride) => {
     setSelectedRide(ride);
-    // Set destination for the map
     setDestinationLocation({
       lat: ride.destination.coordinates[1],
       lng: ride.destination.coordinates[0],
@@ -224,7 +216,6 @@ const Map = () => {
     e.stopPropagation(); // Prevent card selection
 
     try {
-      // Get user info
       const loggedInUserStr = localStorage.getItem('LoggedInUser');
       const loggedInUser = loggedInUserStr ? JSON.parse(loggedInUserStr) : null;
       const userId = loggedInUser?.id;
@@ -241,13 +232,12 @@ const Map = () => {
 
       show('Booking your ride...');
 
-      // Calculate meeting point (nearest point on route to pickup location)
       let nearestPoint = null;
       let minDistance = Infinity;
       
       ride.route.coordinates.forEach((coord) => {
         const [lng, lat] = coord;
-        const R = 6371; // Earth's radius in km
+        const R = 6371; 
         const dLat = (lat - pickupLocation.lat) * Math.PI / 180;
         const dLng = (lng - pickupLocation.lng) * Math.PI / 180;
         const a = 
@@ -272,7 +262,7 @@ const Map = () => {
         },
         pickupLocationName: pickupLocation.name || 'My Location',
         meetingPoint: nearestPoint,
-        distanceToMeetingPoint: minDistance * 1000, // Convert to meters
+        distanceToMeetingPoint: minDistance * 1000, 
         riderNotes: '',
         paymentMethod: 'cash'
       };
@@ -288,7 +278,6 @@ const Map = () => {
           type: 'success',
         });
         alert('Booking successful! The driver will confirm your request.');
-        // Refresh rides to update seat availability
         handleSearchRides();
       } else {
         addNotification({

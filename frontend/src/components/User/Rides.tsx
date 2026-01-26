@@ -135,7 +135,7 @@ const Rides = () => {
   };
 
   const handleBookRide = async (e: React.MouseEvent, ride: Ride) => {
-    e.stopPropagation(); // Prevent card click event
+    e.stopPropagation(); 
     
     show('Booking your ride...');
 
@@ -145,7 +145,6 @@ const Rides = () => {
         return;
       }
 
-      // Calculate meeting point (nearest point on route)
       let nearestPoint = null;
       let minDistance = Infinity;
       
@@ -275,7 +274,6 @@ const Rides = () => {
 
   const sortedRides = sortRides(rides);
 
-  // Server-side pagination - calculate based on total rides from server
   const totalPages = Math.ceil(totalRides / ridesPerPage);
 
   const handlePageChange = (pageNumber: number) => {

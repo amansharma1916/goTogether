@@ -70,7 +70,6 @@ const Profile = () => {
       return;
     }
 
-    // Basic validation
     if (!editedData.fullname.trim()) {
       setError('Full name is required');
       return;
@@ -81,7 +80,6 @@ const Profile = () => {
       return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(editedData.email)) {
       setError('Please enter a valid email address');
@@ -102,7 +100,6 @@ const Profile = () => {
       const data = response.data;
 
       if (data.success) {
-        // Update localStorage with new user data
         const updatedUser = { ...userData, ...data.user };
         localStorage.setItem('LoggedInUser', JSON.stringify(updatedUser));
         setUserData(updatedUser);
@@ -114,7 +111,6 @@ const Profile = () => {
           type: 'success',
         });
         
-        // Clear success message after 3 seconds
         setTimeout(() => setSuccessMessage(null), 3000);
       } else {
         throw new Error(data.message || 'Failed to update profile');
