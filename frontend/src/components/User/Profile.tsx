@@ -3,16 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Assets/Navbar';
 import '../../Styles/User/Profile.css';
 import { useNotifications } from '../../context/NotificationContext';
+import apiClient from '../../services/api';
 
 interface UserData {
-  _id?: string;
+  id?: string;
   fullname: string;
   email: string;
   college?: string;
   createdAt?: string;
 }
-
-const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 
 const Profile = () => {
@@ -36,6 +35,7 @@ const Profile = () => {
         const parsedUser = JSON.parse(user);
         setUserData(parsedUser);
         console.log('Fetched user data:', parsedUser);
+        
         setEditedData({
           fullname: parsedUser.fullname || '',
           email: parsedUser.email || '',
@@ -65,12 +65,11 @@ const Profile = () => {
   const handleSave = async () => {
     console.log('Saving edited data:', editedData);
     console.log('Current user data:', userData);
-    if (!userData?._id) {
+    if (!userData?.id) {
       setError('User ID not found. Please log in again.');
       return;
     }
 
-    // Basic validation
     if (!editedData.fullname.trim()) {
       setError('Full name is required');
       return;
@@ -81,7 +80,6 @@ const Profile = () => {
       return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(editedData.email)) {
       setError('Please enter a valid email address');
@@ -93,26 +91,15 @@ const Profile = () => {
     setSuccessMessage(null);
 
     try {
-      const response = await fetch(`${ServerURL}/api/auth/update-profile/${userData._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullname: editedData.fullname,
-          email: editedData.email,
-          college: editedData.college,
-        }),
+      const response = await apiClient.put(`/auth/update-profile/${userData.id}`, {
+        fullname: editedData.fullname,
+        email: editedData.email,
+        college: editedData.college,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to update profile');
-      }
+      const data = response.data;
 
       if (data.success) {
-        // Update localStorage with new user data
         const updatedUser = { ...userData, ...data.user };
         localStorage.setItem('LoggedInUser', JSON.stringify(updatedUser));
         setUserData(updatedUser);
@@ -124,7 +111,6 @@ const Profile = () => {
           type: 'success',
         });
         
-        // Clear success message after 3 seconds
         setTimeout(() => setSuccessMessage(null), 3000);
       } else {
         throw new Error(data.message || 'Failed to update profile');

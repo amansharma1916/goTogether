@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import Registration from '../../DB/Schema/registrationSchema.js';
 import bcrypt from 'bcryptjs';
+import generateToken from '../../utils/generateToken.js';
+import authMiddleware from '../../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
@@ -18,7 +20,18 @@ router.post('/register', async (req, res) => {
             college
         });
         await newUser.save();
-        res.status(201).json({ message: 'User registered successfully', success: true });
+        const token = generateToken(newUser._id, newUser.email);
+        res.status(201).json({ 
+            message: 'User registered successfully', 
+            success: true,
+            token,
+            user: {
+                id: newUser._id,
+                fullname: newUser.fullname,
+                email: newUser.email,
+                college: newUser.college
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error' ,error: error.message });
     }
@@ -35,10 +48,42 @@ router.post('/login', async (req, res) => {
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
-        res.status(200).json({ message: 'Login successful', user, success: true });
+        const token = generateToken(user._id, user.email);
+        res.status(200).json({ 
+            message: 'Login successful', 
+            success: true,
+            token,
+            user: {
+                id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+                college: user.college
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
         
+    }
+});
+
+router.get('/verify', authMiddleware, async (req, res) => {
+    try {
+        const user = await Registration.findById(req.user.userId).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found', success: false });
+        }
+        res.status(200).json({ 
+            message: 'Token verified', 
+            success: true,
+            user: {
+                id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+                college: user.college
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message, success: false });
     }
 });
 
@@ -47,7 +92,7 @@ router.get('/test', (req, res) => {
 });
 
 // Update user profile
-router.put('/update-profile/:id', async (req, res) => {
+router.put('/update-profile/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const { fullname, email, college } = req.body;
     

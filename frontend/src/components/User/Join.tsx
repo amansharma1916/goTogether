@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom'
 import Loader from './Assets/Loader'
 import { useNotifications } from '../../context/NotificationContext'
 import { useGlobalLoader } from '../../context/GlobalLoaderContext'
+import apiClient from '../../services/api'
 
 interface LocationData {
   lat: number;
@@ -19,11 +20,6 @@ interface NominatimResult {
   lon: string;
   display_name: string;
 }
-
-const ServerURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const ORS_API_KEY = import.meta.env.VITE_ORS_API_KEY || '';
-
-
 
 const Join = () => {
   const location = useLocation();
@@ -154,7 +150,6 @@ const Join = () => {
 
     const rideData = {
       origin: originLocation,
-      userId: User?.id,
       fullname: User.fullname,
       destination: destLocation,
       selectedRouteIndex,
@@ -169,16 +164,9 @@ const Join = () => {
     console.log("Publishing ride with data:", rideData);
     
     try {
-      const response = await fetch(`${ServerURL}/api/rides`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': ORS_API_KEY,
-        },
-        body: JSON.stringify(rideData)
-      });
+      const response = await apiClient.post('/rides', rideData);
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.success) {
         addNotification({

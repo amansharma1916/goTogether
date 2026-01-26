@@ -1,13 +1,14 @@
 import express from 'express';
 import { createRide, getRides, getRideById, searchRides, getMyRides } from '../controllers/rideController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 
-router.post('/', createRide);
+router.post('/', authMiddleware, createRide);
 
 
-router.get('/my-rides', getMyRides);
+router.get('/my-rides', authMiddleware, getMyRides);
 
 
 router.get('/', getRides);
