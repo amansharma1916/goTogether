@@ -46,7 +46,7 @@ function getStorageKeyForUser(userId: string | null): string {
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [, setCurrentUserId] = useState<string | null>(null);
   const [storageKey, setStorageKey] = useState<string>(() => getStorageKeyForUser(getUserIdentifier()));
 
   // Load on mount and whenever the user changes
