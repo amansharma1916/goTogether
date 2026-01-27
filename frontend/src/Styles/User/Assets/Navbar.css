@@ -289,6 +289,12 @@
     font-size: 12px;
 }
 
+.notification-panel__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .notification-panel__mark-all {
     background: rgba(74, 222, 128, 0.12);
     border: 1px solid rgba(74, 222, 128, 0.3);
@@ -301,6 +307,22 @@
 }
 
 .notification-panel__mark-all:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.notification-panel__clear-all {
+    background: rgba(239, 68, 68, 0.12); /* red-500 */
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.notification-panel__clear-all:disabled {
     opacity: 0.5;
     cursor: default;
 }

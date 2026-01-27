@@ -40,6 +40,7 @@ const LoginPage = ({ onSwitchToRegister }: LoginPageProps) => {
       
       localStorage.setItem('token', data.token);
       localStorage.setItem('LoggedInUser', JSON.stringify(data.user));
+      window.dispatchEvent(new Event('user-changed'));
       
       navigate('/dashboard');
     } catch (err) {

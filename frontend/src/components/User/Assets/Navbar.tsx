@@ -8,7 +8,7 @@ import { useNotifications } from '../../../context/NotificationContext'
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { notifications, unreadCount, markAllAsRead, removeNotification } = useNotifications();
+  const { notifications, unreadCount, markAllAsRead, removeNotification, clearNotifications } = useNotifications();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -33,9 +33,12 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
+    // Clear current in-memory notifications and auth storage
+    clearNotifications();
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('LoggedInUser');
     localStorage.removeItem('token');
+    window.dispatchEvent(new Event('user-changed'));
     navigate('/login');
   };
   
@@ -122,6 +125,7 @@ const Navbar = () => {
                 notifications={notifications}
                 onMarkAll={markAllAsRead}
                 onRemove={removeNotification}
+                onClearAll={clearNotifications}
               />
             )}
           </div>
