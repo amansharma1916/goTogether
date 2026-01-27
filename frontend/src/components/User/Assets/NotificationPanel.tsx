@@ -5,6 +5,7 @@ interface NotificationPanelProps {
   notifications: NotificationItem[];
   onMarkAll: () => void;
   onRemove: (id: string) => void;
+  onClearAll?: () => void;
 }
 
 const formatTime = (timestamp: number) => {
@@ -17,7 +18,7 @@ const formatTime = (timestamp: number) => {
   });
 };
 
-const NotificationPanel = ({ notifications, onMarkAll, onRemove }: NotificationPanelProps) => {
+const NotificationPanel = ({ notifications, onMarkAll, onRemove, onClearAll }: NotificationPanelProps) => {
   return (
     <div className="notification-panel">
       <div className="notification-panel__header">
@@ -25,9 +26,22 @@ const NotificationPanel = ({ notifications, onMarkAll, onRemove }: NotificationP
           <p className="notification-panel__title">Notifications</p>
           <p className="notification-panel__subtitle">Stay up to date with your rides</p>
         </div>
-        <button className="notification-panel__mark-all" onClick={onMarkAll} disabled={!notifications.length}>
-          Mark all read
-        </button>
+        <div className="notification-panel__actions">
+          <button className="notification-panel__mark-all" onClick={onMarkAll} disabled={!notifications.length}>
+            Mark all read
+          </button>
+          {onClearAll && (
+            <button
+              className="notification-panel__clear-all"
+              onClick={onClearAll}
+              disabled={!notifications.length}
+              aria-label="Clear all notifications"
+              title="Clear all"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
       </div>
 
       {notifications.length === 0 ? (
