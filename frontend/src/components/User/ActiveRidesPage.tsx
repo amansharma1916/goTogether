@@ -16,11 +16,11 @@ interface ActiveRide {
   };
   riderId: {
     _id: string;
-    fullName: string;
+    fullname: string;
   };
   driverId: {
     _id: string;
-    fullName: string;
+    fullname: string;
   };
   seatsBooked: number;
   pickupLocationName: string;
@@ -61,9 +61,9 @@ const ActiveRidesPage = () => {
   const fetchActiveRides = async () => {
     setIsLoading(true);
     try {
-      // Fetch confirmed bookings where user is rider
       const riderResponse = await apiClient.get('/bookings/my-bookings');
       const riderData = riderResponse.data;
+      console.log('Rider bookings data:', riderData);
       const riderRides = riderData.success
         ? riderData.bookings.filter((b: ActiveRide) => b.status === 'confirmed')
         : [];
@@ -189,6 +189,8 @@ const ActiveRidesPage = () => {
             {activeRides.map((ride) => {
               const isRider = ride.riderId._id === userId;
               const counterparty = isRider ? ride.driverId : ride.riderId;
+              console.log('Rendering ride:', ride);
+              console.log('Counterparty:', counterparty);
 
               return (
                 <div key={ride._id} className="ride-card">
@@ -199,7 +201,7 @@ const ActiveRidesPage = () => {
                         <span className="location-icon">📍</span>
                         <div className="location-details">
                           <span className="location-label">From</span>
-                          <span className="location-name">{ride.rideId.origin.name}</span>
+                          <span className="location-name">{ride.rideId.origin.coordinates?.map(coord => coord.toFixed(2)).join(', ')}</span>
                         </div>
                       </div>
                       <div className="route-divider"></div>
@@ -207,7 +209,7 @@ const ActiveRidesPage = () => {
                         <span className="location-icon">🎯</span>
                         <div className="location-details">
                           <span className="location-label">To</span>
-                          <span className="location-name">{ride.rideId.destination.name}</span>
+                          <span className="location-name">{ride.rideId.destination.coordinates?.map(coord => coord.toFixed(2)).join(', ')}</span>
                         </div>
                       </div>
                     </div>
@@ -222,7 +224,7 @@ const ActiveRidesPage = () => {
                         {isRider ? '🚗 Driver' : '👤 Passenger'}
                       </h4>
                       <div className="person-info">
-                        <span className="person-name">{counterparty.fullName}</span>
+                        <span className="person-name">{counterparty.fullname}</span>
                       </div>
                     </div>
 
@@ -336,7 +338,7 @@ const ActiveRidesPage = () => {
                 <div className="ride-summary">
                   <p><strong>Route:</strong> {selectedRide.rideId.origin.name} → {selectedRide.rideId.destination.name}</p>
                   <p><strong>Amount:</strong> ₹{selectedRide.payment.totalAmount}</p>
-                  <p><strong>{selectedRide.riderId._id === userId ? 'Driver' : 'Passenger'}:</strong> {selectedRide.riderId._id === userId ? selectedRide.driverId.fullName : selectedRide.riderId.fullName}</p>
+                  <p><strong>{selectedRide.riderId._id === userId ? 'Driver' : 'Passenger'}:</strong> {selectedRide.riderId._id === userId ? selectedRide.driverId.fullname : selectedRide.riderId.fullname}</p>
                 </div>
 
                 {statusAction === 'payment' && (
