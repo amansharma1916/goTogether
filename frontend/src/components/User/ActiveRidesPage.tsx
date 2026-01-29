@@ -105,6 +105,14 @@ const ActiveRidesPage = () => {
 
   const handleStatusUpdate = async () => {
     if (!selectedRide) return;
+    const isRider = selectedRide.riderId._id === userId;
+    if (isRider && (statusAction === 'payment' || statusAction === 'complete')) {
+      setShowStatusModal(false);
+      setSelectedRide(null);
+      setCancellationReason('');
+      alert('Only the driver can update payment or complete the ride.');
+      return;
+    }
 
     setIsUpdating(true);
     try {
@@ -284,7 +292,7 @@ const ActiveRidesPage = () => {
                     
                     {/* Status Update Buttons */}
                     <div className="status-actions">
-                      {ride.payment.paymentStatus === 'pending' && (
+                      {!isRider && ride.payment.paymentStatus === 'pending' && (
                         <button 
                           className="status-btn payment-btn"
                           onClick={() => openStatusModal(ride, 'payment')}
@@ -293,7 +301,7 @@ const ActiveRidesPage = () => {
                         </button>
                       )}
                       
-                      {ride.payment.paymentStatus === 'paid' && (
+                      {!isRider && ride.payment.paymentStatus === 'paid' && (
                         <button 
                           className="status-btn complete-btn"
                           onClick={() => openStatusModal(ride, 'complete')}
@@ -336,6 +344,7 @@ const ActiveRidesPage = () => {
 
               <div className="modal-body">
                 <div className="ride-summary">
+                  
                   <p><strong>Route:</strong> {selectedRide.rideId.origin.name} → {selectedRide.rideId.destination.name}</p>
                   <p><strong>Amount:</strong> ₹{selectedRide.payment.totalAmount}</p>
                   <p><strong>{selectedRide.riderId._id === userId ? 'Driver' : 'Passenger'}:</strong> {selectedRide.riderId._id === userId ? selectedRide.driverId.fullname : selectedRide.riderId.fullname}</p>

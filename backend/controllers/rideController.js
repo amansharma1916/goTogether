@@ -143,12 +143,14 @@ export const createRide = async (req, res) => {
     
     const originPoint = {
       type: "Point",
-      coordinates: [origin.lng, origin.lat]
+      coordinates: [origin.lng, origin.lat],
+      name: origin.name || ""
     };
 
     const destinationPoint = {
       type: "Point",
-      coordinates: [destination.lng, destination.lat]
+      coordinates: [destination.lng, destination.lat],
+      name: destination.name || ""
     };
 
     
