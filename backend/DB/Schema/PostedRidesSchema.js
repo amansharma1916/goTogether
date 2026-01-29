@@ -7,6 +7,11 @@ const PointSchema = new Schema({
     required: true,
     default: "Point"
   },
+  name: {
+    type: String,
+    required: false,
+    default: ""
+  },
   coordinates: {
     type: [Number], 
     required: true
