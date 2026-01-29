@@ -140,8 +140,8 @@ export const createBooking = async (req, res) => {
     
     await newBooking.populate([
       { path: 'rideId' },
-      { path: 'riderId', select: 'fullName email phone' },
-      { path: 'driverId', select: 'fullName email phone' }
+      { path: 'riderId', select: 'fullname email phone' },
+      { path: 'driverId', select: 'fullname email phone' }
     ]);
 
     return res.status(201).json({
@@ -175,26 +175,23 @@ export const getMyBookings = async (req, res) => {
 
     const { status, page = 1, limit = 4 } = req.query;
 
-    // Pagination calculations
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    // Build filter
     const filter = { riderId: userId };
     if (status) {
       filter.status = status;
     }
 
-    // Get total count
     const totalBookings = await BookedRide.countDocuments(filter);
 
     // Fetch bookings with pagination
     const bookings = await BookedRide.find(filter)
       .populate([
         { path: 'rideId' },
-        { path: 'riderId', select: 'fullName email phone' },
-        { path: 'driverId', select: 'fullName email phone' }
+        { path: 'riderId', select: 'fullname email phone' },
+        { path: 'driverId', select: 'fullname email phone' }
       ])
       .sort({ bookedAt: -1 })
       .skip(skip)
@@ -239,12 +236,9 @@ export const getReceivedBookings = async (req, res) => {
 
     const { status, page = 1, limit = 4 } = req.query;
 
-    // Pagination calculations
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
-
-    // Build filter
     const filter = { driverId: userId };
     if (status) {
       filter.status = status;
@@ -257,8 +251,8 @@ export const getReceivedBookings = async (req, res) => {
     const bookings = await BookedRide.find(filter)
       .populate([
         { path: 'rideId' },
-        { path: 'riderId', select: 'fullName email phone' },
-        { path: 'driverId', select: 'fullName email phone' }
+        { path: 'riderId', select: 'fullname email phone' },
+        { path: 'driverId', select: 'fullname email phone' }
       ])
       .sort({ bookedAt: -1 })
       .skip(skip)
@@ -300,8 +294,8 @@ export const getRideBookings = async (req, res) => {
     }
 
     const bookings = await BookedRide.find(query)
-      .populate('riderId', 'fullName email phone')
-      .populate('driverId', 'fullName email phone')
+      .populate('riderId', 'fullname email phone')
+      .populate('driverId', 'fullname email phone')
       .sort({ bookedAt: -1 });
 
     return res.status(200).json({
@@ -327,8 +321,8 @@ export const getBookingById = async (req, res) => {
 
     const booking = await BookedRide.findById(id)
       .populate('rideId')
-      .populate('riderId', 'fullName email phone')
-      .populate('driverId', 'fullName email phone');
+      .populate('riderId', 'fullname email phone')
+      .populate('driverId', 'fullname email phone');
 
     if (!booking) {
       return res.status(404).json({
@@ -757,8 +751,8 @@ export const updateRideStatus = async (req, res) => {
 
     // Populate booking data for response
     await booking.populate([
-      { path: 'riderId', select: 'fullName email phone' },
-      { path: 'driverId', select: 'fullName email phone' }
+      { path: 'riderId', select: 'fullname email phone' },
+      { path: 'driverId', select: 'fullname email phone' }
     ]);
 
     return res.status(200).json({
@@ -776,3 +770,4 @@ export const updateRideStatus = async (req, res) => {
     });
   }
 };
+
