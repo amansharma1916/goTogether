@@ -237,7 +237,7 @@ const ActiveRidesPage = () => {
                           <span className="detail-value">{ride.pickupLocationName}</span>
                         </div>
                         <div className="detail-row">
-                          <span className="detail-key">Departure</span>
+                          <span className="detail-key">Time (currently fixed )</span>
                           <span className="detail-value">{formatTime(ride.rideId.departureTime)}</span>
                         </div>
                         <div className="detail-row">
