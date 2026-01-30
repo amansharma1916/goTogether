@@ -19,13 +19,13 @@ interface Booking {
   };
   riderId: {
     _id: string;
-    fullName: string;
+    fullname: string;
     email: string;
     phone: string;
   };
   driverId: {
     _id: string;
-    fullName: string;
+    fullname: string;
     email: string;
     phone: string;
   };
@@ -335,10 +335,10 @@ const Bookings = () => {
             <>
               <div className="detail-row">
                 <span className="detail-label">Rider:</span>
-                <span className="detail-value">{booking.riderId.fullName}</span>
+                <span className="detail-value">{booking.riderId.fullname}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Contact:</span>
+                <span className="detail-label">Contact:( pending )</span>
                 <span className="detail-value">{booking.riderId.phone}</span>
               </div>
             </>
@@ -346,10 +346,10 @@ const Bookings = () => {
             <>
               <div className="detail-row">
                 <span className="detail-label">Driver:</span>
-                <span className="detail-value">{booking.driverId.fullName}</span>
+                <span className="detail-value">{booking.driverId.fullname}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Contact:</span>
+                <span className="detail-label">Contact:( pending )</span>
                 <span className="detail-value">{booking.driverId.phone}</span>
               </div>
             </>
@@ -405,8 +405,8 @@ const Bookings = () => {
               )}
               {booking.status === 'confirmed' && (
                 <>
-                  <button className="btn-complete" onClick={() => handleComplete(booking._id)}>
-                    Mark as Completed
+                  <button className="btn-show-ride" onClick={() => navigate('/active-rides')}>
+                    Show Ride
                   </button>
                   <button className="btn-cancel" onClick={() => handleCancel(booking._id, true)}>
                     Cancel
@@ -417,10 +417,20 @@ const Bookings = () => {
           ) : (
             // Actions for my bookings (as rider)
             <>
-              {(booking.status === 'pending' || booking.status === 'confirmed') && (
+              {booking.status === 'pending' && (
                 <button className="btn-cancel" onClick={() => handleCancel(booking._id, false)}>
                   Cancel Booking
                 </button>
+              )}
+              {booking.status === 'confirmed' && (
+                <>
+                  <button className="btn-show-ride" onClick={() => navigate('/active-rides')}>
+                    Show Ride
+                  </button>
+                  <button className="btn-cancel" onClick={() => handleCancel(booking._id, false)}>
+                    Cancel Booking
+                  </button>
+                </>
               )}
             </>
           )}
