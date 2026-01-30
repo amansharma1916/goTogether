@@ -212,43 +212,43 @@ const Bookings = () => {
     }
   };
 
-  const handleComplete = async (bookingId: string) => {
-    try {
-      show('Completing ride...');
-      const response = await apiClient.patch(`/bookings/${bookingId}/complete`);
-      const data = response.data;
-      if (data.success) {
-        const successMsg = data.message || 'The ride has been marked as completed.';
-        addNotification({
-          title: 'Ride completed',
-          message: successMsg,
-          type: 'success',
-        });
-        alert(successMsg);
-        hide();
-        fetchReceivedBookings(currentPage);
-      } else {
-        const warnMsg = data.message || 'Unable to complete booking.';
-        addNotification({
-          title: 'Completion failed',
-          message: warnMsg,
-          type: 'warning',
-        });
-        alert(warnMsg);
-        hide();
-      }
-    } catch (error) {
-      console.error('Error completing booking:', error);
-      const errorMsg = 'Something went wrong while completing the booking.';
-      addNotification({
-        title: 'Completion error',
-        message: errorMsg,
-        type: 'warning',
-      });
-      alert(errorMsg);
-      hide();
-    }
-  };
+  // const handleComplete = async (bookingId: string) => {
+  //   try {
+  //     show('Completing ride...');
+  //     const response = await apiClient.patch(`/bookings/${bookingId}/complete`);
+  //     const data = response.data;
+  //     if (data.success) {
+  //       const successMsg = data.message || 'The ride has been marked as completed.';
+  //       addNotification({
+  //         title: 'Ride completed',
+  //         message: successMsg,
+  //         type: 'success',
+  //       });
+  //       alert(successMsg);
+  //       hide();
+  //       fetchReceivedBookings(currentPage);
+  //     } else {
+  //       const warnMsg = data.message || 'Unable to complete booking.';
+  //       addNotification({
+  //         title: 'Completion failed',
+  //         message: warnMsg,
+  //         type: 'warning',
+  //       });
+  //       alert(warnMsg);
+  //       hide();
+  //     }
+  //   } catch (error) {
+  //     console.error('Error completing booking:', error);
+  //     const errorMsg = 'Something went wrong while completing the booking.';
+  //     addNotification({
+  //       title: 'Completion error',
+  //       message: errorMsg,
+  //       type: 'warning',
+  //     });
+  //     alert(errorMsg);
+  //     hide();
+  //   }
+  // };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
