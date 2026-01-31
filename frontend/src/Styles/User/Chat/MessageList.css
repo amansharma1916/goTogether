@@ -1,0 +1,245 @@
+/* Message Groups */
+.message-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.message-group.sent {
+  justify-content: flex-end;
+}
+
+.message-group.received {
+  justify-content: flex-start;
+}
+
+/* Message Avatar */
+.message-avatar {
+  flex-shrink: 0;
+}
+
+.avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4ADE80, #3BC970);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a2332;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* Message Bubble */
+.message-bubble {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  gap: 4px;
+  word-wrap: break-word;
+}
+
+/* Sent Messages */
+.message-group.sent .message-bubble {
+  background: rgba(74, 222, 128, 0.15);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 12px 12px 6px 12px;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.1);
+  color: white;
+}
+
+.message-group.sent .message-bubble:hover {
+  background: rgba(74, 222, 128, 0.25);
+  box-shadow: 0 6px 16px rgba(74, 222, 128, 0.15);
+}
+
+/* Received Messages */
+.message-group.received .message-bubble {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px 12px 12px 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: #e2e8f0;
+}
+
+.message-group.received .message-bubble:hover {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Message Text */
+.message-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Message Footer */
+.message-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.message-time {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.message-group.sent .message-time {
+  color: #94a3b8;
+}
+
+.message-group.received .message-time {
+  color: #94a3b8;
+}
+
+/* Read Status */
+.read-status {
+  font-size: 12px;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.read-status.sent {
+  color: #94a3b8;
+}
+
+.read-status.read {
+  color: #4ADE80;
+  font-weight: 700;
+}
+
+/* System Messages */
+.message-system {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+  color: #7dd3fc;
+  font-size: 12px;
+  text-align: center;
+  margin: 16px auto;
+  max-width: fit-content;
+}
+
+.message-system p {
+  margin: 0;
+}
+
+.message-system .message-time {
+  font-size: 10px;
+  color: #7dd3fc;
+  opacity: 0.7;
+}
+
+/* Typing Indicator */
+.message-bubble.typing {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px 12px 12px 6px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ADE80;
+  animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.typing-text {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .message-bubble {
+    max-width: 85%;
+  }
+
+  .avatar-placeholder {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+  }
+
+  .message-text {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .message-bubble {
+    max-width: 90%;
+    padding: 8px 10px;
+  }
+
+  .avatar-placeholder {
+    width: 24px;
+    height: 24px;
+    font-size: 9px;
+  }
+
+  .message-text {
+    font-size: 12px;
+  }
+
+  .message-time {
+    font-size: 10px;
+  }
+
+  .read-status {
+    font-size: 11px;
+  }
+}

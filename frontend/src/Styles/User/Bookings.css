@@ -80,9 +80,9 @@
 }
 
 .bookings-grid {
-  display: grid;
+  display: flex;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
+  gap: 4.5rem;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -95,6 +95,8 @@
   padding: 1.5rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
+  width: 22rem;
+  max-width: 25rem;
 }
 
 .booking-card:hover {
@@ -269,6 +271,36 @@
   border-color: rgba(56, 189, 248, 0.5);
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+}
+
+.btn-show-ride {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #c4b5fd;
+}
+
+.btn-show-ride:hover {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+}
+
+.btn-chat {
+  background: rgba(74, 222, 128, 0.15);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: #86efac;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-chat:hover {
+  background: rgba(74, 222, 128, 0.25);
+  border-color: rgba(74, 222, 128, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(74, 222, 128, 0.2);
 }
 
 .btn-cancel {

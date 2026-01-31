@@ -4,6 +4,8 @@ import "../../Styles/User/Bookings.css";
 import Navbar from './Assets/Navbar';
 import { useNotifications } from '../../context/NotificationContext';
 import { useGlobalLoader } from '../../context/GlobalLoaderContext';
+import { useChat } from '../../hooks/useChat';
+import ChatWindow from './Chat/ChatWindow';
 import apiClient from '../../services/api';
 
 interface Booking {
@@ -19,13 +21,13 @@ interface Booking {
   };
   riderId: {
     _id: string;
-    fullName: string;
+    fullname: string;
     email: string;
     phone: string;
   };
   driverId: {
     _id: string;
-    fullName: string;
+    fullname: string;
     email: string;
     phone: string;
   };
@@ -56,6 +58,7 @@ interface Booking {
 const Bookings = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotifications();
+  const { openChat, activeRoom, closeChat } = useChat();
   const [viewMode, setViewMode] = useState<'received' | 'sent'>('received');
   const [receivedBookings, setReceivedBookings] = useState<Booking[]>([]);
   const [myBookings, setMyBookings] = useState<Booking[]>([]);
@@ -212,41 +215,58 @@ const Bookings = () => {
     }
   };
 
-  const handleComplete = async (bookingId: string) => {
+  // const handleComplete = async (bookingId: string) => {
+  //   try {
+  //     show('Completing ride...');
+  //     const response = await apiClient.patch(`/bookings/${bookingId}/complete`);
+  //     const data = response.data;
+  //     if (data.success) {
+  //       const successMsg = data.message || 'The ride has been marked as completed.';
+  //       addNotification({
+  //         title: 'Ride completed',
+  //         message: successMsg,
+  //         type: 'success',
+  //       });
+  //       alert(successMsg);
+  //       hide();
+  //       fetchReceivedBookings(currentPage);
+  //     } else {
+  //       const warnMsg = data.message || 'Unable to complete booking.';
+  //       addNotification({
+  //         title: 'Completion failed',
+  //         message: warnMsg,
+  //         type: 'warning',
+  //       });
+  //       alert(warnMsg);
+  //       hide();
+  //     }
+  //   } catch (error) {
+  //     console.error('Error completing booking:', error);
+  //     const errorMsg = 'Something went wrong while completing the booking.';
+  //     addNotification({
+  //       title: 'Completion error',
+  //       message: errorMsg,
+  //       type: 'warning',
+  //     });
+  //     alert(errorMsg);
+  //     hide();
+  //   }
+  // };
+
+  const handleOpenChat = (booking: Booking, isReceived: boolean) => {
     try {
-      show('Completing ride...');
-      const response = await apiClient.patch(`/bookings/${bookingId}/complete`);
-      const data = response.data;
-      if (data.success) {
-        const successMsg = data.message || 'The ride has been marked as completed.';
-        addNotification({
-          title: 'Ride completed',
-          message: successMsg,
-          type: 'success',
-        });
-        alert(successMsg);
-        hide();
-        fetchReceivedBookings(currentPage);
-      } else {
-        const warnMsg = data.message || 'Unable to complete booking.';
-        addNotification({
-          title: 'Completion failed',
-          message: warnMsg,
-          type: 'warning',
-        });
-        alert(warnMsg);
-        hide();
-      }
+      const otherPartyId = isReceived ? booking.riderId._id : booking.driverId._id;
+      const otherPartyName = isReceived ? booking.riderId.fullname : booking.driverId.fullname;
+      const otherPartyPhone = isReceived ? booking.riderId.phone : booking.driverId.phone;
+      
+      openChat(booking._id, otherPartyId, otherPartyName, otherPartyPhone);
     } catch (error) {
-      console.error('Error completing booking:', error);
-      const errorMsg = 'Something went wrong while completing the booking.';
+      console.error('Error opening chat:', error);
       addNotification({
-        title: 'Completion error',
-        message: errorMsg,
+        title: 'Chat Error',
+        message: 'Unable to open chat. Please try again.',
         type: 'warning',
       });
-      alert(errorMsg);
-      hide();
     }
   };
 
@@ -260,6 +280,7 @@ const Bookings = () => {
       minute: '2-digit'
     });
   };
+
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -335,10 +356,10 @@ const Bookings = () => {
             <>
               <div className="detail-row">
                 <span className="detail-label">Rider:</span>
-                <span className="detail-value">{booking.riderId.fullName}</span>
+                <span className="detail-value">{booking.riderId.fullname}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Contact:</span>
+                <span className="detail-label">Contact:( pending )</span>
                 <span className="detail-value">{booking.riderId.phone}</span>
               </div>
             </>
@@ -346,10 +367,10 @@ const Bookings = () => {
             <>
               <div className="detail-row">
                 <span className="detail-label">Driver:</span>
-                <span className="detail-value">{booking.driverId.fullName}</span>
+                <span className="detail-value">{booking.driverId.fullname}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Contact:</span>
+                <span className="detail-label">Contact:( pending )</span>
                 <span className="detail-value">{booking.driverId.phone}</span>
               </div>
             </>
@@ -405,8 +426,11 @@ const Bookings = () => {
               )}
               {booking.status === 'confirmed' && (
                 <>
-                  <button className="btn-complete" onClick={() => handleComplete(booking._id)}>
-                    Mark as Completed
+                  <button className="btn-chat" onClick={() => handleOpenChat(booking, true)}>
+                    💬 Chat
+                  </button>
+                  <button className="btn-show-ride" onClick={() => navigate('/active-rides')}>
+                    Show Ride
                   </button>
                   <button className="btn-cancel" onClick={() => handleCancel(booking._id, true)}>
                     Cancel
@@ -417,10 +441,23 @@ const Bookings = () => {
           ) : (
             // Actions for my bookings (as rider)
             <>
-              {(booking.status === 'pending' || booking.status === 'confirmed') && (
+              {booking.status === 'pending' && (
                 <button className="btn-cancel" onClick={() => handleCancel(booking._id, false)}>
                   Cancel Booking
                 </button>
+              )}
+              {booking.status === 'confirmed' && (
+                <>
+                  <button className="btn-chat" onClick={() => handleOpenChat(booking, false)}>
+                    💬 Chat
+                  </button>
+                  <button className="btn-show-ride" onClick={() => navigate('/active-rides')}>
+                    Show Ride
+                  </button>
+                  <button className="btn-cancel" onClick={() => handleCancel(booking._id, false)}>
+                    Cancel Booking
+                  </button>
+                </>
               )}
             </>
           )}
@@ -546,6 +583,8 @@ const Bookings = () => {
         )}
         </>
       )}
+      
+      {activeRoom && <ChatWindow onClose={closeChat} />}
     </div>
     </>
   );
