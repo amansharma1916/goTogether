@@ -260,6 +260,7 @@ const Bookings = () => {
       minute: '2-digit'
     });
   };
+  
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
