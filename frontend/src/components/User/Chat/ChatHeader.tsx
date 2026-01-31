@@ -9,7 +9,7 @@ interface ChatHeaderProps {
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
   otherPartyName,
-  otherPartyPhone,
+  // {otherPartyPhone,}
   isOnline,
   onClose
 }) => {
