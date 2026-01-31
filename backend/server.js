@@ -15,13 +15,24 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
+
+// Socket.io configuration for production (Vercel)
 const io = new Server(httpServer, {
     cors: {
         origin: process.env.FRONTEND_URL || 'http://localhost:5173',
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
     },
-    transports: ['websocket', 'polling']
+    // CRITICAL: Use polling first for Vercel compatibility, websocket as fallback
+    transports: process.env.NODE_ENV === 'production' 
+        ? ['polling', 'websocket']
+        : ['websocket', 'polling'],
+    // Connection tuning for serverless
+    pingInterval: 25000,
+    pingTimeout: 60000,
+    upgradeTimeout: 10000,
+    allowUpgrades: true,
+    serveClient: false
 });
 
 const PORT = process.env.PORT || 5000;
@@ -57,4 +68,6 @@ app.set('io', io);
 httpServer.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log(`WebSocket server ready at ws://localhost:${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Socket.io transports: ${process.env.NODE_ENV === 'production' ? 'polling→websocket' : 'websocket→polling'}`);
 });
