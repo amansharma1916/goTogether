@@ -23,7 +23,11 @@ export const createSocket = (token: string): Socket => {
     reconnectionDelay: 1000,
     reconnectionDelayMax: 5000,
     reconnectionAttempts: 5,
-    transports: ['websocket', 'polling']
+    // CRITICAL for Vercel: polling-first
+    transports: ['polling', 'websocket'],
+    // Increase timeouts for serverless
+    timeout: 20000,
+    upgrade: true
   });
 
   socket.on('connect', () => {
