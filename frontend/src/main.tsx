@@ -6,15 +6,18 @@ import App from './App.tsx'
 import ParticleTheme from './theme/ParticleTheme.tsx'
 import { NotificationProvider } from './context/NotificationContext'
 import { GlobalLoaderProvider } from './context/GlobalLoaderContext'
+import { ChatProvider } from './context/ChatProvider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ParticleTheme />
     <NotificationProvider>
       <GlobalLoaderProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <ChatProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ChatProvider>
       </GlobalLoaderProvider>
     </NotificationProvider>
   </StrictMode>,

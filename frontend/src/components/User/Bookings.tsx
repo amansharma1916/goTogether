@@ -4,6 +4,8 @@ import "../../Styles/User/Bookings.css";
 import Navbar from './Assets/Navbar';
 import { useNotifications } from '../../context/NotificationContext';
 import { useGlobalLoader } from '../../context/GlobalLoaderContext';
+import { useChat } from '../../hooks/useChat';
+import ChatWindow from './Chat/ChatWindow';
 import apiClient from '../../services/api';
 
 interface Booking {
@@ -56,6 +58,7 @@ interface Booking {
 const Bookings = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotifications();
+  const { openChat, activeRoom, closeChat } = useChat();
   const [viewMode, setViewMode] = useState<'received' | 'sent'>('received');
   const [receivedBookings, setReceivedBookings] = useState<Booking[]>([]);
   const [myBookings, setMyBookings] = useState<Booking[]>([]);
@@ -250,6 +253,23 @@ const Bookings = () => {
   //   }
   // };
 
+  const handleOpenChat = (booking: Booking, isReceived: boolean) => {
+    try {
+      const otherPartyId = isReceived ? booking.riderId._id : booking.driverId._id;
+      const otherPartyName = isReceived ? booking.riderId.fullname : booking.driverId.fullname;
+      const otherPartyPhone = isReceived ? booking.riderId.phone : booking.driverId.phone;
+      
+      openChat(booking._id, otherPartyId, otherPartyName, otherPartyPhone);
+    } catch (error) {
+      console.error('Error opening chat:', error);
+      addNotification({
+        title: 'Chat Error',
+        message: 'Unable to open chat. Please try again.',
+        type: 'warning',
+      });
+    }
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -260,7 +280,7 @@ const Bookings = () => {
       minute: '2-digit'
     });
   };
-  
+
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -406,6 +426,9 @@ const Bookings = () => {
               )}
               {booking.status === 'confirmed' && (
                 <>
+                  <button className="btn-chat" onClick={() => handleOpenChat(booking, true)}>
+                    💬 Chat
+                  </button>
                   <button className="btn-show-ride" onClick={() => navigate('/active-rides')}>
                     Show Ride
                   </button>
@@ -425,6 +448,9 @@ const Bookings = () => {
               )}
               {booking.status === 'confirmed' && (
                 <>
+                  <button className="btn-chat" onClick={() => handleOpenChat(booking, false)}>
+                    💬 Chat
+                  </button>
                   <button className="btn-show-ride" onClick={() => navigate('/active-rides')}>
                     Show Ride
                   </button>
@@ -557,6 +583,8 @@ const Bookings = () => {
         )}
         </>
       )}
+      
+      {activeRoom && <ChatWindow onClose={closeChat} />}
     </div>
     </>
   );
