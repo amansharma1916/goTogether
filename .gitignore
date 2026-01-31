@@ -1,3 +1,7 @@
 node_modules
 dist
 .env
+srs.md
+CHAT_IMPLEMENTATION_GUIDE.md
+CHAT_QUICK_START.md
+CHAT_SYSTEM_SUMMARY.md
