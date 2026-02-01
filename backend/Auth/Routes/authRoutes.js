@@ -91,18 +91,18 @@ router.get('/test', (req, res) => {
     res.send('Auth route is working!');
 });
 
-// Update user profile
+ 
 router.put('/update-profile/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const { fullname, email, college } = req.body;
     
     try {
-        // Validate MongoDB ObjectId
+         
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: 'Invalid user ID', success: false });
         }
 
-        // Check if email is being changed and if it already exists
+         
         if (email) {
             const existingUser = await Registration.findOne({ email, _id: { $ne: id } });
             if (existingUser) {
@@ -110,7 +110,6 @@ router.put('/update-profile/:id', authMiddleware, async (req, res) => {
             }
         }
 
-        // Update user profile
         const updatedUser = await Registration.findByIdAndUpdate(
             id,
             {
@@ -119,7 +118,7 @@ router.put('/update-profile/:id', authMiddleware, async (req, res) => {
                 ...(college !== undefined && { college })
             },
             { new: true, runValidators: true }
-        ).select('-password'); // Exclude password from response
+        ).select('-password');  
 
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found', success: false });

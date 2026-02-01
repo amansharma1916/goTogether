@@ -16,19 +16,16 @@ dotenv.config();
 const app = express();
 const httpServer = createServer(app);
 
-// Socket.io configuration for production (Vercel)
-const io = new Server(httpServer, {
+ const io = new Server(httpServer, {
     cors: {
         origin: process.env.FRONTEND_URL || 'http://localhost:5173',
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
     },
-    // CRITICAL: Use polling first for Vercel compatibility, websocket as fallback
-    transports: process.env.NODE_ENV === 'production' 
+     transports: process.env.NODE_ENV === 'production' 
         ? ['polling', 'websocket']
         : ['websocket', 'polling'],
-    // Connection tuning for serverless
-    pingInterval: 25000,
+     pingInterval: 25000,
     pingTimeout: 60000,
     upgradeTimeout: 10000,
     allowUpgrades: true,
@@ -50,20 +47,16 @@ app.get('/', (req, res) => {
 
 connectDB();
 
-// API Routes
-app.use('/api/auth', authRoutes);
+ app.use('/api/auth', authRoutes);
 app.use('/api/rides', rideRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/messages', messageRoutes);
 
-// Socket.io Authentication Middleware
-io.use(socketAuthMiddleware);
+ io.use(socketAuthMiddleware);
 
-// Setup Socket.io Events
-setupSocketEvents(io);
+ setupSocketEvents(io);
 
-// Make io accessible to routes if needed
-app.set('io', io);
+ app.set('io', io);
 
 httpServer.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
