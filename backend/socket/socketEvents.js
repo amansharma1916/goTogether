@@ -5,13 +5,13 @@ export const setupSocketEvents = (io) => {
   io.on("connection", (socket) => {
     console.log(`User connected: ${socket.userId}`);
 
-    // User joins a chat room for a specific booking
+     
     socket.on("join_room", async (data) => {
       try {
         const { bookingId } = data;
         const userId = socket.userId;
 
-        // Verify user is part of the booking
+         
         const booking = await BookedRide.findById(bookingId);
         if (!booking) {
           socket.emit("error", { message: "Booking not found" });
@@ -26,13 +26,13 @@ export const setupSocketEvents = (io) => {
           return;
         }
 
-        // Join the room
+         
         const roomName = `booking_${bookingId}`;
         socket.join(roomName);
         socket.currentRoom = roomName;
         socket.currentBookingId = bookingId;
 
-        // Mark messages as read
+         
         await Message.updateMany(
           {
             bookingId,
@@ -45,7 +45,7 @@ export const setupSocketEvents = (io) => {
           }
         );
 
-        // Notify other user in room
+         
         io.to(roomName).emit("user_joined", {
           userId,
           roomName
@@ -57,8 +57,7 @@ export const setupSocketEvents = (io) => {
         socket.emit("error", { message: "Error joining room" });
       }
     });
-
-    // User sends a message
+ 
     socket.on("send_message", async (data) => {
       try {
         const { bookingId, recipientId, messageText, messageType = "text" } = data;
@@ -74,15 +73,14 @@ export const setupSocketEvents = (io) => {
           return;
         }
 
-        // Verify booking exists
+         
         const booking = await BookedRide.findById(bookingId).populate("riderId driverId");
         if (!booking) {
           socket.emit("error", { message: "Booking not found" });
           return;
         }
 
-        // Get sender name
-        let senderName = "";
+         let senderName = "";
         if (booking.riderId._id.toString() === senderId) {
           senderName = booking.riderId.fullname;
         } else if (booking.driverId._id.toString() === senderId) {
@@ -92,8 +90,7 @@ export const setupSocketEvents = (io) => {
           return;
         }
 
-        // Create message
-        const message = new Message({
+         const message = new Message({
           bookingId,
           rideId: booking.rideId,
           senderId,
@@ -123,8 +120,7 @@ export const setupSocketEvents = (io) => {
       }
     });
 
-    // User is typing
-    socket.on("typing", (data) => {
+     socket.on("typing", (data) => {
       try {
         const { bookingId } = data;
         const roomName = `booking_${bookingId}`;
@@ -138,8 +134,7 @@ export const setupSocketEvents = (io) => {
       }
     });
 
-    // User stopped typing
-    socket.on("stop_typing", (data) => {
+     socket.on("stop_typing", (data) => {
       try {
         const { bookingId } = data;
         const roomName = `booking_${bookingId}`;
@@ -153,14 +148,12 @@ export const setupSocketEvents = (io) => {
       }
     });
 
-    // Mark message as read
-    socket.on("mark_read", async (data) => {
+     socket.on("mark_read", async (data) => {
       try {
         const { messageId, bookingId } = data;
         const userId = socket.userId;
 
-        // Update message as read
-        const message = await Message.findByIdAndUpdate(
+         const message = await Message.findByIdAndUpdate(
           messageId,
           { isRead: true, readAt: new Date() },
           { new: true }
@@ -178,8 +171,7 @@ export const setupSocketEvents = (io) => {
       }
     });
 
-    // User leaves chat room
-    socket.on("leave_room", (data) => {
+     socket.on("leave_room", (data) => {
       try {
         const { bookingId } = data;
         const roomName = `booking_${bookingId}`;
@@ -196,8 +188,7 @@ export const setupSocketEvents = (io) => {
       }
     });
 
-    // Handle disconnect
-    socket.on("disconnect", () => {
+     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.userId}`);
 
       if (socket.currentRoom) {
@@ -208,8 +199,7 @@ export const setupSocketEvents = (io) => {
       }
     });
 
-    // Handle connection error
-    socket.on("error", (error) => {
+     socket.on("error", (error) => {
       console.error("Socket error:", error);
       socket.emit("error_response", { message: "An error occurred" });
     });

@@ -36,8 +36,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     return () => clearInterval(interval);
   }, [authToken, authUserStr]);
 
-  // Initialize socket connection on mount
-  useEffect(() => {
+   useEffect(() => {
     if (!authToken || !authUser) return;
 
     try {
@@ -72,8 +71,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     }
   }, [authToken, authUser]);
 
-  // Open chat room
-  const openChat = useCallback(
+   const openChat = useCallback(
     async (
       bookingId: string,
       otherPartyId: string,
@@ -93,8 +91,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       }
 
       try {
-        // Create room object
-        const newRoom: ChatRoom = {
+         const newRoom: ChatRoom = {
           bookingId,
           otherPartyId,
           otherPartyName,
@@ -108,8 +105,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
         setActiveRoom(newRoom);
 
-        // Fetch chat history
-        try {
+         try {
           const response = await chatService.getChatHistory(bookingId, 1, 20);
           if (response.data.success) {
             newRoom.messages = response.data.data || [];
@@ -123,14 +119,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
           setActiveRoom({ ...newRoom });
         }
 
-        // Join room via socket
-        socket.emit('join_room', { bookingId });
+         socket.emit('join_room', { bookingId });
 
-        // Update chat rooms map
-        setChatRooms((prev) => new Map(prev).set(bookingId, newRoom));
+         setChatRooms((prev) => new Map(prev).set(bookingId, newRoom));
 
-        // Mark messages as read
-        try {
+         try {
           await chatService.markMessagesAsRead(bookingId);
         } catch (error) {
           console.error('Error marking messages as read:', error);
@@ -142,8 +135,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     [authToken]
   );
 
-  // Close chat room
-  const closeChat = useCallback(() => {
+   const closeChat = useCallback(() => {
       const socket = getSocket();
     if (socket && activeRoom?.bookingId) {
       socket.emit('leave_room', { bookingId: activeRoom.bookingId });
@@ -152,8 +144,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     setIsTyping(false);
   }, [activeRoom?.bookingId]);
 
-  // Send message
-  const sendMessage = useCallback(
+   const sendMessage = useCallback(
     (bookingId: string, messageText: string) => {
       const latestToken = localStorage.getItem('token') || authToken;
       if (!latestToken) {
@@ -183,16 +174,13 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     [chatRooms, authToken]
   );
 
-  // Mark as read
-  const markAsRead = useCallback((bookingId: string) => {
+   const markAsRead = useCallback((bookingId: string) => {
     const socket = getSocket();
     if (socket && activeRoom?.bookingId === bookingId) {
-      // Mark all messages in active room as read
-    }
+     }
   }, [activeRoom?.bookingId]);
 
-  // Handle typing
-  const handleSetIsTyping = useCallback((typing: boolean, bookingId: string) => {
+   const handleSetIsTyping = useCallback((typing: boolean, bookingId: string) => {
     const socket = getSocket();
     if (!socket) return;
 
@@ -200,13 +188,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       socket.emit('typing', { bookingId });
       setIsTyping(true);
 
-      // Clear previous timeout
-      if (typingTimeout) {
+       if (typingTimeout) {
         clearTimeout(typingTimeout);
       }
 
-      // Set new timeout to stop typing indicator
-      const timeout = setTimeout(() => {
+       const timeout = setTimeout(() => {
         socket.emit('stop_typing', { bookingId });
         setIsTyping(false);
       }, 3000);
@@ -218,17 +204,14 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     }
   }, [typingTimeout]);
 
-  // Listen for socket events
-  useEffect(() => {
+   useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
 
-    // New message received
-    socket.on('new_message', (data: any) => {
+     socket.on('new_message', (data: any) => {
       const { senderId, senderName, messageText, timestamp, isRead, _id, messageType } = data;
       
-      // Find which room this message belongs to
-      chatRooms.forEach((_room, bookingId) => {
+       chatRooms.forEach((_room, bookingId) => {
         const message: Message = {
           _id,
           bookingId,
@@ -250,8 +233,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
           });
         }
 
-        // Update room in map
-        setChatRooms((prev) => {
+         setChatRooms((prev) => {
           const updated = new Map(prev);
           const currentRoom = updated.get(bookingId);
           if (currentRoom) {
@@ -265,8 +247,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       });
     });
 
-    // User is typing
-    socket.on('user_typing', (data: any) => {
+     socket.on('user_typing', (data: any) => {
       const { userId } = data;
       setActiveRoom((prev) => {
         if (!prev || prev.otherPartyId !== userId) return prev;
@@ -274,8 +255,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       });
     });
 
-    // User stopped typing
-    socket.on('user_stopped_typing', (data: any) => {
+     socket.on('user_stopped_typing', (data: any) => {
       const { userId } = data;
       setActiveRoom((prev) => {
         if (!prev || prev.otherPartyId !== userId) return prev;
@@ -283,8 +263,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       });
     });
 
-    // Message read receipt
-    socket.on('message_read', (data: any) => {
+     socket.on('message_read', (data: any) => {
       const { messageId } = data;
       setActiveRoom((prev) => {
         if (!prev) return prev;
@@ -297,18 +276,14 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       });
     });
 
-    // User joined room
-    socket.on('user_joined', () => {
-      // Optional: Show notification that other user is online
-    });
+     socket.on('user_joined', () => {
+     });
 
-    // Room joined confirmation
-    socket.on('room_joined', () => {
+     socket.on('room_joined', () => {
       setIsConnected(true);
     });
 
-    // Error handling
-    socket.on('error', (error: any) => {
+     socket.on('error', (error: any) => {
       console.error('Socket error:', error);
       if (activeRoom) {
         setActiveRoom((prev) => {
@@ -332,8 +307,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     };
   }, [chatRooms, activeRoom?.bookingId, activeRoom?.otherPartyId, authToken]);
 
-  // Cleanup on logout
-  useEffect(() => {
+   useEffect(() => {
     if (!authToken || !authUser) {
       disconnectSocket();
       setIsConnected(false);
