@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Assets/Navbar';
+import DriverLocationTracker from './Assets/DriverLocationTracker';
 import '../../Styles/User/ActiveRidesPage.css';
 import apiClient from '../../services/api';
+import { isRideToday, formatRideDate, getRideScheduleText } from '../../utils/dateHelpers';
+import { useLocationTracking } from '../../context/LocationTrackingContext';
 
 interface ActiveRide {
   _id: string;
@@ -36,6 +39,8 @@ interface ActiveRide {
 const ActiveRidesPage = () => {
   const navigate = useNavigate();
   const [activeRides, setActiveRides] = useState<ActiveRide[]>([]);
+  const [todaysRides, setTodaysRides] = useState<ActiveRide[]>([]);
+  const [upcomingRides, setUpcomingRides] = useState<ActiveRide[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string>('');
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -43,6 +48,9 @@ const ActiveRidesPage = () => {
   const [statusAction, setStatusAction] = useState<'payment' | 'complete' | 'cancel'>('payment');
   const [cancellationReason, setCancellationReason] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Location tracking
+  const { startTracking, stopTracking, isTracking, error: trackingError } = useLocationTracking();
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('LoggedInUser');
@@ -77,6 +85,13 @@ const ActiveRidesPage = () => {
 
       const allRides = [...riderRides, ...driverRides];
       setActiveRides(allRides);
+      
+      // Filter today's rides and upcoming rides
+      const today = allRides.filter(ride => isRideToday(ride.rideId.departureTime));
+      const upcoming = allRides.filter(ride => !isRideToday(ride.rideId.departureTime));
+      
+      setTodaysRides(today);
+      setUpcomingRides(upcoming);
     } catch (error) {
       console.error('Error fetching active rides:', error);
     } finally {
@@ -164,6 +179,154 @@ const ActiveRidesPage = () => {
     setShowStatusModal(true);
   };
 
+  const handleStartTracking = (bookingId: string) => {
+    startTracking(bookingId);
+  };
+
+  const handleStopTracking = (bookingId: string) => {
+    stopTracking(bookingId);
+  };
+
+  const renderRideCard = (ride: ActiveRide) => {
+    const isRider = ride.riderId._id === userId;
+    const counterparty = isRider ? ride.driverId : ride.riderId;
+    const isTodayRide = isRideToday(ride.rideId.departureTime);
+
+    return (
+      <div key={ride._id} className="ride-card">
+        {/* Header */}
+        <div className="card-header">
+          <div className="route-display">
+            <div className="location-item">
+              <span className="location-icon">📍</span>
+              <div className="location-details">
+                <span className="location-label">From</span>
+                <span className="location-name">{ride.rideId.origin.coordinates?.map(coord => coord.toFixed(2)).join(', ')}</span>
+              </div>
+            </div>
+            <div className="route-divider"></div>
+            <div className="location-item">
+              <span className="location-icon">🎯</span>
+              <div className="location-details">
+                <span className="location-label">To</span>
+                <span className="location-name">{ride.rideId.destination.coordinates?.map(coord => coord.toFixed(2)).join(', ')}</span>
+              </div>
+            </div>
+          </div>
+          <span className="status-label">✓ CONFIRMED</span>
+        </div>
+
+        {/* Body */}
+        <div className="card-body">
+          {/* Person Section */}
+          <div className="info-section">
+            <h4 className="section-title">
+              {isRider ? '🚗 Driver' : '👤 Passenger'}
+            </h4>
+            <div className="person-info">
+              <span className="person-name">{counterparty.fullname}</span>
+            </div>
+          </div>
+
+          {/* Trip Details Section */}
+          <div className="info-section">
+            <h4 className="section-title">📅 Trip Details</h4>
+            <div className="details-grid">
+              <div className="detail-row">
+                <span className="detail-key">Pickup Location</span>
+                <span className="detail-value">{ride.pickupLocationName}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-key">Scheduled Time</span>
+                <span className="detail-value">{getRideScheduleText(ride.rideId.departureTime)}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-key">Seats</span>
+                <span className="detail-value">{ride.seatsBooked}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Payment Section */}
+          <div className="info-section">
+            <h4 className="section-title">💰 Payment</h4>
+            <div className="payment-info">
+              <div className="payment-row">
+                <span className="payment-label">Amount</span>
+                <span className="payment-amount">₹{ride.payment.totalAmount}</span>
+              </div>
+              <div className="payment-row">
+                <span className="payment-label">Status</span>
+                <span className={`payment-status ${ride.payment.paymentStatus}`}>
+                  {ride.payment.paymentStatus === 'paid' ? '✓ Paid' : '⏳ Pending'}
+                </span>
+              </div>
+              <div className="payment-row">
+                <span className="payment-label">Method</span>
+                <span className="payment-method">{ride.payment.paymentMethod}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Location Tracking Section - Only for today's rides */}
+          {isTodayRide && (
+            <div className="info-section tracking-section">
+              <h4 className="section-title">📍 Live Tracking</h4>
+              {isRider ? (
+                <div className="tracking-info">
+                  <p className="tracking-text">Track your driver's location in real-time</p>
+                  <button 
+                    className="tracking-btn view-tracking-btn"
+                    onClick={() => navigate(`/track/${ride._id}`)}
+                  >
+                    🗺️ View on Map
+                  </button>
+                </div>
+              ) : (
+                <DriverLocationTracker 
+                  bookingId={ride._id}
+                  onTrackingStart={() => console.log(`Started tracking for booking ${ride._id}`)}
+                  onTrackingStop={() => console.log(`Stopped tracking for booking ${ride._id}`)}
+                />
+              )}
+              {trackingError && (
+                <p className="tracking-error">{trackingError}</p>
+              )}
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="action-buttons">
+            {isRider && ride.payment.paymentStatus === 'pending' && (
+              <button 
+                className="status-btn payment-btn"
+                onClick={() => openStatusModal(ride, 'payment')}
+              >
+                💳 Payment Done
+              </button>
+            )}
+            
+            {!isRider && ride.payment.paymentStatus === 'paid' && (
+              <button 
+                className="status-btn complete-btn"
+                onClick={() => openStatusModal(ride, 'complete')}
+              >
+                ✅ Complete Ride
+              </button>
+            )}
+            
+            <button 
+              className="status-btn cancel-btn"
+              onClick={() => openStatusModal(ride, 'cancel')}
+            >
+              ⚠️ Emergency Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <Navbar />
@@ -193,135 +356,27 @@ const ActiveRidesPage = () => {
             </button>
           </div>
         ) : (
-          <div className="rides-grid">
-            {activeRides.map((ride) => {
-              const isRider = ride.riderId._id === userId;
-              const counterparty = isRider ? ride.driverId : ride.riderId;
-              console.log('Rendering ride:', ride);
-              console.log('Counterparty:', counterparty);
-
-              return (
-                <div key={ride._id} className="ride-card">
-                  {/* Header */}
-                  <div className="card-header">
-                    <div className="route-display">
-                      <div className="location-item">
-                        <span className="location-icon">📍</span>
-                        <div className="location-details">
-                          <span className="location-label">From</span>
-                          <span className="location-name">{ride.rideId.origin.coordinates?.map(coord => coord.toFixed(2)).join(', ')}</span>
-                        </div>
-                      </div>
-                      <div className="route-divider"></div>
-                      <div className="location-item">
-                        <span className="location-icon">🎯</span>
-                        <div className="location-details">
-                          <span className="location-label">To</span>
-                          <span className="location-name">{ride.rideId.destination.coordinates?.map(coord => coord.toFixed(2)).join(', ')}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <span className="status-label">✓ CONFIRMED</span>
-                  </div>
-
-                  {/* Body */}
-                  <div className="card-body">
-                    {/* Person Section */}
-                    <div className="info-section">
-                      <h4 className="section-title">
-                        {isRider ? '🚗 Driver' : '👤 Passenger'}
-                      </h4>
-                      <div className="person-info">
-                        <span className="person-name">{counterparty.fullname}</span>
-                      </div>
-                    </div>
-
-                    {/* Trip Details Section */}
-                    <div className="info-section">
-                      <h4 className="section-title">📅 Trip Details</h4>
-                      <div className="details-grid">
-                        <div className="detail-row">
-                          <span className="detail-key">Pickup Location</span>
-                          <span className="detail-value">{ride.pickupLocationName}</span>
-                        </div>
-                        <div className="detail-row">
-                          <span className="detail-key">Time (currently fixed )</span>
-                          <span className="detail-value">{formatTime(ride.rideId.departureTime)}</span>
-                        </div>
-                        <div className="detail-row">
-                          <span className="detail-key">Date</span>
-                          <span className="detail-value">
-                            {new Date(ride.rideId.departureTime).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric'
-                            })}
-                          </span>
-                        </div>
-                        <div className="detail-row">
-                          <span className="detail-key">Seats</span>
-                          <span className="detail-value">{ride.seatsBooked}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Payment Section */}
-                    <div className="info-section">
-                      <h4 className="section-title">💳 Payment</h4>
-                      <div className="payment-info">
-                        <div className="price-box">
-                          <span className="price-label">Total Amount</span>
-                          <span className="price-amount">₹{ride.payment.totalAmount}</span>
-                        </div>
-                        <div className="payment-details">
-                          <span className="payment-status">{ride.payment.paymentStatus.toUpperCase()}</span>
-                          <span className="payment-method">{ride.payment.paymentMethod.toUpperCase()}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Footer */}
-                  <div className="card-footer">
-                    <button 
-                      className="action-btn primary-btn"
-                      onClick={() => navigate('/map', { state: { booking: ride } })}
-                    >
-                      View on Map
-                    </button>
-                    
-                    {/* Status Update Buttons */}
-                    <div className="status-actions">
-                      {!isRider && ride.payment.paymentStatus === 'pending' && (
-                        <button 
-                          className="status-btn payment-btn"
-                          onClick={() => openStatusModal(ride, 'payment')}
-                        >
-                          💳 Payment Done
-                        </button>
-                      )}
-                      
-                      {!isRider && ride.payment.paymentStatus === 'paid' && (
-                        <button 
-                          className="status-btn complete-btn"
-                          onClick={() => openStatusModal(ride, 'complete')}
-                        >
-                          ✅ Complete Ride
-                        </button>
-                      )}
-                      
-                      <button 
-                        className="status-btn cancel-btn"
-                        onClick={() => openStatusModal(ride, 'cancel')}
-                      >
-                        ⚠️ Emergency Cancel
-                      </button>
-                    </div>
-                  </div>
+          <>
+            {/* Today's Rides Section */}
+            {todaysRides.length > 0 && (
+              <div className="rides-section">
+                <h2 className="section-heading">🚗 Today's Rides ({todaysRides.length})</h2>
+                <div className="rides-grid">
+                  {todaysRides.map((ride) => renderRideCard(ride))}
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            )}
+
+            {/* Upcoming Rides Section */}
+            {upcomingRides.length > 0 && (
+              <div className="rides-section">
+                <h2 className="section-heading">📅 Upcoming Rides ({upcomingRides.length})</h2>
+                <div className="rides-grid">
+                  {upcomingRides.map((ride) => renderRideCard(ride))}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Status Update Modal */}

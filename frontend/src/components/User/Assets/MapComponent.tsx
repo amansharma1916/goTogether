@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { useLocationTrackingSafe } from '../../../context/LocationTrackingContext';
+import type { DriverLocation } from '../../../context/LocationTrackingContext';
 
 interface LocationData {
   lat: number;
@@ -17,6 +19,9 @@ interface MapComponentProps {
   onRoutesUpdate?: (count: number) => void;
   rideRoute?: { type: string; coordinates: number[][] } | null;
   showUserRoutes?: boolean; // Control whether to fetch user routes
+  showDriverTracking?: boolean; // Show real-time driver location
+  bookingId?: string; // Booking ID for tracking
+  driverLocationOverride?: DriverLocation | null; // Optional override for last known driver location
 }
 
 const ORS_API_KEY = import.meta.env.VITE_ORS_API_KEY || '';
@@ -29,14 +34,24 @@ const MapComponent = ({
   onRouteSelect,
   onRoutesUpdate,
   rideRoute,
-  showUserRoutes = true // Default true for Join page
+  showUserRoutes = true, // Default true for Join page
+  showDriverTracking = false,
+  bookingId,
+  driverLocationOverride = null
 }: MapComponentProps) => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const pickupMarker = useRef<maplibregl.Marker | null>(null);
   const destinationMarker = useRef<maplibregl.Marker | null>(null);
+  const driverMarker = useRef<maplibregl.Marker | null>(null);
   const [routes, setRoutes] = useState<any[]>([]);
   const mapClickHandler = useRef<((e: any) => void) | null>(null);
+  
+  // Location tracking context (safe - uses defaults if not in provider)
+  const { driverLocation, etaMinutes, distanceKm, isTracking } = useLocationTrackingSafe();
+  const effectiveDriverLocation = driverLocationOverride ?? driverLocation;
+  const effectiveEtaMinutes = driverLocationOverride?.etaMinutes ?? etaMinutes;
+  const effectiveDistanceKm = driverLocationOverride?.distanceKm ?? distanceKm;
 
   // Initialize map
   useEffect(() => {
@@ -178,6 +193,53 @@ const MapComponent = ({
       duration: 1500,
     });
   }, [destinationLocation]);
+
+  // Handle driver location updates (real-time tracking)
+  useEffect(() => {
+    if (!map.current || !showDriverTracking) return;
+
+    // Don't show marker if no location data
+    if (!effectiveDriverLocation) return;
+
+    const { latitude, longitude } = effectiveDriverLocation;
+
+    // Remove existing driver marker if any
+    if (driverMarker.current) {
+      driverMarker.current.remove();
+    }
+
+    // Create custom blue marker element for driver
+    const el = document.createElement('div');
+    el.style.width = '36px';
+    el.style.height = '36px';
+    el.style.backgroundImage = `url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%233B82F6"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="white"/></svg>')`;
+    el.style.backgroundSize = 'contain';
+    el.style.backgroundRepeat = 'no-repeat';
+
+    // Create popup content with ETA and distance
+     let popupContent = `<strong>Driver Location`;
+     if (!isTracking) {
+       popupContent += ` (Last Known)`;
+     }
+     popupContent += `</strong>`;
+    if (effectiveEtaMinutes !== null) {
+      popupContent += `<br/>ETA: ${effectiveEtaMinutes} minute${effectiveEtaMinutes !== 1 ? 's' : ''}`;
+    }
+    if (effectiveDistanceKm !== null) {
+      popupContent += `<br/>Distance: ${effectiveDistanceKm.toFixed(1)} km`;
+    }
+
+    // Add driver marker
+    driverMarker.current = new maplibregl.Marker({ element: el })
+      .setLngLat([longitude, latitude])
+      .setPopup(new maplibregl.Popup().setHTML(popupContent))
+      .addTo(map.current);
+
+    // Optionally pan map to show driver if tracking
+    if (isTracking) {
+      map.current.panTo([longitude, latitude]);
+    }
+  }, [effectiveDriverLocation, showDriverTracking, effectiveEtaMinutes, effectiveDistanceKm, isTracking]);
 
   // Fetch and display routes when both locations are set
   useEffect(() => {
