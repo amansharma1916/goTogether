@@ -1,4 +1,3 @@
-/* Rider Tracking Page Styles - Dark Theme */
 
 .tracking-page {
   min-height: 100vh;
@@ -7,7 +6,6 @@
   flex-direction: column;
 }
 
-/* Loading State */
 .tracking-page.loading {
   justify-content: center;
   align-items: center;
@@ -36,7 +34,6 @@
   font-size: 16px;
 }
 
-/* Error State */
 .tracking-page.error {
   justify-content: center;
   align-items: center;
