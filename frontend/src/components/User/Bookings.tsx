@@ -294,6 +294,8 @@ const Bookings = () => {
         return 'status-badge status-cancelled';
       case 'rejected':
         return 'status-badge status-rejected';
+      case 'expired':
+        return 'status-badge status-expired';
       default:
         return 'status-badge';
     }
@@ -310,6 +312,15 @@ const Bookings = () => {
   };
 
   const renderBookingCard = (booking: Booking, isReceived: boolean) => {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const isExpired =
+      new Date(booking.rideId.departureTime) < startOfToday &&
+      booking.status !== 'completed' &&
+      booking.status !== 'cancelled' &&
+      booking.status !== 'rejected';
+    const displayStatus = isExpired ? 'expired' : booking.status;
+
     return (
       <div key={booking._id} className="booking-card">
         <div className="booking-header">
@@ -318,8 +329,8 @@ const Bookings = () => {
             <span className="route-arrow">→</span>
             <h3>{booking.rideId.destination.name}</h3>
           </div>
-          <span className={getStatusBadgeClass(booking.status)}>
-            {booking.status.toUpperCase()}
+          <span className={getStatusBadgeClass(displayStatus)}>
+            {displayStatus.toUpperCase()}
           </span>
         </div>
 

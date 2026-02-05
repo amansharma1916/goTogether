@@ -41,6 +41,7 @@ const ActiveRidesPage = () => {
   const [activeRides, setActiveRides] = useState<ActiveRide[]>([]);
   const [todaysRides, setTodaysRides] = useState<ActiveRide[]>([]);
   const [upcomingRides, setUpcomingRides] = useState<ActiveRide[]>([]);
+  const [pastRides, setPastRides] = useState<ActiveRide[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string>('');
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -48,6 +49,7 @@ const ActiveRidesPage = () => {
   const [statusAction, setStatusAction] = useState<'payment' | 'complete' | 'cancel'>('payment');
   const [cancellationReason, setCancellationReason] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showSchedulePanel, setShowSchedulePanel] = useState(false);
   
   // Location tracking
   const { startTracking, stopTracking, isTracking, error: trackingError } = useLocationTracking();
@@ -86,12 +88,21 @@ const ActiveRidesPage = () => {
       const allRides = [...riderRides, ...driverRides];
       setActiveRides(allRides);
       
-      // Filter today's rides and upcoming rides
+      // Filter today's rides, upcoming rides, and past rides
+      const now = new Date();
       const today = allRides.filter(ride => isRideToday(ride.rideId.departureTime));
-      const upcoming = allRides.filter(ride => !isRideToday(ride.rideId.departureTime));
-      
+      const upcoming = allRides.filter(ride => {
+        const rideDate = new Date(ride.rideId.departureTime);
+        return !isRideToday(ride.rideId.departureTime) && rideDate > now;
+      });
+      const past = allRides.filter(ride => {
+        const rideDate = new Date(ride.rideId.departureTime);
+        return rideDate < now && !isRideToday(ride.rideId.departureTime);
+      });
+
       setTodaysRides(today);
       setUpcomingRides(upcoming);
+      setPastRides(past);
     } catch (error) {
       console.error('Error fetching active rides:', error);
     } finally {
@@ -252,7 +263,7 @@ const ActiveRidesPage = () => {
             <h4 className="section-title">💰 Payment</h4>
             <div className="payment-info">
               <div className="payment-row">
-                <span className="payment-label">Amount</span>
+                <span className="payment-label">Amount </span>
                 <span className="payment-amount">₹{ride.payment.totalAmount}</span>
               </div>
               <div className="payment-row">
@@ -262,7 +273,7 @@ const ActiveRidesPage = () => {
                 </span>
               </div>
               <div className="payment-row">
-                <span className="payment-label">Method</span>
+                <span className="payment-label">Method </span>
                 <span className="payment-method">{ride.payment.paymentMethod}</span>
               </div>
             </div>
@@ -327,6 +338,8 @@ const ActiveRidesPage = () => {
     );
   };
 
+  const visibleRidesCount = todaysRides.length + upcomingRides.length;
+
   return (
     <>
       <Navbar />
@@ -336,8 +349,14 @@ const ActiveRidesPage = () => {
             ← Back
           </button>
           <h1>My Active Rides</h1>
+          <button
+            className="schedule-button"
+            onClick={() => setShowSchedulePanel(true)}
+          >
+            📌 View Schedule
+          </button>
           <div className="rides-count">
-            {activeRides.length} {activeRides.length === 1 ? 'ride' : 'rides'}
+            {visibleRidesCount} {visibleRidesCount === 1 ? 'ride' : 'rides'}
           </div>
         </div>
 
@@ -346,7 +365,7 @@ const ActiveRidesPage = () => {
             <div className="spinner"></div>
             <p>Loading your active rides...</p>
           </div>
-        ) : activeRides.length === 0 ? (
+        ) : visibleRidesCount === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">🚗</div>
             <h2>No Active Rides</h2>
@@ -446,6 +465,69 @@ const ActiveRidesPage = () => {
                 >
                   {isUpdating ? 'Updating...' : 'Confirm'}
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Schedule Overview Panel */}
+        {showSchedulePanel && (
+          <div className="schedule-panel-overlay" onClick={() => setShowSchedulePanel(false)}>
+            <div className="schedule-panel" onClick={(e) => e.stopPropagation()}>
+              <div className="schedule-panel-header">
+                <h3>📅 Schedule Overview</h3>
+                <button
+                  className="close-btn"
+                  onClick={() => setShowSchedulePanel(false)}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="schedule-panel-body">
+                <div className="schedule-section">
+                  <h4>Upcoming Rides</h4>
+                  {upcomingRides.length === 0 ? (
+                    <p className="schedule-empty">No upcoming rides</p>
+                  ) : (
+                    upcomingRides.map((ride) => (
+                      <div key={ride._id} className="schedule-bar">
+                        <div className="schedule-bar-main">
+                          <div className="schedule-names">
+                            <span>Driver: {ride.driverId.fullname}</span>
+                            <span>Rider: {ride.riderId.fullname}</span>
+                          </div>
+                          <div className="schedule-meta">
+                            <span className="schedule-price">₹{ride.payment.totalAmount}</span>
+                            <span className="schedule-date">{formatRideDate(ride.rideId.departureTime)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="schedule-section">
+                  <h4>Past Rides</h4>
+                  {pastRides.length === 0 ? (
+                    <p className="schedule-empty">No past rides</p>
+                  ) : (
+                    pastRides.map((ride) => (
+                      <div key={ride._id} className="schedule-bar">
+                        <div className="schedule-bar-main">
+                          <div className="schedule-names">
+                            <span>Driver: {ride.driverId.fullname}</span>
+                            <span>Rider: {ride.riderId.fullname}</span>
+                          </div>
+                          <div className="schedule-meta">
+                            <span className="schedule-price">₹{ride.payment.totalAmount}</span>
+                            <span className="schedule-date">{formatRideDate(ride.rideId.departureTime)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
           </div>
