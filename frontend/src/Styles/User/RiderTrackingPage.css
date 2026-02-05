@@ -299,7 +299,6 @@
   color: #7dd3fc;
 }
 
-/* Map Container */
 .tracking-map-container {
   flex: 1;
   min-height: 40vh;
@@ -321,7 +320,6 @@
   display: block;
 }
 
-/* Help Text */
 .tracking-help {
   padding: 15px 20px;
   background: rgba(0, 0, 0, 0.2);
@@ -336,7 +334,6 @@
   line-height: 1.5;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .tracking-header {
     padding: 12px 15px;
