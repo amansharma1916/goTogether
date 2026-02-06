@@ -301,7 +301,7 @@
 
 .tracking-map-container {
   flex: 1;
-  min-height: 40vh;
+  min-height: 32vh;
   position: relative;
   background: rgba(0, 0, 0, 0.2);
 }
@@ -310,7 +310,7 @@
 .tracking-map-container > div {
   width: 100% !important;
   height: 100% !important;
-  min-height: 1000px;
+  min-height: 520px;
 }
 
 .tracking-map-container .maplibregl-map,
@@ -374,11 +374,11 @@
   }
 
   .tracking-map-container {
-    min-height: 400px;
+    min-height: 320px;
   }
 
   .tracking-map-container > div {
-    min-height: 400px;
+    min-height: 320px;
   }
 }
 

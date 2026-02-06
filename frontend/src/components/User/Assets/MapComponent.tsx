@@ -36,7 +36,6 @@ const MapComponent = ({
   rideRoute,
   showUserRoutes = true, // Default true for Join page
   showDriverTracking = false,
-  bookingId,
   driverLocationOverride = null
 }: MapComponentProps) => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
