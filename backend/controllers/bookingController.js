@@ -1,4 +1,5 @@
 import BookedRide from '../DB/Schema/BookedRideSchema.js';
+import { findBookingByIdOrCode } from '../utils/bookingLookup.js';
 import Ride from '../DB/Schema/PostedRidesSchema.js';
 
 
@@ -319,10 +320,11 @@ export const getBookingById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const booking = await BookedRide.findById(id)
-      .populate('rideId')
-      .populate('riderId', 'fullname email phone')
-      .populate('driverId', 'fullname email phone');
+    const booking = await findBookingByIdOrCode(id, [
+      { path: 'rideId' },
+      { path: 'riderId', select: 'fullname email phone' },
+      { path: 'driverId', select: 'fullname email phone' }
+    ]);
 
     if (!booking) {
       return res.status(404).json({
@@ -360,7 +362,7 @@ export const confirmBooking = async (req, res) => {
       });
     }
 
-    const booking = await BookedRide.findById(id).populate('rideId');
+    const booking = await findBookingByIdOrCode(id, [{ path: 'rideId' }]);
 
     if (!booking) {
       return res.status(404).json({
@@ -419,7 +421,7 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
-    const booking = await BookedRide.findById(id);
+    const booking = await findBookingByIdOrCode(id);
 
     if (!booking) {
       return res.status(404).json({
@@ -492,7 +494,7 @@ export const completeBooking = async (req, res) => {
       });
     }
 
-    const booking = await BookedRide.findById(id);
+    const booking = await findBookingByIdOrCode(id);
 
     if (!booking) {
       return res.status(404).json({
@@ -550,7 +552,7 @@ export const rateBooking = async (req, res) => {
       });
     }
 
-    const booking = await BookedRide.findById(id);
+    const booking = await findBookingByIdOrCode(id);
 
     if (!booking) {
       return res.status(404).json({
@@ -619,7 +621,7 @@ export const updatePaymentStatus = async (req, res) => {
     const { id } = req.params;
     const { paymentStatus, transactionId } = req.body;
 
-    const booking = await BookedRide.findById(id);
+    const booking = await findBookingByIdOrCode(id);
 
     if (!booking) {
       return res.status(404).json({
@@ -677,7 +679,7 @@ export const updateRideStatus = async (req, res) => {
       });
     }
 
-    const booking = await BookedRide.findById(id).populate('rideId');
+    const booking = await findBookingByIdOrCode(id, [{ path: 'rideId' }]);
 
     if (!booking) {
       return res.status(404).json({

@@ -9,6 +9,7 @@ import { useLocationTracking } from '../../context/LocationTrackingContext';
 
 interface ActiveRide {
   _id: string;
+  bookingCode?: string;
   rideId: {
     _id: string;
     origin: { name: string; coordinates?: [number, number] };
@@ -53,6 +54,8 @@ const ActiveRidesPage = () => {
   
   // Location tracking
   const { startTracking, stopTracking, isTracking, error: trackingError } = useLocationTracking();
+
+  const getBookingIdentifier = (ride: ActiveRide) => ride.bookingCode || ride._id;
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('LoggedInUser');
@@ -156,7 +159,7 @@ const ActiveRidesPage = () => {
       }
 
       const response = await apiClient.patch(
-        `/bookings/${selectedRide._id}/status`,
+        `/bookings/${getBookingIdentifier(selectedRide)}/status`,
         {
           status,
           paymentStatus,
@@ -288,16 +291,16 @@ const ActiveRidesPage = () => {
                   <p className="tracking-text">Track your driver's location in real-time</p>
                   <button 
                     className="tracking-btn view-tracking-btn"
-                    onClick={() => navigate(`/track/${ride._id}`)}
+                    onClick={() => navigate(`/track/${getBookingIdentifier(ride)}`)}
                   >
                     🗺️ View on Map
                   </button>
                 </div>
               ) : (
                 <DriverLocationTracker 
-                  bookingId={ride._id}
-                  onTrackingStart={() => console.log(`Started tracking for booking ${ride._id}`)}
-                  onTrackingStop={() => console.log(`Stopped tracking for booking ${ride._id}`)}
+                  bookingId={getBookingIdentifier(ride)}
+                  onTrackingStart={() => console.log(`Started tracking for booking ${getBookingIdentifier(ride)}`)}
+                  onTrackingStop={() => console.log(`Stopped tracking for booking ${getBookingIdentifier(ride)}`)}
                 />
               )}
               {trackingError && (

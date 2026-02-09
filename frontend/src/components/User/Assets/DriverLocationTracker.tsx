@@ -1,7 +1,3 @@
-/**
- * Driver Location Tracker Component
- * Handles geolocation permissions and periodic location sharing for drivers
- */
 
 import React, { useEffect, useState } from 'react';
 import useDriverLocation from '../../../hooks/useDriverLocation';

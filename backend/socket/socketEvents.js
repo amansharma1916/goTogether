@@ -1,6 +1,6 @@
 import Message from "../DB/Schema/MessageSchema.js";
-import BookedRide from "../DB/Schema/BookedRideSchema.js";
 import { isRideToday } from "../utils/dateHelpers.js";
+import { findBookingByIdOrCode } from "../utils/bookingLookup.js";
 import {
   validateDriverLocationTracking,
   validateRiderLocationTracking,
@@ -31,11 +31,14 @@ export const setupSocketEvents = (io) => {
         const userId = socket.userId;
 
          
-        const booking = await BookedRide.findById(bookingId);
+        const booking = await findBookingByIdOrCode(bookingId);
         if (!booking) {
           socket.emit("error", { message: "Booking not found" });
           return;
         }
+
+        const bookingKey = booking.bookingCode || booking._id.toString();
+        const bookingDbId = booking._id.toString();
 
         const isParticipant =
           booking.riderId.toString() === userId || booking.driverId.toString() === userId;
@@ -46,15 +49,15 @@ export const setupSocketEvents = (io) => {
         }
 
          
-        const roomName = `booking_${bookingId}`;
+        const roomName = `booking_${bookingKey}`;
         socket.join(roomName);
         socket.currentRoom = roomName;
-        socket.currentBookingId = bookingId;
+        socket.currentBookingId = bookingKey;
 
          
         await Message.updateMany(
           {
-            bookingId,
+            bookingId: bookingDbId,
             recipientId: userId,
             isRead: false
           },
@@ -93,11 +96,13 @@ export const setupSocketEvents = (io) => {
         }
 
          
-        const booking = await BookedRide.findById(bookingId).populate("riderId driverId");
+        const booking = await findBookingByIdOrCode(bookingId, ["riderId", "driverId"]);
         if (!booking) {
           socket.emit("error", { message: "Booking not found" });
           return;
         }
+
+        const bookingKey = booking.bookingCode || booking._id.toString();
 
          let senderName = "";
         if (booking.riderId._id.toString() === senderId) {
@@ -109,8 +114,8 @@ export const setupSocketEvents = (io) => {
           return;
         }
 
-         const message = new Message({
-          bookingId,
+        const message = new Message({
+          bookingId: booking._id,
           rideId: booking.rideId,
           senderId,
           senderName,
@@ -121,7 +126,7 @@ export const setupSocketEvents = (io) => {
 
         await message.save();
 
-        const roomName = `booking_${bookingId}`;
+        const roomName = `booking_${bookingKey}`;
         io.to(roomName).emit("new_message", {
           _id: message._id,
           senderId,

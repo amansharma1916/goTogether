@@ -1,7 +1,4 @@
-/**
- * Rider Tracking Page
- * Full-screen map view for riders to track driver's real-time location
- */
+
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -246,6 +243,7 @@ const RiderTrackingPage: React.FC = () => {
           destinationLocation={destinationLocation}
           showDriverTracking={true}
           bookingId={bookingId}
+          
         />
       </div>
 

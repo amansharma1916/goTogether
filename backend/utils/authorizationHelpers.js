@@ -3,7 +3,7 @@
  * Centralized authorization logic for ride tracking socket events
  */
 
-import BookedRide from "../DB/Schema/BookedRideSchema.js";
+import { findBookingByIdOrCode } from "./bookingLookup.js";
 import { isRideToday } from "./dateHelpers.js";
 
 /**
@@ -14,7 +14,7 @@ import { isRideToday } from "./dateHelpers.js";
  */
 export const validateDriverAuthorization = async (bookingId, userId) => {
   try {
-    const booking = await BookedRide.findById(bookingId).populate("rideId driverId");
+    const booking = await findBookingByIdOrCode(bookingId, ["rideId", "driverId"]);
 
     if (!booking) {
       return {
@@ -55,7 +55,7 @@ export const validateDriverAuthorization = async (bookingId, userId) => {
  */
 export const validateRiderAuthorization = async (bookingId, userId) => {
   try {
-    const booking = await BookedRide.findById(bookingId).populate("rideId riderId");
+    const booking = await findBookingByIdOrCode(bookingId, ["rideId", "riderId"]);
 
     if (!booking) {
       return {

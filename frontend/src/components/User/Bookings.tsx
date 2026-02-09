@@ -10,6 +10,7 @@ import apiClient from '../../services/api';
 
 interface Booking {
   _id: string;
+  bookingCode?: string;
   rideId: {
     _id: string;
     origin: { name: string; coordinates?: [number, number] };
@@ -69,6 +70,8 @@ const Bookings = () => {
   const [totalReceivedBookings, setTotalReceivedBookings] = useState(0);
   const [totalMyBookings, setTotalMyBookings] = useState(0);
   const { show, hide } = useGlobalLoader();
+
+  const getBookingIdentifier = (booking: Booking) => booking.bookingCode || booking._id;
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('LoggedInUser');
@@ -259,7 +262,7 @@ const Bookings = () => {
       const otherPartyName = isReceived ? booking.riderId.fullname : booking.driverId.fullname;
       const otherPartyPhone = isReceived ? booking.riderId.phone : booking.driverId.phone;
       
-      openChat(booking._id, otherPartyId, otherPartyName, otherPartyPhone);
+      openChat(getBookingIdentifier(booking), otherPartyId, otherPartyName, otherPartyPhone);
     } catch (error) {
       console.error('Error opening chat:', error);
       addNotification({
@@ -427,10 +430,10 @@ const Bookings = () => {
             <>
               {booking.status === 'pending' && (
                 <>
-                  <button className="btn-confirm" onClick={() => handleConfirm(booking._id)}>
+                  <button className="btn-confirm" onClick={() => handleConfirm(getBookingIdentifier(booking))}>
                     Confirm Booking
                   </button>
-                  <button className="btn-cancel" onClick={() => handleCancel(booking._id, true)}>
+                  <button className="btn-cancel" onClick={() => handleCancel(getBookingIdentifier(booking), true)}>
                     Reject
                   </button>
                 </>
@@ -443,7 +446,7 @@ const Bookings = () => {
                   <button className="btn-show-ride" onClick={() => navigate('/active-rides')}>
                     Show Ride
                   </button>
-                  <button className="btn-cancel" onClick={() => handleCancel(booking._id, true)}>
+                  <button className="btn-cancel" onClick={() => handleCancel(getBookingIdentifier(booking), true)}>
                     Cancel
                   </button>
                 </>
@@ -453,7 +456,7 @@ const Bookings = () => {
             // Actions for my bookings (as rider)
             <>
               {booking.status === 'pending' && (
-                <button className="btn-cancel" onClick={() => handleCancel(booking._id, false)}>
+                <button className="btn-cancel" onClick={() => handleCancel(getBookingIdentifier(booking), false)}>
                   Cancel Booking
                 </button>
               )}
@@ -465,7 +468,7 @@ const Bookings = () => {
                   <button className="btn-show-ride" onClick={() => navigate('/active-rides')}>
                     Show Ride
                   </button>
-                  <button className="btn-cancel" onClick={() => handleCancel(booking._id, false)}>
+                  <button className="btn-cancel" onClick={() => handleCancel(getBookingIdentifier(booking), false)}>
                     Cancel Booking
                   </button>
                 </>
