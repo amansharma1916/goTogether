@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import crypto from "crypto";
 
 
 
@@ -21,6 +22,13 @@ const PointSchema = new Schema({
 
 const BookedRideSchema = new Schema(
   {
+    bookingCode: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true,
+      default: () => `BKG-${crypto.randomUUID()}`
+    },
     rideId: {
       type: Schema.Types.ObjectId,
       ref: "Ride",

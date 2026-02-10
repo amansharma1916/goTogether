@@ -10,6 +10,7 @@ import apiClient from '../../services/api';
 
 interface Booking {
   _id: string;
+  bookingCode?: string;
   rideId: {
     _id: string;
     origin: { name: string; coordinates?: [number, number] };
@@ -69,6 +70,8 @@ const Bookings = () => {
   const [totalReceivedBookings, setTotalReceivedBookings] = useState(0);
   const [totalMyBookings, setTotalMyBookings] = useState(0);
   const { show, hide } = useGlobalLoader();
+
+  const getBookingIdentifier = (booking: Booking) => booking.bookingCode || booking._id;
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('LoggedInUser');
@@ -259,7 +262,7 @@ const Bookings = () => {
       const otherPartyName = isReceived ? booking.riderId.fullname : booking.driverId.fullname;
       const otherPartyPhone = isReceived ? booking.riderId.phone : booking.driverId.phone;
       
-      openChat(booking._id, otherPartyId, otherPartyName, otherPartyPhone);
+      openChat(getBookingIdentifier(booking), otherPartyId, otherPartyName, otherPartyPhone);
     } catch (error) {
       console.error('Error opening chat:', error);
       addNotification({
@@ -294,6 +297,8 @@ const Bookings = () => {
         return 'status-badge status-cancelled';
       case 'rejected':
         return 'status-badge status-rejected';
+      case 'expired':
+        return 'status-badge status-expired';
       default:
         return 'status-badge';
     }
@@ -310,6 +315,15 @@ const Bookings = () => {
   };
 
   const renderBookingCard = (booking: Booking, isReceived: boolean) => {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const isExpired =
+      new Date(booking.rideId.departureTime) < startOfToday &&
+      booking.status !== 'completed' &&
+      booking.status !== 'cancelled' &&
+      booking.status !== 'rejected';
+    const displayStatus = isExpired ? 'expired' : booking.status;
+
     return (
       <div key={booking._id} className="booking-card">
         <div className="booking-header">
@@ -318,8 +332,8 @@ const Bookings = () => {
             <span className="route-arrow">→</span>
             <h3>{booking.rideId.destination.name}</h3>
           </div>
-          <span className={getStatusBadgeClass(booking.status)}>
-            {booking.status.toUpperCase()}
+          <span className={getStatusBadgeClass(displayStatus)}>
+            {displayStatus.toUpperCase()}
           </span>
         </div>
 
@@ -416,10 +430,10 @@ const Bookings = () => {
             <>
               {booking.status === 'pending' && (
                 <>
-                  <button className="btn-confirm" onClick={() => handleConfirm(booking._id)}>
+                  <button className="btn-confirm" onClick={() => handleConfirm(getBookingIdentifier(booking))}>
                     Confirm Booking
                   </button>
-                  <button className="btn-cancel" onClick={() => handleCancel(booking._id, true)}>
+                  <button className="btn-cancel" onClick={() => handleCancel(getBookingIdentifier(booking), true)}>
                     Reject
                   </button>
                 </>
@@ -432,7 +446,7 @@ const Bookings = () => {
                   <button className="btn-show-ride" onClick={() => navigate('/active-rides')}>
                     Show Ride
                   </button>
-                  <button className="btn-cancel" onClick={() => handleCancel(booking._id, true)}>
+                  <button className="btn-cancel" onClick={() => handleCancel(getBookingIdentifier(booking), true)}>
                     Cancel
                   </button>
                 </>
@@ -442,7 +456,7 @@ const Bookings = () => {
             // Actions for my bookings (as rider)
             <>
               {booking.status === 'pending' && (
-                <button className="btn-cancel" onClick={() => handleCancel(booking._id, false)}>
+                <button className="btn-cancel" onClick={() => handleCancel(getBookingIdentifier(booking), false)}>
                   Cancel Booking
                 </button>
               )}
@@ -454,7 +468,7 @@ const Bookings = () => {
                   <button className="btn-show-ride" onClick={() => navigate('/active-rides')}>
                     Show Ride
                   </button>
-                  <button className="btn-cancel" onClick={() => handleCancel(booking._id, false)}>
+                  <button className="btn-cancel" onClick={() => handleCancel(getBookingIdentifier(booking), false)}>
                     Cancel Booking
                   </button>
                 </>

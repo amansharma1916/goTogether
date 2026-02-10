@@ -1,5 +1,5 @@
 import Message from "../DB/Schema/MessageSchema.js";
-import BookedRide from "../DB/Schema/BookedRideSchema.js";
+import { findBookingByIdOrCode } from "../utils/bookingLookup.js";
 
 // Create a new message
 export const createMessage = async (req, res) => {
@@ -22,7 +22,7 @@ export const createMessage = async (req, res) => {
     }
 
     // Verify booking exists and user is part of it
-    const booking = await BookedRide.findById(bookingId).populate("riderId driverId");
+    const booking = await findBookingByIdOrCode(bookingId, ["riderId", "driverId"]);
     if (!booking) {
       return res.status(404).json({
         success: false,
@@ -46,7 +46,7 @@ export const createMessage = async (req, res) => {
 
     // Create message
     const message = new Message({
-      bookingId,
+      bookingId: booking._id,
       rideId: booking.rideId,
       senderId,
       senderName: isRider ? booking.riderId.fullname : booking.driverId.fullname,
@@ -79,7 +79,7 @@ export const getChatHistory = async (req, res) => {
     const userId = req.userId || req.user?.userId || req.user?.id || req.user?._id;
 
     // Verify user is part of booking
-    const booking = await BookedRide.findById(bookingId);
+    const booking = await findBookingByIdOrCode(bookingId);
     if (!booking) {
       return res.status(404).json({
         success: false,
@@ -99,13 +99,13 @@ export const getChatHistory = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-    const messages = await Message.find({ bookingId })
+    const messages = await Message.find({ bookingId: booking._id })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .lean();
 
-    const totalMessages = await Message.countDocuments({ bookingId });
+    const totalMessages = await Message.countDocuments({ bookingId: booking._id });
 
     res.status(200).json({
       success: true,
@@ -132,9 +132,17 @@ export const markMessagesAsRead = async (req, res) => {
     const userId = req.userId || req.user?.userId || req.user?.id || req.user?._id;
 
     // Update all unread messages for this user in this booking
+    const booking = await findBookingByIdOrCode(bookingId);
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found"
+      });
+    }
+
     const result = await Message.updateMany(
       {
-        bookingId,
+        bookingId: booking._id,
         recipientId: userId,
         isRead: false
       },

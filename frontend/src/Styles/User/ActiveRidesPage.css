@@ -50,6 +50,25 @@
   font-size: 0.9rem;
 }
 
+.schedule-button {
+  background: rgba(244, 114, 182, 0.15);
+  border: 1px solid rgba(244, 114, 182, 0.35);
+  color: #f9a8d4;
+  padding: 0.65rem 1.25rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.schedule-button:hover {
+  background: rgba(244, 114, 182, 0.25);
+  border-color: rgba(244, 114, 182, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(244, 114, 182, 0.2);
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -106,6 +125,114 @@
   margin: 0;
   color: #94a3b8;
   font-size: 1.1rem;
+}
+
+.schedule-panel-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(8, 12, 20, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-top: 80px;
+}
+
+.schedule-panel {
+  width: min(420px, 90vw);
+  height: calc(100% - 80px);
+  background: rgba(11, 16, 26, 0.95);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-panel-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tracking-text {
+  color: white;
+}
+
+.schedule-panel-header h3 {
+  margin: 0;
+  color: #e2e8f0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.schedule-panel-body {
+  padding: 1rem 1.5rem 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.schedule-section h4 {
+  margin: 0 0 0.75rem;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.schedule-empty {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.schedule-bar {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.85rem 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.schedule-bar-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.schedule-names {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.schedule-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+}
+
+.schedule-price {
+  color: #86efac;
+  font-weight: 700;
+}
+
+.schedule-date {
+  color: #93c5fd;
+  font-weight: 600;
 }
 
 .btn-browse {
@@ -303,6 +430,7 @@
 .payment-info {
   display: flex;
   gap: 0.75rem;
+  color: white;
 }
 
 .price-box {

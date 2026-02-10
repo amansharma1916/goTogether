@@ -9,8 +9,10 @@ import Join from "./components/User/Join";
 import Rides from "./components/User/Rides";
 import Bookings from "./components/User/Bookings";
 import ActiveRidesPage from "./components/User/ActiveRidesPage";
+import RiderTrackingPage from "./components/User/RiderTrackingPage";
 import Profile from "./components/User/Profile";
 import GlobalLoader from "./components/GlobalLoader";
+import LocationTrackingProvider from "./context/LocationTrackingProvider";
 
 const App = () => {
   useEffect(() => {
@@ -18,83 +20,94 @@ const App = () => {
   }, []);
 
   return (
-    <div>
-      <GlobalLoader />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Switcher />} />
-        <Route path="/register" element={<Switcher />} />
+    <LocationTrackingProvider>
+      <div>
+        <GlobalLoader />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Switcher />} />
+          <Route path="/register" element={<Switcher />} />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/map"
-          element={
-            <ProtectedRoute>
-              <Map />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/join"
-          element={
-            <ProtectedRoute>
-              <Join />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/rides"
-          element={
-            <ProtectedRoute>
-              <Rides />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/map"
+            element={
+              <ProtectedRoute>
+                <Map />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/join"
+            element={
+              <ProtectedRoute>
+                <Join />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/rides"
+            element={
+              <ProtectedRoute>
+                <Rides />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/bookings"
-          element={
-            <ProtectedRoute>
-              <Bookings />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/bookings"
+            element={
+              <ProtectedRoute>
+                <Bookings />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/active-rides"
-          element={
-            <ProtectedRoute>
-              <ActiveRidesPage />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/active-rides"
+            element={
+              <ProtectedRoute>
+                <ActiveRidesPage />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/track/:bookingId"
+            element={
+              <ProtectedRoute>
+                <RiderTrackingPage />
+              </ProtectedRoute>
+            }
+          />
 
-      </Routes>
-    </div>
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+        </Routes>
+      </div>
+    </LocationTrackingProvider>
   )
 }
 
