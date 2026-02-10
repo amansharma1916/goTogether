@@ -39,7 +39,7 @@ interface ActiveRide {
 
 const ActiveRidesPage = () => {
   const navigate = useNavigate();
-  const [activeRides, setActiveRides] = useState<ActiveRide[]>([]);
+  const [, setActiveRides] = useState<ActiveRide[]>([]);
   const [todaysRides, setTodaysRides] = useState<ActiveRide[]>([]);
   const [upcomingRides, setUpcomingRides] = useState<ActiveRide[]>([]);
   const [pastRides, setPastRides] = useState<ActiveRide[]>([]);
@@ -53,7 +53,7 @@ const ActiveRidesPage = () => {
   const [showSchedulePanel, setShowSchedulePanel] = useState(false);
   
   // Location tracking
-  const { startTracking, stopTracking, isTracking, error: trackingError } = useLocationTracking();
+  const { startTracking, stopTracking, error: trackingError } = useLocationTracking();
 
   const getBookingIdentifier = (ride: ActiveRide) => ride.bookingCode || ride._id;
 
@@ -124,13 +124,13 @@ const ActiveRidesPage = () => {
   //   });
   // };
 
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  // const formatTime = (dateString: string) => {
+  //   const date = new Date(dateString);
+  //   return date.toLocaleTimeString('en-US', {
+  //     hour: '2-digit',
+  //     minute: '2-digit'
+  //   });
+  // };
 
   const handleStatusUpdate = async () => {
     if (!selectedRide) return;
@@ -193,13 +193,13 @@ const ActiveRidesPage = () => {
     setShowStatusModal(true);
   };
 
-  const handleStartTracking = (bookingId: string) => {
-    startTracking(bookingId);
-  };
+  // const handleStartTracking = (bookingId: string) => {
+  //   startTracking(bookingId);
+  // };
 
-  const handleStopTracking = (bookingId: string) => {
-    stopTracking(bookingId);
-  };
+  // const handleStopTracking = (bookingId: string) => {
+  //   stopTracking(bookingId);
+  // };
 
   const renderRideCard = (ride: ActiveRide) => {
     const isRider = ride.riderId._id === userId;
