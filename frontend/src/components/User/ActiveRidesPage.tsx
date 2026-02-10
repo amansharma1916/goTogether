@@ -53,7 +53,7 @@ const ActiveRidesPage = () => {
   const [showSchedulePanel, setShowSchedulePanel] = useState(false);
   
   // Location tracking
-  const { startTracking, stopTracking, error: trackingError } = useLocationTracking();
+  const { error: trackingError } = useLocationTracking();
 
   const getBookingIdentifier = (ride: ActiveRide) => ride.bookingCode || ride._id;
 
