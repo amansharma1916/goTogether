@@ -183,3 +183,8 @@ export default defineConfig([
   },
 ])
 ```
+
+Major Features :
+  1. Map Based Ride Post and Join 
+  2. Multi Route feature for Ride Posting - cs1
+
