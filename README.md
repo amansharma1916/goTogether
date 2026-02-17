@@ -537,16 +537,16 @@ Contributions are welcome! Please follow these steps:
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Project of [@amansharma1916](https://github.com/amansharma1916)
 
 ---
 
 ## 👥 Team
 
 **Developer:** Your Name
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
+- GitHub: [@amansharma1916](https://github.com/amansharma1916)
+- LinkedIn: [www.linkedin.com/in/amansharma1916](www.linkedin.com/in/amansharma1916)
+- Email: amansharmayt19@gmail.com
 
 ---
 
@@ -564,9 +564,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 If you have any questions or need support, please:
-- Open an issue in the [GitHub repository](https://github.com/yourusername/goTogether/issues)
-- Email: support@gotogether.com
-- Join our community Discord: [discord.gg/gotogether](https://discord.gg/gotogether)
+- Open an issue in the [GitHub repository](https://github.com/amansharma1916/goTogether/issues)
+- Email: amansharmayt19@gmail.com
 
 ---
 
@@ -576,6 +575,6 @@ If you have any questions or need support, please:
 
 ⭐ Star this repo if you find it helpful!
 
-[Live Demo](YOUR_VERCEL_DEPLOYMENT_URL) • [Report Bug](https://github.com/yourusername/goTogether/issues) • [Request Feature](https://github.com/yourusername/goTogether/issues)
+[Live Demo](https://gotogetherv1.vercel.app) • [Report Bug](https://github.com/amansharma1916/goTogether/issues) • [Request Feature](https://github.com/amansharma1916/goTogether/issues)
 
 </div>
