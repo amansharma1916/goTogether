@@ -543,7 +543,7 @@ This project is licensed under the Project of [@amansharma1916](https://github.c
 
 ## 👥 Team
 
-**Developer:** Your Name
+**Developer:** Aman Sharma
 - GitHub: [@amansharma1916](https://github.com/amansharma1916)
 - LinkedIn: [www.linkedin.com/in/amansharma1916](www.linkedin.com/in/amansharma1916)
 - Email: amansharmayt19@gmail.com
