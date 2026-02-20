@@ -558,7 +558,7 @@ This project is licensed under the Project of [@amansharma1916](https://github.c
 - [MapLibre GL JS](https://maplibre.org/) - Map rendering library
 - [MongoDB](https://www.mongodb.com/) - Database platform
 - [Vercel](https://vercel.com/) - Frontend hosting
-- [Railway](https://railway.app/) - Backend hosting
+- [render](https://onrender.com/) - Backend hosting
 
 ---
 
