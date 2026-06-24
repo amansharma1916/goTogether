@@ -4,13 +4,12 @@
 
 ![goTogether Logo](./frontend/src/images/logo/gotogetherLogo.png)
 
-**A modern, full-stack rideshare platform designed specifically for students**
+**A modern full-stack rideshare platform built for students**
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](YOUR_VERCEL_DEPLOYMENT_URL)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://gotogetherv1.vercel.app)
 [![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20TypeScript-blue?style=for-the-badge&logo=react)](./frontend)
 [![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-green?style=for-the-badge&logo=node.js)](./backend)
 [![Database](https://img.shields.io/badge/Database-MongoDB-47A248?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
-
 
 </div>
 
@@ -23,135 +22,122 @@
 - [Tech Stack](#-tech-stack)
 - [Screenshots](#-screenshots)
 - [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
 - [Project Structure](#-project-structure)
-- [API Documentation](#-api-documentation)
+- [API Overview](#-api-overview)
+- [Realtime Chat (Socket.IO)](#-realtime-chat-socketio)
 - [Deployment](#-deployment)
 - [Contributing](#-contributing)
 - [License](#-license)
+- [Team](#-team)
+- [Support](#-support)
 
 ---
 
 ## 🎯 About
 
-**goTogether** is a comprehensive rideshare platform built for students to connect and share rides efficiently. With real-time geospatial searches, interactive maps, and a complete booking system, students can easily find rides or offer rides to fellow students heading in the same direction.
+**goTogether** helps students share rides by connecting drivers and riders through map-based discovery, booking workflows, and live in-app chat.
 
 ### Why goTogether?
 
-- 💰 **Save Money** - Split fuel costs with other students
-- 🌍 **Eco-Friendly** - Reduce carbon footprint by carpooling
-- 🤝 **Build Community** - Connect with fellow students
-- 🔒 **Safe & Secure** - Student-verified platform with ratings
-- 📱 **Easy to Use** - Intuitive interface with real-time updates
+- 💰 **Save Money** - Share travel costs with fellow students
+- 🌍 **Eco-Friendly** - Fewer vehicles and reduced emissions
+- 🤝 **Build Community** - Connect students from nearby routes
+- 🔒 **Secure Access** - JWT-protected user sessions
+- 📱 **Simple UX** - Responsive UI with map-driven interactions
 
 ---
 
 ## ✨ Features
 
-### 🗺️ **Interactive Mapping**
-- Real-time route visualization with MapLibre GL
-- Click-to-select locations on map
-- Autocomplete location search powered by Nominatim
-- Meeting point calculation for convenient pickup
+### 🔐 Authentication & Profile
+- Register and login with JWT
+- Token verification endpoint for session restore
+- Protected frontend routes
+- Profile update support
 
-### 🚗 **Ride Management**
-- Post rides with complete route information
-- View all available rides with filters
-- Separate "My Rides" view for posted rides
-- Real-time seat availability updates
-- Sort by distance, time, or price
-- Geospatial proximity search (find rides near you)
+### 🗺️ Mapping & Geospatial
+- Interactive maps with **MapLibre GL**
+- Nominatim-powered place search/autocomplete
+- Route generation through **OpenRouteService**
+- GeoJSON storage (`Point`, `LineString`, `Polygon`) in MongoDB
+- Proximity ride search via geospatial queries
 
-### 📱 **Booking System**
-- One-click booking with validation
-- Booking lifecycle: Pending → Confirmed → Completed
-- Driver dashboard to manage received requests
-- Rider dashboard to track sent requests
-- Cancel bookings with reason tracking
-- Payment method selection (Cash/Card/UPI/Wallet)
-- Automatic seat count management
+### 🚗 Ride Management
+- Post rides with origin, destination, date/time, seats, and pricing
+- Auto-fetch and store route geometry + simplified route + bounding box
+- Browse rides with pagination
+- Filter by departure date
+- “My Rides” view for posted rides
 
-### ⭐ **Rating & Reviews**
-- Rate drivers after ride completion
-- Leave detailed reviews
-- 5-star rating system
+### 📱 Booking System
+- Create bookings with seat validation
+- Prevent self-booking and duplicate active booking
+- Booking lifecycle: **pending → confirmed → completed**
+- Cancellation flow with cancellation metadata
+- Rider rating/review after completion
+- Payment metadata (`cash`, `card`, `upi`, `wallet`)
 
-### 🔐 **Authentication & Security**
-- Secure JWT-based authentication
-- Password hashing with bcrypt
-- Protected routes and API endpoints
-- Session management with localStorage
+### 💬 Realtime Chat
+- Booking-specific chat threads
+- Socket room join/leave per booking
+- Live message delivery
+- Typing indicators
+- Read status updates and unread counters
 
-### 🎨 **Modern UI/UX**
-- Dark-themed gradient design
-- Glassmorphism effects with backdrop blur
-- Fully responsive (mobile, tablet, desktop)
-- Smooth animations and transitions
-- Status badges with color coding
-- Loading states and error handling
+### 🎨 UI/UX
+- Dark, modern visual style
+- Responsive layouts for mobile and desktop
+- Loading states and status-aware UI feedback
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework:** React 18 with TypeScript
+- **React:** 19
+- **Language:** TypeScript
 - **Build Tool:** Vite
-- **Routing:** React Router v6
+- **Routing:** react-router-dom (v7)
 - **Maps:** MapLibre GL JS
-- **Styling:** Custom CSS with modern effects
-- **APIs:** OpenRouteService, Nominatim (OpenStreetMap)
+- **HTTP:** Axios + Fetch
+- **Realtime:** socket.io-client
 
 ### Backend
 - **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MongoDB with Mongoose ODM
-- **Authentication:** JWT + bcryptjs
-- **Geospatial:** MongoDB GeoJSON with 2dsphere indexes
-- **API Architecture:** RESTful
+- **Framework:** Express
+- **Database:** MongoDB + Mongoose
+- **Auth:** JWT + bcryptjs
+- **Realtime:** Socket.IO
+- **Geospatial Utilities:** Turf (`@turf/*`)
 
-### DevOps & Deployment
-- **Frontend Hosting:** Vercel
-- **Backend Hosting:** Heroku/Railway/Render
-- **Database:** MongoDB Atlas (Cloud)
-- **Version Control:** Git & GitHub
+### Dev Utilities
+- **Concurrency:** concurrently (root script)
+- **Backend Dev Server:** nodemon
 
 ---
 
 ## 📸 Screenshots
 
-### Landing Page
+### Landing & Auth
 ![Landing Page](./screenshots/landing.png)
 ![Login Page](./screenshots/login.png)
 ![Register Page](./screenshots/register.png)
-*Modern hero section with search functionality*
 
-### Home Page
+### Main App
 ![Home Page](./screenshots/home.png)
-
-### Interactive Map
 ![Map View](./screenshots/map.png)
-*Search rides with interactive map visualization*
-
-### Browse Rides
 ![Rides Page](./screenshots/rides.png)
-*Browse all available rides with filters and sorting*
-
-### Post New Ride
 ![Post Ride](./screenshots/join.png)
-*Create rides with route selection on map*
 
-### Booking Management
+### Bookings
 ![Bookings](./screenshots/bookings.png)
-*Manage received and sent booking requests*
-![Bookings](./screenshots/bookings2.png)
-*Manage received and sent booking requests*
+![Bookings (Alt)](./screenshots/bookings2.png)
 
-### Mobile Responsive
+### Mobile
 <div align="center">
 <img src="./screenshots/mobile.png" alt="Mobile View" width="300">
 </div>
-
-*Fully responsive design for all devices*
 
 ---
 
@@ -159,260 +145,230 @@
 
 ### Prerequisites
 
-Before you begin, ensure you have the following installed:
-- **Node.js** (v16 or higher)
-- **npm** or **yarn**
-- **MongoDB** (local installation or MongoDB Atlas account)
-- **Git**
+- Node.js (18+ recommended)
+- npm
+- MongoDB (local or Atlas)
+- OpenRouteService API key
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/goTogether.git
-   cd goTogether
-   ```
+1. **Clone repository**
+	 ```bash
+	 git clone https://github.com/amansharma1916/goTogether.git
+	 cd goTogether
+	 ```
 
-2. **Set up Backend**
-   ```bash
-   cd backend
-   npm install
-   
-   # Create .env file
-   cp .env.example .env
-   # Edit .env with your configuration
-   
-   # Start backend server
-   npm start
-   ```
+2. **Install dependencies**
+	 ```bash
+	 npm install
+	 npm install --prefix backend
+	 npm install --prefix frontend
+	 ```
 
-3. **Set up Frontend**
-   ```bash
-   cd ../frontend
-   npm install
-   
-   # Create .env file
-   cp .env.example .env
-   # Edit .env with your configuration
-   
-   # Start development server
-   npm run dev
-   ```
+3. **Create environment files**
+	 - `backend/.env`
+	 - `frontend/.env`
 
-4. **Access the application**
-   - Frontend: http://localhost:5173
-   - Backend: http://localhost:5000
+4. **Run app (frontend + backend together)**
+	 ```bash
+	 npm run app
+	 ```
 
-### Environment Variables
+### Run separately
 
-#### Backend `.env`
+```bash
+# terminal 1
+cd backend
+npm start
+
+# terminal 2
+cd frontend
+npm run dev
+```
+
+### Local URLs
+
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:5000`
+
+---
+
+## 🔧 Environment Variables
+
+### Backend `.env`
+
 ```env
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/gotogether
-# OR use MongoDB Atlas
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/gotogether
 JWT_SECRET=your_super_secret_jwt_key_here
+FRONTEND_URL=http://localhost:5173
+ORS_API_KEY=your_openrouteservice_api_key
 NODE_ENV=development
 ```
 
-#### Frontend `.env`
+### Frontend `.env`
+
 ```env
 VITE_API_URL=http://localhost:5000
 VITE_ORS_API_KEY=your_openrouteservice_api_key
 ```
 
-**Get API Keys:**
-- [OpenRouteService API Key](https://openrouteservice.org/dev/#/signup) (Free tier available)
-
 ---
 
 ## 📁 Project Structure
 
-```
+```text
 goTogether/
-├── frontend/                # React + TypeScript frontend
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   │   ├── Default/    # Public pages (Landing, Login, Register)
-│   │   │   └── User/       # Protected pages (Home, Map, Rides, Join, Bookings)
-│   │   ├── Styles/         # CSS files
-│   │   ├── images/         # Static assets
-│   │   ├── App.tsx         # Main app with routing
-│   │   └── main.tsx        # Entry point
-│   ├── .env                # Environment variables
-│   ├── vercel.json         # Vercel deployment config
-│   └── vite.config.ts      # Vite configuration
+├── backend/
+│   ├── Auth/Routes/               # auth routes
+│   ├── controllers/               # auth/ride/booking/message controllers
+│   ├── DB/Schema/                 # Mongoose schemas
+│   ├── middleware/                # JWT + socket auth middleware
+│   ├── routes/                    # ride/booking/message routes
+│   ├── socket/                    # Socket.IO events
+│   └── server.js                  # backend entry point
 │
-├── backend/                 # Node.js + Express backend
-│   ├── DB/
-│   │   └── Schema/         # Mongoose schemas
-│   │       ├── RegistrationSchema.js    # User model
-│   │       ├── PostedRidesSchema.js     # Ride model
-│   │       └── BookedRideSchema.js      # Booking model
-│   ├── controllers/        # Request handlers
-│   │   ├── authController.js
-│   │   ├── rideController.js
-│   │   └── bookingController.js
-│   ├── routes/             # API routes
-│   │   ├── authRoutes.js
-│   │   ├── rideRoutes.js
-│   │   └── bookingRoutes.js
-│   ├── .env                # Environment variables
-│   └── server.js           # Entry point
+├── frontend/
+│   ├── src/components/Default/    # public pages
+│   ├── src/components/User/       # protected user pages
+│   ├── src/context/               # auth/chat/global state
+│   ├── src/services/              # API + socket services
+│   ├── src/Styles/                # CSS files
+│   └── src/App.tsx                # app routes
 │
-└── README.md               # This file
+├── screenshots/
+├── package.json                   # root script: npm run app
+└── README.md
 ```
 
 ---
 
-## 📚 API Documentation
+## 📚 API Overview
 
-### Authentication Endpoints
+Base URL: `http://localhost:5000/api`
 
-#### Register User
+### Auth
+
+#### Register
 ```http
 POST /api/auth/register
 Content-Type: application/json
 
 {
-  "fullName": "John Doe",
-  "email": "john@example.com",
-  "password": "SecurePass123",
-  "college": "Amity University",
-  "phone": "1234567890"
+	"fullname": "John Doe",
+	"email": "john@example.com",
+	"password": "SecurePass123",
+	"college": "Amity University"
 }
 ```
 
-#### Login User
+#### Login
 ```http
 POST /api/auth/login
 Content-Type: application/json
 
 {
-  "email": "john@example.com",
-  "password": "SecurePass123"
+	"email": "john@example.com",
+	"password": "SecurePass123"
 }
 ```
 
-### Ride Endpoints
-
-#### Get All Rides (excluding user's own)
+#### Verify token
 ```http
-GET /api/rides?userId={userId}
+GET /api/auth/verify
+Authorization: Bearer <token>
 ```
 
-#### Search Rides by Proximity
+### Rides
+
+- `POST /api/rides` (auth)
+- `GET /api/rides`
+- `POST /api/rides/search`
+- `GET /api/rides/my-rides` (auth)
+- `GET /api/rides/:id`
+
+#### Search rides by proximity
 ```http
 POST /api/rides/search
 Content-Type: application/json
 
 {
-  "pickupLocation": {
-    "lat": 23.334284,
-    "lng": 85.258330
-  },
-  "radiusMeters": 20000,
-  "userId": "user_id_here"
+	"pickup": {
+		"lat": 23.334284,
+		"lng": 85.258330
+	},
+	"radiusMeters": 800,
+	"timeWindow": {
+		"from": "2026-02-23T08:00:00.000Z",
+		"to": "2026-02-23T20:00:00.000Z"
+	},
+	"userId": "optional_user_id"
 }
 ```
 
-#### Create Ride
-```http
-POST /api/rides
-Content-Type: application/json
+### Bookings
 
-{
-  "userId": "driver_user_id",
-  "origin": {
-    "type": "Point",
-    "coordinates": [85.258330, 23.334284],
-    "name": "Amity University"
-  },
-  "destination": {
-    "type": "Point",
-    "coordinates": [85.310320, 23.363790],
-    "name": "Ranchi Railway Station"
-  },
-  "route": {
-    "type": "LineString",
-    "coordinates": [[85.258330, 23.334284], ...]
-  },
-  "departureTime": "2025-12-15T10:00:00Z",
-  "seatsAvailable": 3,
-  "pricePerSeat": 50,
-  "vehicle": "Toyota Camry",
-  "notes": "AC car, comfortable ride"
-}
-```
+- `POST /api/bookings` (auth)
+- `GET /api/bookings/my-bookings` (auth)
+- `GET /api/bookings/received` (auth)
+- `GET /api/bookings/ride/:rideId`
+- `GET /api/bookings/:id` (auth)
+- `PATCH /api/bookings/:id/confirm` (auth)
+- `PATCH /api/bookings/:id/cancel` (auth)
+- `PATCH /api/bookings/:id/complete` (auth)
+- `PATCH /api/bookings/:id/rate` (auth)
+- `PATCH /api/bookings/:id/payment` (auth)
+- `PATCH /api/bookings/:id/status` (auth)
 
-### Booking Endpoints
-
-#### Create Booking
+#### Create booking
 ```http
 POST /api/bookings
+Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "rideId": "ride_id_here",
-  "riderId": "rider_user_id",
-  "seatsBooked": 2,
-  "pickupLocation": {
-    "type": "Point",
-    "coordinates": [85.280000, 23.340000]
-  },
-  "pickupLocationName": "Near College Gate",
-  "meetingPoint": {
-    "type": "Point",
-    "coordinates": [85.270000, 23.335000]
-  },
-  "distanceToMeetingPoint": 1200,
-  "paymentMethod": "upi"
+	"rideId": "ride_id_here",
+	"seatsBooked": 1,
+	"pickupLocation": {
+		"lat": 23.340000,
+		"lng": 85.280000
+	},
+	"pickupLocationName": "Near College Gate",
+	"meetingPoint": {
+		"lat": 23.335000,
+		"lng": 85.270000
+	},
+	"distanceToMeetingPoint": 1200,
+	"riderNotes": "Call when near",
+	"paymentMethod": "upi"
 }
 ```
 
-#### Get My Bookings (as rider)
-```http
-GET /api/bookings/my-bookings?userId={userId}&status=pending
-```
+### Messages
 
-#### Get Received Bookings (as driver)
-```http
-GET /api/bookings/received?userId={userId}
-```
+- `POST /api/messages/send` (auth)
+- `GET /api/messages/history/:bookingId` (auth)
+- `PATCH /api/messages/:bookingId/mark-read` (auth)
+- `GET /api/messages/unread/count` (auth)
+- `DELETE /api/messages/:messageId` (auth)
 
-#### Confirm Booking (driver only)
-```http
-PATCH /api/bookings/{bookingId}/confirm
-Content-Type: application/json
+For expanded backend details, see [backend/API_DOCUMENTATION.md](./backend/API_DOCUMENTATION.md).
 
-{
-  "userId": "driver_user_id"
-}
-```
+---
 
-#### Complete Booking (driver only)
-```http
-PATCH /api/bookings/{bookingId}/complete
-Content-Type: application/json
+## 🔌 Realtime Chat (Socket.IO)
 
-{
-  "userId": "driver_user_id"
-}
-```
+The backend Socket.IO server runs on the same host/port as Express.
 
-#### Rate Driver (rider only, after completion)
-```http
-PATCH /api/bookings/{bookingId}/rate
-Content-Type: application/json
+### Auth
+- Client sends JWT in `socket.auth.token`
 
-{
-  "userId": "rider_user_id",
-  "ratingForDriver": 5,
-  "reviewForDriver": "Great ride, very punctual!"
-}
-```
-
-For complete API documentation, see [Backend README](./backend/README.md)
+### Implemented events
+- `join_room`, `room_joined`, `user_joined`
+- `send_message`, `new_message`, `message_sent`
+- `typing`, `stop_typing`, `user_typing`, `user_stopped_typing`
+- `mark_read`, `message_read`
+- `leave_room`, `user_left`, `user_disconnected`
 
 ---
 
@@ -420,152 +376,64 @@ For complete API documentation, see [Backend README](./backend/README.md)
 
 ### Frontend (Vercel)
 
-1. **Push to GitHub**
-   ```bash
-   git add .
-   git commit -m "Ready for deployment"
-   git push origin main
-   ```
+- Root directory: `frontend`
+- `frontend/vercel.json` already includes SPA rewrite to `index.html`
+- Set env vars:
+	- `VITE_API_URL`
+	- `VITE_ORS_API_KEY`
 
-2. **Deploy to Vercel**
-   - Connect your GitHub repository to Vercel
-   - Set root directory to `frontend`
-   - Add environment variables in Vercel dashboard
-   - Deploy!
+### Backend (Render / Railway / Heroku-style hosts)
 
-3. **Important: vercel.json Configuration**
-   The `vercel.json` file is already configured to handle client-side routing:
-   ```json
-   {
-     "rewrites": [
-       {
-         "source": "/(.*)",
-         "destination": "/index.html"
-       }
-     ]
-   }
-   ```
-
-### Backend (Railway/Render/Heroku)
-
-1. **Prepare for Deployment**
-   - Ensure `package.json` has start script
-   - Set up environment variables on hosting platform
-   - Configure MongoDB Atlas connection string
-
-2. **Deploy to Railway** (Recommended)
-   ```bash
-   # Install Railway CLI
-   npm install -g @railway/cli
-   
-   # Login
-   railway login
-   
-   # Initialize project
-   cd backend
-   railway init
-   
-   # Deploy
-   railway up
-   ```
-
-3. **Set Environment Variables**
-   Add the following in your hosting dashboard:
-   - `MONGODB_URI`
-   - `JWT_SECRET`
-   - `NODE_ENV=production`
+- Deploy `backend` service
+- Ensure WebSocket support is enabled
+- Set env vars:
+	- `PORT`
+	- `MONGODB_URI`
+	- `JWT_SECRET`
+	- `FRONTEND_URL`
+	- `ORS_API_KEY`
+	- `NODE_ENV=production`
 
 ### Database (MongoDB Atlas)
 
-1. Create a free cluster at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Create a database user
-3. Whitelist IP addresses (or allow all for development)
-4. Get connection string and add to backend `.env`
-
----
-
-## 🔑 Key Features Explained
-
-### Geospatial Search
-goTogether uses MongoDB's geospatial queries with GeoJSON format:
-- **2dsphere indexes** for efficient location-based searches
-- **$near operator** to find rides within a radius
-- **Haversine formula** for distance calculations
-- **Meeting point optimization** finds the nearest point on the route
-
-### Real-time Seat Management
-- Seats automatically decrease when booking is created
-- Seats restore when booking is cancelled
-- Concurrent booking validation prevents overbooking
-- Available seats displayed in real-time
-
-### Booking Lifecycle
-```
-Pending → Confirmed (by driver) → Completed (by driver) → Rated (by rider)
-   ↓
-Cancelled (by rider or driver)
-```
-
-### Security Features
-- Password hashing with bcrypt (salt rounds: 10)
-- JWT tokens with expiration
-- Protected API routes with authentication middleware
-- Input validation and sanitization
-- Self-booking prevention
-- Duplicate booking prevention
+1. Create cluster
+2. Create database user
+3. Whitelist IP/network
+4. Use Atlas URI in `MONGODB_URI`
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
+Contributions are welcome.
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+3. Commit changes (`git commit -m "Add some AmazingFeature"`)
+4. Push branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-### Development Guidelines
-- Follow existing code style
-- Write meaningful commit messages
-- Add comments for complex logic
-- Test your changes thoroughly
-- Update documentation as needed
 
 ---
 
 ## 📝 License
 
-This project is licensed under the Project of [@amansharma1916](https://github.com/amansharma1916)
+This project is maintained by [@amansharma1916](https://github.com/amansharma1916).
 
 ---
 
 ## 👥 Team
 
 **Developer:** Aman Sharma
+
 - GitHub: [@amansharma1916](https://github.com/amansharma1916)
-- LinkedIn: [www.linkedin.com/in/amansharma1916](www.linkedin.com/in/amansharma1916)
+- LinkedIn: [www.linkedin.com/in/amansharma1916](https://www.linkedin.com/in/amansharma1916)
 - Email: amansharmayt19@gmail.com
-
----
-
-## 🙏 Acknowledgments
-
-- [OpenStreetMap](https://www.openstreetmap.org/) - Map data and tiles
-- [OpenRouteService](https://openrouteservice.org/) - Route calculation
-- [MapLibre GL JS](https://maplibre.org/) - Map rendering library
-- [MongoDB](https://www.mongodb.com/) - Database platform
-- [Vercel](https://vercel.com/) - Frontend hosting
-- [render](https://onrender.com/) - Backend hosting
-
 
 ---
 
 ## 📞 Support
 
-If you have any questions or need support, please:
-- Open an issue in the [GitHub repository](https://github.com/amansharma1916/goTogether/issues)
+- Open an issue: [GitHub Issues](https://github.com/amansharma1916/goTogether/issues)
 - Email: amansharmayt19@gmail.com
 
 ---
@@ -574,7 +442,7 @@ If you have any questions or need support, please:
 
 **Made with ❤️ for Students by Students**
 
-⭐ Star this repo if you find it helpful!
+⭐ Star this repo if you find it useful!
 
 [Live Demo](https://gotogetherv1.vercel.app) • [Report Bug](https://github.com/amansharma1916/goTogether/issues) • [Request Feature](https://github.com/amansharma1916/goTogether/issues)
 
